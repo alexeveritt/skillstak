@@ -1,4 +1,3 @@
-
 // app/routes/login.tsx
 import { Form, redirect, useActionData, Link } from "react-router";
 import type { ActionFunctionArgs } from "react-router";
@@ -28,9 +27,9 @@ export default function Login() {
         <input name="password" type="password" placeholder="Password" className="border p-2 rounded" />
         <button className="bg-black text-white rounded px-4 py-2">Log in</button>
       </Form>
-      <p className="mt-2 text-sm"><Link to="/reset">Forgot password?</Link></p>
+      <p className="mt-2 text-sm">
+        <Link to="/reset">Forgot password?</Link>
+      </p>
     </div>
   );
 }
-
-

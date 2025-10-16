@@ -7,7 +7,7 @@ const SESSION_COOKIE = createCookie("sr.sid", {
   sameSite: "lax",
   secure: true,
   path: "/",
-  maxAge: 60 * 60 * 24 * 30
+  maxAge: 60 * 60 * 24 * 30,
 } satisfies CookieOptions);
 
 export type SessionData = { userId: string };
@@ -16,7 +16,7 @@ export async function getSession(context: any): Promise<SessionData | null> {
   const cookie = await SESSION_COOKIE.parse(context.request.headers.get("Cookie"));
   if (!cookie) return null;
   const { env } = context.cloudflare;
-  const data = await env.SESSIONS.get(`s:${cookie}`, { type: "json" }) as SessionData | null;
+  const data = (await env.SESSIONS.get(`s:${cookie}`, { type: "json" })) as SessionData | null;
   return data ?? null;
 }
 

@@ -1,4 +1,3 @@
-
 // app/routes/_index.tsx
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { Form, Link, useLoaderData } from "react-router";
@@ -9,11 +8,14 @@ import { newId } from "../lib/id";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
-  const projects = await q<{ id: string; name: string; total: number; due: number }>(context.cloudflare.env,
+  const projects = await q<{ id: string; name: string; total: number; due: number }>(
+    context.cloudflare.env,
     `SELECT p.id, p.name,
             (SELECT COUNT(*) FROM card c WHERE c.project_id = p.id) AS total,
             (SELECT COUNT(*) FROM card c JOIN card_schedule s ON s.card_id=c.id WHERE c.project_id = p.id AND s.due_at <= datetime('now')) AS due
-     FROM project p WHERE p.user_id = ? ORDER BY p.created_at DESC`, [userId]);
+     FROM project p WHERE p.user_id = ? ORDER BY p.created_at DESC`,
+    [userId]
+  );
   return { projects };
 }
 
@@ -38,13 +40,19 @@ export default function Home() {
         <button className="bg-black text-white rounded px-4">Add</button>
       </Form>
       <ul className="grid gap-3">
-        {projects.map(p => (
+        {projects.map((p) => (
           <li key={p.id} className="border rounded p-3 flex items-center justify-between">
             <div>
-              <Link to={`/p/${p.id}`} className="font-medium underline">{p.name}</Link>
-              <div className="text-sm text-slate-600">{p.due} due · {p.total} cards</div>
+              <Link to={`/p/${p.id}`} className="font-medium underline">
+                {p.name}
+              </Link>
+              <div className="text-sm text-slate-600">
+                {p.due} due · {p.total} cards
+              </div>
             </div>
-            <Link to={`/p/${p.id}/review`} className="text-sm underline">Practice</Link>
+            <Link to={`/p/${p.id}/review`} className="text-sm underline">
+              Practice
+            </Link>
           </li>
         ))}
       </ul>

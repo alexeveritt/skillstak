@@ -68,11 +68,13 @@ export async function action({ context, request }: ActionFunctionArgs) {
   }
 
   const id = ulid();
-  await run(
-    context.cloudflare.env,
-    "INSERT INTO card (id, project_id, front, back, color) VALUES (?, ?, ?, ?, ?)",
-    [id, projectId, parsed.data.front, parsed.data.back, parsed.data.color ?? null]
-  );
+  await run(context.cloudflare.env, "INSERT INTO card (id, project_id, front, back, color) VALUES (?, ?, ?, ?, ?)", [
+    id,
+    projectId,
+    parsed.data.front,
+    parsed.data.back,
+    parsed.data.color ?? null,
+  ]);
   await run(
     context.cloudflare.env,
     "INSERT INTO card_schedule (card_id, due_at, interval_days, ease, streak, lapses) VALUES (?, ?, 0, 2.5, 0, 0)",

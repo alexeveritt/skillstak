@@ -7,7 +7,11 @@
     "build": "react-router build",
     "start": "react-router start",
     "cf:pages": "wrangler pages dev --compatibility-date=2024-11-11 ./.react-router/build/client",
-    "d1:apply": "wrangler d1 execute SPACED_DB --file=./db/schema.sql"
+    "d1:apply": "wrangler d1 execute SPACED_DB --file=./db/schema.sql",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "ci": "biome ci ."
   },
   "dependencies": {
     "@react-router/cloudflare": "^7.0.0",
@@ -22,6 +26,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.2.6",
     "@cloudflare/workers-types": "^4.20251011.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",

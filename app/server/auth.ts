@@ -15,13 +15,16 @@ export async function createUserWithPassword(env: Env, email: string, password: 
   const hash = await scrypt.hash(password);
   await run(env, "INSERT INTO user (id, email) VALUES (?, ?)", [userId, email]);
   await run(env, "INSERT INTO auth_key (id, user_id, hashed_password) VALUES (?, ?, ?)", [
-    `email:${email.toLowerCase()}`, userId, hash
+    `email:${email.toLowerCase()}`,
+    userId,
+    hash,
   ]);
   return { id: userId, email };
 }
 
 export async function verifyPassword(env: Env, email: string, password: string) {
-  const key = await q<{ user_id: string; hashed_password: string }>(env,
+  const key = await q<{ user_id: string; hashed_password: string }>(
+    env,
     "SELECT user_id, hashed_password FROM auth_key WHERE id = ?",
     [`email:${email.toLowerCase()}`]
   );

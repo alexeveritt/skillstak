@@ -1,8 +1,5 @@
 // app/server/types.ts
-import type {
-  D1Database,
-  KVNamespace,
-} from "@cloudflare/workers-types";
+import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
 
 export type Env = {
   SPACED_DB: D1Database;

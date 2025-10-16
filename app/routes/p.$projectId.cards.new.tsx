@@ -1,4 +1,3 @@
-
 // app/routes/p.$projectId.cards.new.tsx
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { Form, redirect, useActionData } from "react-router";
@@ -17,13 +16,27 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
   const projectId = params.projectId!;
   const fd = await request.formData();
-  const data = { front: String(fd.get("front")||""), back: String(fd.get("back")||""), color: String(fd.get("color")||"")||undefined };
+  const data = {
+    front: String(fd.get("front") || ""),
+    back: String(fd.get("back") || ""),
+    color: String(fd.get("color") || "") || undefined,
+  };
   const parsed = cardSchema.safeParse(data);
   if (!parsed.success) return { error: "Front/back required" };
   const id = newId();
-  await run(context.cloudflare.env, "INSERT INTO card (id, project_id, front, back, color) VALUES (?, ?, ?, ?, ?)", [id, projectId, data.front, data.back, data.color || null]);
+  await run(context.cloudflare.env, "INSERT INTO card (id, project_id, front, back, color) VALUES (?, ?, ?, ?, ?)", [
+    id,
+    projectId,
+    data.front,
+    data.back,
+    data.color || null,
+  ]);
   // seed schedule
-  await run(context.cloudflare.env, "INSERT INTO card_schedule (card_id, due_at, interval_days, ease, streak, lapses) VALUES (?, ?, 0, 2.5, 0, 0)", [id, nowIso()]);
+  await run(
+    context.cloudflare.env,
+    "INSERT INTO card_schedule (card_id, due_at, interval_days, ease, streak, lapses) VALUES (?, ?, 0, 2.5, 0, 0)",
+    [id, nowIso()]
+  );
   return redirect(`/p/${projectId}`);
 }
 

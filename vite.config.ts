@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     reactRouter({
       appDirectory: "app",
-    })
+    }),
   ],
   // Cloudflare-compatible SSR target
   ssr: { target: "webworker" },

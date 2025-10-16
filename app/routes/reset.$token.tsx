@@ -1,4 +1,3 @@
-
 // app/routes/reset.$token.tsx
 import { Form, redirect, useLoaderData, useActionData } from "react-router";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
@@ -18,7 +17,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
   if (!userId || !passwordSchema.safeParse(pass).success) return { error: "Invalid input" };
   const { Scrypt } = await import("oslo/password");
   const hash = await new Scrypt().hash(pass);
-  await run(context.cloudflare.env, "UPDATE auth_key SET hashed_password = ? WHERE user_id = ? AND id LIKE 'email:%'", [hash, userId]);
+  await run(context.cloudflare.env, "UPDATE auth_key SET hashed_password = ? WHERE user_id = ? AND id LIKE 'email:%'", [
+    hash,
+    userId,
+  ]);
   return redirect("/login");
 }
 
