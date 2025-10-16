@@ -1,0 +1,30 @@
+name = "spaced-rep"
+compatibility_date = "2024-11-11"
+
+[vars]
+# set ADSENSE_CLIENT="ca-pub-xxxxxxxx" to enable ad footer
+ADSENSE_CLIENT = ""
+APP_BASE_URL = "https://your-pages-domain.pages.dev"
+
+[[d1_databases]]
+binding = "SPACED_DB"
+database_name = "spaced-rep-db"
+database_id = "REPLACE_WITH_D1_ID"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "REPLACE_WITH_KV_ID"
+
+# Optional Email SMTP creds if you want direct SMTP from Worker (or use an external free tier)
+[vars]
+SMTP_HOST = ""
+SMTP_PORT = ""
+SMTP_USER = ""
+SMTP_PASS = ""
+SMTP_FROM = "no-reply@yourdomain.com"
+
+# Google OAuth placeholders
+[vars]
+GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_SECRET = ""
+GOOGLE_REDIRECT_URI = ""
