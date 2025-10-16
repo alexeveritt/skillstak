@@ -5,8 +5,17 @@ import { passwordSchema } from "../lib/z";
 import { consumeResetToken } from "../server/email";
 import { run } from "../server/db";
 
+// Use Web Crypto API which is available in Cloudflare Workers
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export async function loader({ params, context }: LoaderFunctionArgs) {
-  const userId = await consumeResetToken(context.cloudflare.env, params.token!);
+  const userId = await consumeResetToken(context.cloudflare?.env, params.token!);
   return { userId };
 }
 
@@ -15,12 +24,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const userId = String(form.get("userId"));
   const pass = String(form.get("password"));
   if (!userId || !passwordSchema.safeParse(pass).success) return { error: "Invalid input" };
-  const { Scrypt } = await import("oslo/password");
-  const hash = await new Scrypt().hash(pass);
-  await run(context.cloudflare.env, "UPDATE auth_key SET hashed_password = ? WHERE user_id = ? AND id LIKE 'email:%'", [
-    hash,
-    userId,
-  ]);
+  const hash = await hashPassword(pass);
+  await run(
+    context.cloudflare?.env,
+    "UPDATE auth_key SET hashed_password = ? WHERE user_id = ? AND id LIKE 'email:%'",
+    [hash, userId]
+  );
   return redirect("/login");
 }
 

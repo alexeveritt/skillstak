@@ -1,10 +1,20 @@
 // app/entry.server.tsx
-import type { AppLoadContext } from "react-router";
-import { RemixServer } from "react-router";
-import { renderToReadableStream } from "react-dom/server";
+import type { EntryContext } from "react-router";
+import { ServerRouter } from "react-router";
+import { renderToString } from "react-dom/server";
+import { isbot } from "isbot";
 
-export default function handleRequest(request: Request, statusCode: number, headers: Headers, context: AppLoadContext) {
-  return renderToReadableStream(<RemixServer context={context} url={request.url} />, {
-    bootstrapScripts: ["/assets/entry.client.js"],
+export default async function handleRequest(
+  request: Request,
+  responseStatusCode: number,
+  responseHeaders: Headers,
+  entryContext: EntryContext
+) {
+  const html = renderToString(<ServerRouter context={entryContext} url={request.url} />);
+
+  responseHeaders.set("Content-Type", "text/html");
+  return new Response(html, {
+    headers: responseHeaders,
+    status: responseStatusCode,
   });
 }

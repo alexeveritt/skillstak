@@ -1,37 +1,17 @@
 // app/routes.ts
-import type { RouteObject } from "react-router";
+import { index, route } from "@react-router/dev/routes";
 
-/**
- * RR7 "lazy route modules" — each `lazy` import should export:
- *   - default (Component)
- *   - optional loader/action/links
- * which our scaffolded files already do.
- */
-const routes = [
-  {
-    id: "layout",
-    path: "/",
-    file: "./root.tsx",
-    children: [
-      // /  (projects list)
-      { index: true, file: "./routes/_index.tsx" },
-
-      // auth
-      { path: "login", file: "./routes/login.tsx" },
-      { path: "signup", file: "./routes/signup.tsx" },
-      { path: "logout", file: "./routes/logout.tsx" },
-
-      // password reset
-      { path: "reset", file: "./routes/reset.request.tsx" },
-      { path: "reset/:token", file: "./routes/reset.$token.tsx" },
-
-      // project & cards
-      { path: "p/:projectId", file: "./routes/p.$projectId._index.tsx" },
-      { path: "p/:projectId/review", file: "./routes/p.$projectId.review.tsx" },
-      { path: "p/:projectId/cards/new", file: "./routes/p.$projectId.cards.new.tsx" },
-      { path: "p/:projectId/cards/:cardId/edit", file: "./routes/p.$projectId.cards.$cardId.edit.tsx" },
-    ],
-  },
+export default [
+  index("routes/_index.tsx"),
+  route("login", "routes/login.tsx"),
+  route("signup", "routes/signup.tsx"),
+  route("logout", "routes/logout.tsx"),
+  route("reset", "routes/reset.request.tsx"),
+  route("reset/:token", "routes/reset.$token.tsx"),
+  route("p/:projectId", "routes/p.$projectId._index.tsx"),
+  route("p/:projectId/review", "routes/p.$projectId.review.tsx"),
+  route("p/:projectId/cards/new", "routes/p.$projectId.cards.new.tsx"),
+  route("p/:projectId/cards/:cardId/edit", "routes/p.$projectId.cards.$cardId.edit.tsx"),
+  // Catch-all for .well-known and other 404s
+  route("*", "routes/$.tsx"),
 ];
-
-export default routes;

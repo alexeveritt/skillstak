@@ -1,15 +1,21 @@
 // app/routes/_index.tsx
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { Form, Link, useLoaderData } from "react-router";
-import { requireUserId } from "../server/session";
+import { Form, Link, useLoaderData, redirect } from "react-router";
+import { getSession, requireUserId } from "../server/session";
 import { q, run } from "../server/db";
 import { projectSchema } from "../lib/z";
 import { newId } from "../lib/id";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  // Check if user is logged in, if not redirect to login
+  const session = await getSession({ request, cloudflare: context.cloudflare });
+  if (!session) {
+    return redirect("/login");
+  }
+
+  const userId = session.userId;
   const projects = await q<{ id: string; name: string; total: number; due: number }>(
-    context.cloudflare.env,
+    context.cloudflare?.env,
     `SELECT p.id, p.name,
             (SELECT COUNT(*) FROM card c WHERE c.project_id = p.id) AS total,
             (SELECT COUNT(*) FROM card c JOIN card_schedule s ON s.card_id=c.id WHERE c.project_id = p.id AND s.due_at <= datetime('now')) AS due
@@ -26,7 +32,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const parsed = projectSchema.safeParse({ name });
   if (!parsed.success) return { error: "Enter a name" };
   const id = newId();
-  await run(context.cloudflare.env, "INSERT INTO project (id, user_id, name) VALUES (?, ?, ?)", [id, userId, name]);
+  await run(context.cloudflare?.env, "INSERT INTO project (id, user_id, name) VALUES (?, ?, ?)", [id, userId, name]);
   return null;
 }
 

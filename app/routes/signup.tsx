@@ -12,9 +12,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const emailOk = emailSchema.safeParse(email).success;
   const passOk = passwordSchema.safeParse(password).success;
   if (!emailOk || !passOk) return { error: "Invalid email or password" };
-  const existing = await findUserByEmail(context.cloudflare.env, email);
+  const existing = await findUserByEmail(context.cloudflare?.env, email);
   if (existing) return { error: "Email in use" };
-  const user = await createUserWithPassword(context.cloudflare.env, email, password);
+  const user = await createUserWithPassword(context.cloudflare?.env, email, password);
   const setCookie = await createSession({ request, cloudflare: context.cloudflare }, user.id);
   return redirect("/", { headers: { "Set-Cookie": setCookie } });
 }
