@@ -13,7 +13,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const userId = await verifyPassword(context.cloudflare.env, email, password);
   if (!userId) return { error: "Wrong email or password" };
   const setCookie = await createSession({ request, cloudflare: context.cloudflare }, userId);
-  return redirect("/");
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": setCookie,
+    },
+  });
 }
 
 export default function Login() {
