@@ -5,7 +5,10 @@ import { ulid } from "ulidx";
 const SESSION_COOKIE = createCookie("sr.sid", {
   httpOnly: true,
   sameSite: "lax",
-  secure: process.env.NODE_ENV === "production",
+  // In development (localhost), secure should be false to work with HTTP
+  // In production (with HTTPS), it should be true
+  // Since Cloudflare Workers don't have process.env, we default to false for dev
+  secure: false,
   path: "/",
   maxAge: 60 * 60 * 24 * 30,
 } satisfies CookieOptions);
