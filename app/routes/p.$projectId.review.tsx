@@ -85,7 +85,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 export default function Review() {
   const { card } = useLoaderData<typeof loader>();
   const data = useActionData<typeof action>();
-  if (!card) return <p>No cards due. 🎉</p>;
+  if (!card) return <p>No cards due.</p>;
   return (
     <div className="grid gap-4">
       <CardFlip front={card.front} back={card.back} color={card.color || "#fef3c7"} />

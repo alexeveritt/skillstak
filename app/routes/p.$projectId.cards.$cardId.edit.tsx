@@ -124,7 +124,7 @@ export default function EditCard() {
   return (
     <div className="max-w-md">
       <h1 className="text-xl font-semibold mb-2">
-        Edit card — <span className="text-slate-600">{project?.name}</span>
+        Edit card - <span className="text-slate-600">{project?.name}</span>
       </h1>
 
       {actionData?.error && <p className="text-red-600 mb-2">{actionData.error}</p>}

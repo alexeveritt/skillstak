@@ -53,7 +53,7 @@ export default function Home() {
                 {p.name}
               </Link>
               <div className="text-sm text-slate-600">
-                {p.due} due · {p.total} cards
+                {p.due} due - {p.total} cards
               </div>
             </div>
             <Link to={`/p/${p.id}/review`} className="text-sm underline">

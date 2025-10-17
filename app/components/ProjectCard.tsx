@@ -16,7 +16,7 @@ export function ProjectCard({ id, name, total, due }: Props) {
           {name}
         </Link>
         <div className="text-sm text-slate-600">
-          {due} due · {total} cards
+          {due} due - {total} cards
         </div>
       </div>
       <Link to={`/p/${id}/review`} className="text-sm underline">
