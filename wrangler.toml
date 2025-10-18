@@ -1,10 +1,10 @@
-name = "spaced-rep"
+name = "skillstak"
 compatibility_date = "2024-11-11"
 
 [vars]
 # set ADSENSE_CLIENT="ca-pub-xxxxxxxx" to enable ad footer
 ADSENSE_CLIENT = ""
-APP_BASE_URL = "https://your-pages-domain.pages.dev"
+APP_BASE_URL = "https://www.skillstak.com"
 # Optional Email SMTP creds if you want direct SMTP from Worker (or use an external free tier)
 SMTP_HOST = ""
 SMTP_PORT = ""
@@ -17,10 +17,10 @@ GOOGLE_CLIENT_SECRET = ""
 GOOGLE_REDIRECT_URI = ""
 
 [[d1_databases]]
-binding = "SPACED_DB"
-database_name = "spaced-rep-db"
+binding = "SKILLSTAK_DB"
+database_name = "skillstak-db"
 database_id = "aed633f0-45dc-45c5-8308-cda6475df572"
 
 [[kv_namespaces]]
-binding = "SESSIONS"
+binding = "SKILLSTAK_SESSIONS"
 id = "REPLACE_WITH_KV_ID"

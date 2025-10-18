@@ -2,8 +2,8 @@
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
 
 export type Env = {
-  SPACED_DB: D1Database;
-  SESSIONS: KVNamespace;
+  SKILLSTAK_DB: D1Database;
+  SKILLSTAK_SESSIONS: KVNamespace;
   ADSENSE_CLIENT?: string;
   APP_BASE_URL?: string;
   SMTP_HOST?: string;

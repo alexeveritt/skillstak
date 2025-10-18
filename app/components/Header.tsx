@@ -5,7 +5,7 @@ export function Header({ userId }: { userId?: string | null }) {
   return (
     <header className="mx-auto max-w-3xl p-4 flex items-center justify-between">
       <NavLink to="/" className="font-semibold">
-        Spaced
+        SkillStak
       </NavLink>
       <nav className="flex gap-4 text-sm items-center">
         {userId ? (
