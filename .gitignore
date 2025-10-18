@@ -11,6 +11,7 @@ dist/
 .env.development.local
 # Cloudflare
 .wrangler/
+db-backups/
 wrangler.toml.local
 # OS files
 .DS_Store

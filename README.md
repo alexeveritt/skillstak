@@ -46,7 +46,7 @@ Runs entirely on **Cloudflare Pages + Functions** — globally distributed, fast
 ## 🧱 Project Structure
 
 ```
-spaced-rep/
+skillstak/
 ├─ app/
 │  ├─ routes/                # React Router 7 pages
 │  ├─ server/                # Cloudflare environment helpers
@@ -82,8 +82,8 @@ spaced-rep/
 ### 2. Clone & install
 
 ```bash
-git clone https://github.com/youruser/spaced-rep.git
-cd spaced-rep
+git clone https://github.com/youruser/skillstak.git
+cd skillstak
 npm install
 ```
 
@@ -106,8 +106,8 @@ APP_BASE_URL=http://localhost:5173
 You can test with the local D1 database and KV emulation.
 
 ```bash
-wrangler d1 create spaced-rep-db
-wrangler kv namespace create SESSIONS
+wrangler d1 create skillstak-db
+wrangler kv namespace create SKILLSTAK_SESSIONS
 ```
 
 Paste the generated IDs into `wrangler.toml`.
@@ -171,14 +171,14 @@ In Pages → *Settings → Environment Variables*:
 
 #### D1 binding
 ```
-Binding name: SPACED_DB
-Database: spaced-rep-db
+Binding name: SKILLSTAK_DB
+Database: skillstak-db
 ```
 
 #### KV binding
 ```
-Binding name: SESSIONS
-Namespace: spaced-rep-sessions
+Binding name: SKILLSTAK_SESSIONS
+Namespace: skillstak-sessions
 ```
 
 #### Optional vars
@@ -200,7 +200,7 @@ Namespace: spaced-rep-sessions
 ## 🔐 Authentication
 
 - **Email/password** stored securely using scrypt hashing (via `oslo/password`).
-- Sessions are stored in Cloudflare KV (`SESSIONS`).
+- Sessions are stored in Cloudflare KV (`SKILLSTAK_SESSIONS`).
 - Session cookie: `sr.sid`
 - Password reset:
   - A token is generated and saved in KV for 30 minutes.
@@ -234,7 +234,7 @@ Once your repo is connected and bindings are set:
 
 1. Push to `main`
 2. Cloudflare Pages automatically builds and deploys
-3. You’ll get a live URL like `https://spaced-rep.pages.dev`
+3. You’ll get a live URL like `https://skillstak.pages.dev`
 
 ---
 
@@ -270,7 +270,7 @@ wrangler pages deploy .react-router/build/client
 - The D1 DB is SQLite under the hood.  
   To backup:
   ```bash
-  wrangler d1 export spaced-rep-db --local --output backup.sql
+  wrangler d1 export skillstak-db --local --output backup.sql
   ```
 - You can later upload to R2 or download locally.
 
@@ -322,8 +322,8 @@ Copyright © 2025.
 | `npm run d1:apply` | Initialize database schema |
 | `npm run build` | Production build |
 | `npm run cf:pages` | Cloudflare Pages local test |
-| `wrangler d1 create spaced-rep-db` | Create database |
-| `wrangler kv namespace create SESSIONS` | Create KV |
+| `wrangler d1 create skillstak-db` | Create database |
+| `wrangler kv namespace create SKILLSTAK_SESSIONS` | Create KV |
 | `wrangler pages deploy` | Deploy manually |
 
 ---

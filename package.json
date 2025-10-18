@@ -1,5 +1,5 @@
 {
-  "name": "spaced-rep",
+  "name": "skillstak",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,14 +8,18 @@
     "build": "react-router build",
     "start": "react-router start",
     "cf:pages": "wrangler pages dev --compatibility-date=2024-11-11 ./build/client",
-    "d1:apply": "wrangler d1 execute SPACED_DB --file=./db/schema.sql",
-    "d1:apply:local": "wrangler d1 execute SPACED_DB --local --file=./db/schema.sql",
+    "d1:apply": "wrangler d1 execute SKILLSTAK_DB --file=./db/schema.sql",
+    "d1:apply:local": "wrangler d1 execute SKILLSTAK_DB --local --file=./db/schema.sql",
+    "d1:export-local": "node scripts/export-local-db.js",
+    "d1:delete-local": "rm -rf .wrangler/state/",
+    "d1:reset-local": "npm run d1:delete-local && npm run d1:apply:local",
+
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
     "ci": "biome ci .",
     "kill-port": "node ./scripts/kill-port.cjs 8788"
-  },
+   },
   "dependencies": {
     "@react-router/cloudflare": "^7.0.0",
     "@react-router/dev": "^7.0.0",

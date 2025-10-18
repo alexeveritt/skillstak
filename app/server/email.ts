@@ -3,15 +3,15 @@ import { ulid } from "ulidx";
 
 export async function createResetToken(env: Env, userId: string) {
   const token = ulid();
-  await env.SESSIONS.put(`reset:${token}`, userId, { expirationTtl: 60 * 30 });
+  await env.SKILLSTAK_SESSIONS.put(`reset:${token}`, userId, { expirationTtl: 60 * 30 });
   return token;
 }
 
 export async function consumeResetToken(env: Env, token: string) {
   const key = `reset:${token}`;
-  const userId = await env.SESSIONS.get(key);
+  const userId = await env.SKILLSTAK_SESSIONS.get(key);
   if (!userId) return null;
-  await env.SESSIONS.delete(key);
+  await env.SKILLSTAK_SESSIONS.delete(key);
   return userId;
 }
 
