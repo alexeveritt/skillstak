@@ -1,29 +1,35 @@
 // app/entry.server.tsx
-import type { EntryContext } from "react-router";
+import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
-import { renderToString } from "react-dom/server";
+import { renderToReadableStream } from "react-dom/server";
 import { isbot } from "isbot";
 
-async function handleRequest(
+export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  entryContext: EntryContext
+  entryContext: EntryContext,
+  loadContext: AppLoadContext
 ) {
-  const html = renderToString(<ServerRouter context={entryContext} url={request.url} />);
+  const userAgent = request.headers.get("user-agent");
+  const body = await renderToReadableStream(
+    <ServerRouter context={entryContext} url={request.url} />,
+    {
+      signal: request.signal,
+      onError(error: unknown) {
+        console.error(error);
+        responseStatusCode = 500;
+      },
+    }
+  );
+
+  if (isbot(userAgent)) {
+    await body.allReady;
+  }
 
   responseHeaders.set("Content-Type", "text/html");
-  return new Response(html, {
+  return new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode,
   });
 }
-
-export default {
-  async fetch(request: Request, env: any, ctx: any) {
-    // You may need to adapt entryContext to your framework's needs
-    // Here, we use a minimal placeholder for entryContext
-    const entryContext = {} as EntryContext;
-    return handleRequest(request, 200, new Headers(), entryContext);
-  }
-};

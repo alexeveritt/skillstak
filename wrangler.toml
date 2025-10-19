@@ -1,6 +1,6 @@
-main = "build/server/index.js"
 name = "skillstak"
 compatibility_date = "2024-11-11"
+pages_build_output_dir = "build/client"
 
 [vars]
 # set ADSENSE_CLIENT="ca-pub-xxxxxxxx" to enable ad footer
