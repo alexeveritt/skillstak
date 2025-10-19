@@ -20,7 +20,7 @@ GOOGLE_REDIRECT_URI = ""
 [[d1_databases]]
 binding = "SKILLSTAK_DB"
 database_name = "skillstak-db"
-database_id = "aed633f0-45dc-45c5-8308-cda6475df572"
+database_id = "dcf58c15-f3f1-4904-8307-82b7a100ee1e"
 
 [[kv_namespaces]]
 binding = "SKILLSTAK_SESSIONS"
