@@ -1,3 +1,4 @@
+main = "build/server/index.js"
 name = "skillstak"
 compatibility_date = "2024-11-11"
 
@@ -23,6 +24,4 @@ database_id = "aed633f0-45dc-45c5-8308-cda6475df572"
 
 [[kv_namespaces]]
 binding = "SKILLSTAK_SESSIONS"
-id = "REPLACE_WITH_KV_ID"
-
-main = "build/server/index.js"
+id = "d67e794cc58344848995d50b694a256d"
