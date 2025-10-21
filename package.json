@@ -9,8 +9,8 @@
     "start": "react-router start",
     "cf:pages": "wrangler pages dev --compatibility-date=2024-11-11 ./build/client",
 
-    "d1:apply-prod": "wrangler d1 execute SKILLSTAK_DB --file=./db/schema.sql",
-    "d1:create-prod": "wrangler d1 create skillstak_db",
+    "d1:apply-prod": "wrangler d1 execute SKILLSTAK_DB --file=./db/schema.sql --remote",
+    "d1:create-prod": "wrangler d1 create skillstak-db",
     "d1:export-prod": "node scripts/export-prod-db.js",
 
     "d1:apply:local": "wrangler d1 execute SKILLSTAK_DB --local --file=./db/schema.sql",
