@@ -335,3 +335,4 @@ To verify your Cloudflare Pages deployment:
 - Open the link → you should see the login screen
 - Create an account, add a project, add a card
 - If that works, **your app is live and functional** ✅
+ 
