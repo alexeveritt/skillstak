@@ -13,7 +13,7 @@ Users can:
 
 Runs entirely on **Cloudflare Pages + Functions** — globally distributed, fast, and nearly free to host.
 
----
+--- 
 
 ## 🌍 Tech Stack Overview
 
