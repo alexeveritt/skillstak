@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, redirect, useLoaderData } from "react-router";
 import { requireUserId } from "../server/session";
 import { q } from "../server/db";
+import { DeleteProjectModal } from "../components/DeleteProjectModal";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
@@ -80,18 +81,7 @@ export default function EditProject() {
         <p className="text-sm text-gray-600 mb-3">
           Deleting this project will also delete all its cards. This action cannot be undone.
         </p>
-        <Form method="post">
-          <input type="hidden" name="intent" value="delete" />
-          <button
-            type="submit"
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-            onClick={(e) => {
-              if (!confirm("Are you sure you want to delete this project and all its cards?")) e.preventDefault();
-            }}
-          >
-            Delete Project
-          </button>
-        </Form>
+        <DeleteProjectModal projectName={project.name} />
       </div>
     </div>
   );

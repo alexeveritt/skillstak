@@ -6,6 +6,9 @@ import { q, run } from "../server/db";
 import { projectSchema } from "../lib/z";
 import { newId } from "../lib/id";
 import { useState, useEffect, useRef } from "react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   // Check if user is logged in, if not redirect to login
@@ -53,42 +56,57 @@ export default function Home() {
   }, [navigation.state, actionData]);
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-4">Your projects</h1>
-      <ul className="grid gap-3">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Your projects</h1>
+        <p className="text-muted-foreground">Manage your learning projects and flashcards</p>
+      </div>
+
+      <div className="grid gap-4">
         {projects.map((p) => (
-          <li key={p.id} className="border rounded p-3 flex items-center justify-between">
-            <div>
-              <Link to={`/p/${p.id}`} className="font-medium underline">
-                {p.name}
-              </Link>
-              <div className="text-sm text-slate-600">
-                {p.due} due - {p.total} cards
-              </div>
-            </div>
-            <div className="flex gap-2 items-center">
-              <Link to={`/p/${p.id}/review`} className="text-sm underline">
-                Practice
-              </Link>
-              <Link to={`/p/${p.id}/edit`} className="text-sm underline text-blue-600">
-                Edit
-              </Link>
-            </div>
-          </li>
+          <Card key={p.id}>
+            <CardHeader>
+              <CardTitle className="text-xl">
+                <Link to={`/p/${p.id}`} className="hover:underline">
+                  {p.name}
+                </Link>
+              </CardTitle>
+              <CardDescription>
+                {p.due} due · {p.total} cards total
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex gap-2">
+              <Button variant="default" size="sm" asChild>
+                <Link to={`/p/${p.id}/review`}>Practice</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to={`/p/${p.id}/edit`}>Edit</Link>
+              </Button>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
-      <Form method="post" className="flex gap-2 mt-4">
-        <input
-          ref={inputRef}
-          name="name"
-          placeholder="New project"
-          className="border p-2 rounded flex-1"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <button className="bg-black text-white rounded px-4">Add</button>
-      </Form>
-      {actionData?.error && <div className="text-red-600 mt-2">{actionData.error}</div>}
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Create New Project</CardTitle>
+          <CardDescription>Start a new learning project</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form method="post" className="flex gap-2">
+            <Input
+              ref={inputRef}
+              name="name"
+              placeholder="Project name"
+              className="flex-1"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <Button type="submit">Add Project</Button>
+          </Form>
+          {actionData?.error && <p className="text-destructive text-sm mt-2">{actionData.error}</p>}
+        </CardContent>
+      </Card>
     </div>
   );
 }

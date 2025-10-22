@@ -17,7 +17,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 export default function Root() {
   const { userId, adsense } = useLoaderData<typeof loader>();
   return (
-    <html lang="en" className="h-full bg-slate-50">
+    <html lang="en" className="h-full">
       <head>
         <Meta />
         <Links />
@@ -29,7 +29,7 @@ export default function Root() {
           ></script>
         ) : null}
       </head>
-      <body className="min-h-screen text-slate-900">
+      <body className="min-h-screen">
         <Header userId={userId} />
         <main className="mx-auto max-w-3xl p-4">
           <Outlet />
