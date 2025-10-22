@@ -21,7 +21,15 @@ export async function getNextDueCard(env: Env, projectId: string, userId: string
   return await cardRepo.findNextDueCard(env, projectId, userId);
 }
 
-export async function reviewCardAgain(env: Env, cardId: string): Promise<void> {
+export async function getRandomCardForPractice(env: Env, projectId: string, userId: string): Promise<ReviewCard | null> {
+  return await cardRepo.findRandomCardForPractice(env, projectId, userId);
+}
+
+export async function getProjectStats(env: Env, projectId: string, userId: string) {
+  return await cardRepo.getProjectStats(env, projectId, userId);
+}
+
+export async function reviewCardAgain(env: Env, cardId: string, isPracticeMode = false): Promise<void> {
   const schedule = await cardRepo.findCardSchedule(env, cardId);
   if (!schedule) return;
 
@@ -39,9 +47,16 @@ export async function reviewCardAgain(env: Env, cardId: string): Promise<void> {
   );
 }
 
-export async function reviewCardGood(env: Env, cardId: string): Promise<void> {
+export async function reviewCardGood(env: Env, cardId: string, isPracticeMode = false): Promise<void> {
   const schedule = await cardRepo.findCardSchedule(env, cardId);
   if (!schedule) return;
+
+  // In practice mode, only update cards that aren't well-learned (streak < 5)
+  // OR update failed cards (lapses > 0) positively
+  if (isPracticeMode && schedule.streak >= 5 && schedule.lapses === 0) {
+    // Don't update well-learned cards in practice mode
+    return;
+  }
 
   const newStreak = schedule.streak + 1;
   const newInterval = schedule.interval_days === 0 ? 1 : Math.round(schedule.interval_days * schedule.ease);
@@ -58,7 +73,7 @@ export async function reviewCardGood(env: Env, cardId: string): Promise<void> {
   );
 }
 
-export async function reviewCardWithTypedAnswer(env: Env, cardId: string, answer: string): Promise<boolean> {
+export async function reviewCardWithTypedAnswer(env: Env, cardId: string, answer: string, isPracticeMode = false): Promise<boolean> {
   const schedule = await cardRepo.findCardSchedule(env, cardId);
   if (!schedule) return false;
 
@@ -70,9 +85,9 @@ export async function reviewCardWithTypedAnswer(env: Env, cardId: string, answer
   const isCorrect = inputNormalized === targetNormalized || dist(inputNormalized, targetNormalized) <= allowedDistance;
 
   if (isCorrect) {
-    await reviewCardGood(env, cardId);
+    await reviewCardGood(env, cardId, isPracticeMode);
   } else {
-    await reviewCardAgain(env, cardId);
+    await reviewCardAgain(env, cardId, isPracticeMode);
   }
 
   return isCorrect;

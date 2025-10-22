@@ -112,3 +112,50 @@ export async function findCardSchedule(
   );
   return rows[0] ?? null;
 }
+
+export async function findRandomCardForPractice(env: Env, projectId: string, userId: string): Promise<CardWithSchedule | null> {
+  const rows = await q<CardWithSchedule>(
+    env,
+    `SELECT c.id, c.front, c.back, s.interval_days, s.ease, s.streak, s.lapses
+    FROM card c
+    JOIN project p ON p.id = c.project_id
+    JOIN card_schedule s ON s.card_id = c.id
+    WHERE p.user_id = ? AND p.id = ?
+    ORDER BY RANDOM() LIMIT 1`,
+    [userId, projectId]
+  );
+  return rows[0] ?? null;
+}
+
+export async function getProjectStats(env: Env, projectId: string, userId: string): Promise<{
+  total_cards: number;
+  due_now: number;
+  new_cards: number;
+  learning_cards: number;
+  mastered_cards: number;
+  next_due_at: string | null;
+} | null> {
+  const rows = await q<{
+    total_cards: number;
+    due_now: number;
+    new_cards: number;
+    learning_cards: number;
+    mastered_cards: number;
+    next_due_at: string | null;
+  }>(
+    env,
+    `SELECT 
+      COUNT(*) as total_cards,
+      SUM(CASE WHEN s.due_at <= datetime('now') THEN 1 ELSE 0 END) as due_now,
+      SUM(CASE WHEN s.streak = 0 AND s.lapses = 0 THEN 1 ELSE 0 END) as new_cards,
+      SUM(CASE WHEN s.streak > 0 AND s.streak < 5 THEN 1 ELSE 0 END) as learning_cards,
+      SUM(CASE WHEN s.streak >= 5 THEN 1 ELSE 0 END) as mastered_cards,
+      MIN(CASE WHEN s.due_at > datetime('now') THEN s.due_at ELSE NULL END) as next_due_at
+    FROM card c
+    JOIN project p ON p.id = c.project_id
+    JOIN card_schedule s ON s.card_id = c.id
+    WHERE p.user_id = ? AND p.id = ?`,
+    [userId, projectId]
+  );
+  return rows[0] ?? null;
+}
