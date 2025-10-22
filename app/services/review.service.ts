@@ -25,6 +25,10 @@ export async function getRandomCardForPractice(env: Env, projectId: string, user
   return await cardRepo.findRandomCardForPractice(env, projectId, userId);
 }
 
+export async function getRandomCardsForPracticeSession(env: Env, projectId: string, userId: string, limit: number = 10): Promise<ReviewCard[]> {
+  return await cardRepo.findRandomCardsForPracticeSession(env, projectId, userId, limit);
+}
+
 export async function getProjectStats(env: Env, projectId: string, userId: string) {
   return await cardRepo.getProjectStats(env, projectId, userId);
 }

@@ -1,6 +1,7 @@
 // app/routes/p.$projectId.review.tsx
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { Form, useLoaderData, useActionData, useSearchParams, Link } from "react-router";
+import { Form, useLoaderData, useActionData, Link } from "react-router";
+import { useState, useEffect } from "react";
 import { requireUserId } from "../server/session";
 import { CardFlip } from "../components/CardFlip";
 import * as reviewService from "../services/review.service";
@@ -16,19 +17,22 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const stats = await reviewService.getProjectStats(context.cloudflare.env, projectId, userId);
 
   let card = null;
+  let practiceCards = null;
+
   if (mode === "practice") {
-    card = await reviewService.getRandomCardForPractice(context.cloudflare.env, projectId, userId);
+    // Get a session of random cards for practice
+    practiceCards = await reviewService.getRandomCardsForPracticeSession(context.cloudflare.env, projectId, userId, 10);
   } else {
     card = await reviewService.getNextDueCard(context.cloudflare.env, projectId, userId);
   }
 
-  return { card, project, stats, mode };
+  return { card, practiceCards, project, stats, mode };
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const fd = await request.formData();
   const cardId = String(fd.get("cardId"));
-  const result = String(fd.get("result")); // again|good|type
+  const result = String(fd.get("result")); // again|good
   const mode = String(fd.get("mode") || "review");
   const isPracticeMode = mode === "practice";
   const env = context.cloudflare.env;
@@ -37,9 +41,6 @@ export async function action({ request, context }: ActionFunctionArgs) {
     await reviewService.reviewCardAgain(env, cardId, isPracticeMode);
   } else if (result === "good") {
     await reviewService.reviewCardGood(env, cardId, isPracticeMode);
-  } else if (result === "type") {
-    const answer = String(fd.get("answer") || "");
-    await reviewService.reviewCardWithTypedAnswer(env, cardId, answer, isPracticeMode);
   }
 
   return { ok: true };
@@ -62,17 +63,229 @@ function formatTimeUntil(dueAt: string | null): string {
 }
 
 export default function Review() {
-  const { card, project, stats, mode } = useLoaderData<typeof loader>();
-  const [searchParams] = useSearchParams();
+  const { card, practiceCards, project, stats, mode } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const projectColor = project?.color || "#fef3c7";
   const projectForegroundColor = project?.foreground_color || "#78350f";
 
+  // Practice mode state
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [score, setScore] = useState({ correct: 0, incorrect: 0 });
+  const [sessionComplete, setSessionComplete] = useState(false);
+
+  const isPracticeMode = mode === "practice";
+
+  // Handle auto-advance after action in practice mode
+  useEffect(() => {
+    if (actionData?.ok && isPracticeMode && practiceCards) {
+      const timer = setTimeout(() => {
+        if (currentCardIndex < practiceCards.length - 1) {
+          setCurrentCardIndex(prev => prev + 1);
+          setIsFlipped(false);
+        } else {
+          setSessionComplete(true);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [actionData, isPracticeMode, currentCardIndex, practiceCards]);
+
+  const handleCardFlip = () => {
+    setIsFlipped(prev => !prev);
+  };
+
+  const handleAnswer = (result: "again" | "good") => {
+    if (result === "good") {
+      setScore(prev => ({ ...prev, correct: prev.correct + 1 }));
+    } else {
+      setScore(prev => ({ ...prev, incorrect: prev.incorrect + 1 }));
+    }
+  };
+
+  // Practice mode - session complete
+  if (isPracticeMode && sessionComplete && practiceCards) {
+    const total = score.correct + score.incorrect;
+    const percentage = total > 0 ? Math.round((score.correct / total) * 100) : 0;
+
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4" style={{ color: projectForegroundColor }}>
+            Practice Complete!
+          </h1>
+
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+            <div className="text-6xl mb-4">{percentage >= 80 ? "🎉" : percentage >= 60 ? "👍" : "💪"}</div>
+            <div className="text-5xl font-bold mb-4" style={{ color: projectForegroundColor }}>
+              {percentage}%
+            </div>
+            <div className="text-xl text-gray-700 mb-6">
+              {score.correct} correct, {score.incorrect} need review
+            </div>
+            <div className="text-gray-600">
+              {percentage >= 80 && "Excellent work! You're mastering these cards!"}
+              {percentage >= 60 && percentage < 80 && "Good job! Keep practicing to improve."}
+              {percentage < 60 && "Keep going! Practice makes perfect."}
+            </div>
+          </div>
+
+          <Link
+            to={`?mode=practice`}
+            onClick={() => {
+              setCurrentCardIndex(0);
+              setScore({ correct: 0, incorrect: 0 });
+              setSessionComplete(false);
+              setIsFlipped(false);
+            }}
+            className="inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 mb-4"
+          >
+            Practice Again
+          </Link>
+
+          <Link
+            to={`/p/${project?.id}`}
+            className="block text-center text-gray-600 hover:text-gray-800 underline mt-4"
+          >
+            Back to Project
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Practice mode - show current card from session
+  if (isPracticeMode && practiceCards && practiceCards.length > 0) {
+    const currentCard = practiceCards[currentCardIndex];
+
+    return (
+      <div className="max-w-2xl mx-auto">
+        {/* Progress Header */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm font-medium text-gray-600">
+              Practice Mode
+            </div>
+            <Link
+              to={`?mode=review`}
+              className="text-sm text-blue-600 hover:text-blue-800 underline"
+            >
+              Switch to Review
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-4 mb-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-lg font-bold">
+                Card {currentCardIndex + 1} of {practiceCards.length}
+              </span>
+              <span className="text-sm text-gray-600">
+                Score: {score.correct} / {score.correct + score.incorrect}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all"
+                style={{ width: `${((currentCardIndex + 1) / practiceCards.length) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Card */}
+        <div className="mb-4">
+          <div className="text-center text-sm font-medium text-gray-500 mb-2">
+            {isFlipped ? "Answer" : "Question"}
+          </div>
+          <div onClick={handleCardFlip}>
+            <CardFlip
+              front={currentCard.front}
+              back={currentCard.back}
+              color={projectColor}
+              foregroundColor={projectForegroundColor}
+            />
+          </div>
+        </div>
+
+        {/* See Answer Button */}
+        {!isFlipped && (
+          <div className="mb-4">
+            <button
+              onClick={handleCardFlip}
+              className="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              Show Answer
+            </button>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <Form method="post" className="flex gap-4" onSubmit={(e) => {
+          const formData = new FormData(e.currentTarget);
+          const result = formData.get("result") as "again" | "good";
+          handleAnswer(result);
+        }}>
+          <input type="hidden" name="cardId" value={currentCard.id} />
+          <input type="hidden" name="mode" value="practice" />
+
+          <button
+            name="result"
+            value="again"
+            disabled={!isFlipped}
+            className="flex-1 bg-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            <div className="text-sm mb-1">I need to review this</div>
+            <div className="text-lg">Review Again</div>
+          </button>
+
+          <button
+            name="result"
+            value="good"
+            disabled={!isFlipped}
+            className="flex-1 bg-green-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            <div className="text-sm mb-1">I know this well</div>
+            <div className="text-lg">I Got This!</div>
+          </button>
+        </Form>
+
+        <Link
+          to={`/p/${project?.id}`}
+          className="block text-center text-gray-600 hover:text-gray-800 underline mt-6"
+        >
+          Back to Project
+        </Link>
+      </div>
+    );
+  }
+
+  // Practice mode - no cards available
+  if (isPracticeMode && (!practiceCards || practiceCards.length === 0)) {
+    return (
+      <div className="max-w-2xl mx-auto text-center">
+        <h1 className="text-3xl font-bold mb-4" style={{ color: projectForegroundColor }}>
+          No Cards Available
+        </h1>
+        <p className="text-lg text-gray-700 mb-6">
+          Add some cards to start practicing!
+        </p>
+        <Link
+          to={`/p/${project?.id}/cards/new`}
+          className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+        >
+          Add Your First Card
+        </Link>
+      </div>
+    );
+  }
+
+  // Review mode - no cards due
   if (!card) {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2" style={{ color: projectForegroundColor }}>
-            🎉 All Done!
+            All Done!
           </h1>
           <p className="text-lg text-gray-700">Great job! You've reviewed all your cards for now.</p>
         </div>
@@ -88,17 +301,17 @@ export default function Review() {
 
               <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-green-700">{stats.mastered_cards}</div>
-                <div className="text-sm font-medium text-green-600 mt-1">⭐ Mastered</div>
+                <div className="text-sm font-medium text-green-600 mt-1">Mastered</div>
               </div>
 
               <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-yellow-700">{stats.learning_cards}</div>
-                <div className="text-sm font-medium text-yellow-600 mt-1">📚 Learning</div>
+                <div className="text-sm font-medium text-yellow-600 mt-1">Learning</div>
               </div>
 
               <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-purple-700">{stats.new_cards}</div>
-                <div className="text-sm font-medium text-purple-600 mt-1">✨ New</div>
+                <div className="text-sm font-medium text-purple-600 mt-1">New</div>
               </div>
             </div>
 
@@ -107,7 +320,7 @@ export default function Review() {
               className="rounded-2xl p-6 shadow-lg"
               style={{ backgroundColor: projectColor, color: projectForegroundColor }}
             >
-              <div className="text-lg font-semibold mb-2">⏰ Next Review</div>
+              <div className="text-lg font-semibold mb-2">Next Review</div>
               <div className="text-3xl font-bold">{formatTimeUntil(stats.next_due_at)}</div>
               {stats.next_due_at && (
                 <div className="text-sm mt-2 opacity-80">
@@ -121,27 +334,26 @@ export default function Review() {
               to={`?mode=practice`}
               className="block w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center font-bold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
             >
-              🎮 Practice Random Cards
+              Practice Random Cards
             </Link>
 
             <Link
               to={`/p/${project?.id}`}
               className="block w-full text-center text-gray-600 hover:text-gray-800 underline mt-4"
             >
-              ← Back to Project
+              Back to Project
             </Link>
           </div>
         )}
 
         {(!stats || stats.total_cards === 0) && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📝</div>
             <p className="text-xl text-gray-600 mb-6">No cards yet! Let's create some.</p>
             <Link
               to={`/p/${project?.id}/cards/new`}
               className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
             >
-              ➕ Add Your First Card
+              Add Your First Card
             </Link>
           </div>
         )}
@@ -149,37 +361,24 @@ export default function Review() {
     );
   }
 
-  const isPracticeMode = mode === "practice";
-
+  // Review mode - show card
   return (
     <div className="max-w-2xl mx-auto">
       {/* Mode Indicator */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{isPracticeMode ? "🎮" : "📖"}</span>
-          <span className="font-semibold text-lg">
-            {isPracticeMode ? "Practice Mode" : "Review Mode"}
-          </span>
+          <span className="font-semibold text-lg">Review Mode</span>
         </div>
-        {isPracticeMode ? (
-          <Link
-            to={`?mode=review`}
-            className="text-sm bg-white border-2 border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50"
-          >
-            Switch to Review
-          </Link>
-        ) : (
-          <Link
-            to={`?mode=practice`}
-            className="text-sm bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200"
-          >
-            Practice Mode
-          </Link>
-        )}
+        <Link
+          to={`?mode=practice`}
+          className="text-sm bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200"
+        >
+          Practice Mode
+        </Link>
       </div>
 
       {/* Progress indicator */}
-      {stats && !isPracticeMode && (
+      {stats && (
         <div className="mb-4 text-center">
           <div className="text-sm font-medium text-gray-600">
             {stats.due_now > 1 ? `${stats.due_now - 1} more cards to review` : "Last card!"}
@@ -187,56 +386,58 @@ export default function Review() {
         </div>
       )}
 
-      <CardFlip front={card.front} back={card.back} color={projectColor} foregroundColor={projectForegroundColor} />
+      <div className="mb-4">
+        <div className="text-center text-sm font-medium text-gray-500 mb-2">
+          {isFlipped ? "Answer" : "Question"}
+        </div>
+        <div onClick={handleCardFlip}>
+          <CardFlip front={card.front} back={card.back} color={projectColor} foregroundColor={projectForegroundColor} />
+        </div>
+      </div>
+
+      {/* See Answer Button */}
+      {!isFlipped && (
+        <div className="mb-4">
+          <button
+            onClick={handleCardFlip}
+            className="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          >
+            Show Answer
+          </button>
+        </div>
+      )}
 
       {/* Button Form */}
-      <Form method="post" className="mt-6 flex gap-3">
+      <Form method="post" className="flex gap-4">
         <input type="hidden" name="cardId" value={card.id} />
-        <input type="hidden" name="mode" value={mode} />
+        <input type="hidden" name="mode" value="review" />
+
         <button
           name="result"
           value="again"
-          className="flex-1 bg-gradient-to-r from-red-400 to-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          disabled={!isFlipped}
+          className="flex-1 bg-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          <div className="text-2xl mb-1">😅</div>
-          <div>Again</div>
+          <div className="text-sm mb-1">I need to review this</div>
+          <div className="text-lg">Review Again</div>
         </button>
+
         <button
           name="result"
           value="good"
-          className="flex-1 bg-gradient-to-r from-green-400 to-green-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+          disabled={!isFlipped}
+          className="flex-1 bg-green-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          <div className="text-2xl mb-1">✅</div>
-          <div>Got It!</div>
+          <div className="text-sm mb-1">I know this well</div>
+          <div className="text-lg">I Got This!</div>
         </button>
-      </Form>
-
-      {/* Type Answer Form */}
-      <Form method="post" className="mt-4">
-        <input type="hidden" name="cardId" value={card.id} />
-        <input type="hidden" name="mode" value={mode} />
-        <div className="flex gap-3">
-          <input
-            name="answer"
-            placeholder="Type your answer..."
-            className="flex-1 border-2 border-gray-300 p-4 rounded-xl text-lg focus:border-blue-500 focus:outline-none"
-            autoComplete="off"
-          />
-          <button
-            name="result"
-            value="type"
-            className="bg-gradient-to-r from-blue-400 to-blue-500 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            Check ✏️
-          </button>
-        </div>
       </Form>
 
       <Link
         to={`/p/${project?.id}`}
         className="block text-center text-gray-600 hover:text-gray-800 underline mt-6"
       >
-        ← Back to Project
+        Back to Project
       </Link>
     </div>
   );

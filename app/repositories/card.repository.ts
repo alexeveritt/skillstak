@@ -127,6 +127,20 @@ export async function findRandomCardForPractice(env: Env, projectId: string, use
   return rows[0] ?? null;
 }
 
+export async function findRandomCardsForPracticeSession(env: Env, projectId: string, userId: string, limit: number = 10): Promise<CardWithSchedule[]> {
+  const rows = await q<CardWithSchedule>(
+    env,
+    `SELECT c.id, c.front, c.back, s.interval_days, s.ease, s.streak, s.lapses
+    FROM card c
+    JOIN project p ON p.id = c.project_id
+    JOIN card_schedule s ON s.card_id = c.id
+    WHERE p.user_id = ? AND p.id = ?
+    ORDER BY RANDOM() LIMIT ?`,
+    [userId, projectId, limit]
+  );
+  return rows;
+}
+
 export async function getProjectStats(env: Env, projectId: string, userId: string): Promise<{
   total_cards: number;
   due_now: number;
