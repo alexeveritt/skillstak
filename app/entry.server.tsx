@@ -12,16 +12,13 @@ export default async function handleRequest(
   loadContext: AppLoadContext
 ) {
   const userAgent = request.headers.get("user-agent");
-  const body = await renderToReadableStream(
-    <ServerRouter context={entryContext} url={request.url} />,
-    {
-      signal: request.signal,
-      onError(error: unknown) {
-        console.error(error);
-        responseStatusCode = 500;
-      },
-    }
-  );
+  const body = await renderToReadableStream(<ServerRouter context={entryContext} url={request.url} />, {
+    signal: request.signal,
+    onError(error: unknown) {
+      console.error(error);
+      responseStatusCode = 500;
+    },
+  });
 
   if (isbot(userAgent)) {
     await body.allReady;
