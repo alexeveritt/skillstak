@@ -91,46 +91,69 @@ export default function EditCard() {
   };
 
   return (
-    <div className="max-w-md">
-      <h1 className="text-xl font-semibold mb-2">
-        Edit card - <span className="text-slate-600">{project?.name}</span>
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">
+        Edit Card - <span className="text-gray-600">{project?.name}</span>
       </h1>
 
-      {actionData?.error && <p className="text-red-600 mb-2">{actionData.error}</p>}
+      {actionData?.error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">{actionData.error}</div>
+      )}
 
-      <Form method="post" className="grid gap-2 mb-4">
-        <label className="text-sm">Front</label>
-        <input name="front" defaultValue={defaults.front} className="border p-2 rounded" placeholder="Front" />
+      <Form method="post" className="space-y-6 mb-8">
+        <div>
+          <label htmlFor="front" className="block text-sm font-medium text-gray-700 mb-2">
+            Front of Card
+          </label>
+          <textarea
+            id="front"
+            name="front"
+            defaultValue={defaults.front}
+            placeholder="Enter the question or prompt..."
+            rows={4}
+            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+          />
+        </div>
 
-        <label className="text-sm">Back</label>
-        <textarea
-          name="back"
-          defaultValue={defaults.back}
-          className="border p-2 rounded min-h-[120px]"
-          placeholder="Back"
-        />
+        <div>
+          <label htmlFor="back" className="block text-sm font-medium text-gray-700 mb-2">
+            Back of Card
+          </label>
+          <textarea
+            id="back"
+            name="back"
+            defaultValue={defaults.back}
+            placeholder="Enter the answer or response..."
+            rows={4}
+            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+          />
+        </div>
 
-        <div className="flex items-center gap-2 mt-2">
-          <button name="intent" value="save" className="bg-black text-white rounded px-4 py-2">
-            Save
+        <div className="flex items-center gap-3 pt-2">
+          <button
+            name="intent"
+            value="save"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-6 py-2.5 transition-colors"
+          >
+            Save Changes
           </button>
-          <Link to={`/p/${project?.id}`} className="underline">
+          <Link to={`/p/${project?.id}`} className="text-gray-600 hover:text-gray-800 underline transition-colors">
             Cancel
           </Link>
         </div>
       </Form>
 
-      <Form method="post" className="mt-6">
+      <Form method="post" className="pt-6 border-t border-gray-200">
         <input type="hidden" name="intent" value="delete" />
         <button
-          className="text-red-700 border border-red-300 rounded px-3 py-2"
+          className="text-red-700 hover:text-red-800 border border-red-300 hover:border-red-400 bg-red-50 hover:bg-red-100 rounded-lg px-4 py-2.5 font-medium transition-colors"
           onClick={(e) => {
             if (!confirm("Delete this card? This cannot be undone.")) {
               e.preventDefault();
             }
           }}
         >
-          Delete card
+          Delete Card
         </button>
       </Form>
     </div>

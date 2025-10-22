@@ -19,9 +19,15 @@ export async function getProject(env: Env, projectId: string, userId: string) {
   return await projectRepo.findProjectById(env, projectId, userId);
 }
 
-export async function createProject(env: Env, userId: string, name: string, color?: string): Promise<string> {
+export async function createProject(
+  env: Env,
+  userId: string,
+  name: string,
+  color?: string,
+  foregroundColor?: string
+): Promise<string> {
   const id = newId();
-  await projectRepo.createProject(env, id, userId, name, color || null);
+  await projectRepo.createProject(env, id, userId, name, color || null, foregroundColor || null);
   return id;
 }
 
@@ -30,9 +36,10 @@ export async function updateProject(
   projectId: string,
   userId: string,
   name: string,
-  color?: string
+  color?: string,
+  foregroundColor?: string
 ): Promise<void> {
-  await projectRepo.updateProject(env, projectId, userId, name, color || null);
+  await projectRepo.updateProject(env, projectId, userId, name, color || null, foregroundColor || null);
 }
 
 export async function deleteProject(env: Env, projectId: string, userId: string): Promise<void> {

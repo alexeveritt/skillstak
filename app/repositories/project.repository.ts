@@ -7,6 +7,7 @@ export type Project = {
   user_id: string;
   name: string;
   color: string | null;
+  foreground_color: string | null;
   created_at?: string;
 };
 
@@ -14,6 +15,7 @@ export type ProjectWithStats = {
   id: string;
   name: string;
   color: string | null;
+  foreground_color: string | null;
   total: number;
   due: number;
 };
@@ -21,7 +23,7 @@ export type ProjectWithStats = {
 export async function findProjectById(env: Env, projectId: string, userId: string): Promise<Project | null> {
   const rows = await q<Project>(
     env,
-    "SELECT id, user_id, name, color, created_at FROM project WHERE id = ? AND user_id = ?",
+    "SELECT id, user_id, name, color, foreground_color, created_at FROM project WHERE id = ? AND user_id = ?",
     [projectId, userId]
   );
   return rows[0] ?? null;
@@ -30,7 +32,7 @@ export async function findProjectById(env: Env, projectId: string, userId: strin
 export async function findProjectsByUserId(env: Env, userId: string): Promise<ProjectWithStats[]> {
   return await q<ProjectWithStats>(
     env,
-    `SELECT p.id, p.name, p.color,
+    `SELECT p.id, p.name, p.color, p.foreground_color,
             (SELECT COUNT(*) FROM card c WHERE c.project_id = p.id) AS total,
             (SELECT COUNT(*) FROM card c JOIN card_schedule s ON s.card_id=c.id WHERE c.project_id = p.id AND s.due_at <= datetime('now')) AS due
      FROM project p WHERE p.user_id = ? ORDER BY p.created_at DESC`,
@@ -43,9 +45,16 @@ export async function createProject(
   id: string,
   userId: string,
   name: string,
-  color: string | null
+  color: string | null,
+  foregroundColor: string | null
 ): Promise<void> {
-  await run(env, "INSERT INTO project (id, user_id, name, color) VALUES (?, ?, ?, ?)", [id, userId, name, color]);
+  await run(env, "INSERT INTO project (id, user_id, name, color, foreground_color) VALUES (?, ?, ?, ?, ?)", [
+    id,
+    userId,
+    name,
+    color,
+    foregroundColor,
+  ]);
 }
 
 export async function updateProject(
@@ -53,11 +62,13 @@ export async function updateProject(
   projectId: string,
   userId: string,
   name: string,
-  color: string | null
+  color: string | null,
+  foregroundColor: string | null
 ): Promise<void> {
-  await run(env, "UPDATE project SET name = ?, color = ? WHERE id = ? AND user_id = ?", [
+  await run(env, "UPDATE project SET name = ?, color = ?, foreground_color = ? WHERE id = ? AND user_id = ?", [
     name,
     color,
+    foregroundColor,
     projectId,
     userId,
   ]);

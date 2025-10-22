@@ -32,15 +32,41 @@ export default function NewCard() {
   const projectId = params.projectId!;
 
   return (
-    <div className="max-w-md">
-      <h1 className="text-xl font-semibold mb-2">New card</h1>
-      {data?.error && <p className="text-red-600">{data.error}</p>}
-      <Form method="post" className="grid gap-2">
-        <input name="front" placeholder="Front" className="border p-2 rounded" />
-        <textarea name="back" placeholder="Back" className="border p-2 rounded" />
-        <div className="flex items-center gap-2">
-          <button className="bg-black text-white rounded px-4 py-2">Save</button>
-          <Link to={`/p/${projectId}`} className="underline">
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Create New Card</h1>
+      {data?.error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">{data.error}</div>
+      )}
+      <Form method="post" className="space-y-6">
+        <div>
+          <label htmlFor="front" className="block text-sm font-medium text-gray-700 mb-2">
+            Front of Card
+          </label>
+          <textarea
+            id="front"
+            name="front"
+            placeholder="Enter the question or prompt..."
+            rows={4}
+            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+          />
+        </div>
+        <div>
+          <label htmlFor="back" className="block text-sm font-medium text-gray-700 mb-2">
+            Back of Card
+          </label>
+          <textarea
+            id="back"
+            name="back"
+            placeholder="Enter the answer or response..."
+            rows={4}
+            className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+          />
+        </div>
+        <div className="flex items-center gap-3 pt-2">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-6 py-2.5 transition-colors">
+            Save Card
+          </button>
+          <Link to={`/p/${projectId}`} className="text-gray-600 hover:text-gray-800 underline transition-colors">
             Cancel
           </Link>
         </div>

@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS project (
   user_id TEXT NOT NULL,
   name TEXT NOT NULL,
   color TEXT,
+  foreground_color TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY(user_id) REFERENCES user(id)
 );

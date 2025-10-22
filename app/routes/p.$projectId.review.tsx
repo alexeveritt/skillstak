@@ -41,11 +41,12 @@ export default function Review() {
   const { card, project } = useLoaderData<typeof loader>();
   const data = useActionData<typeof action>();
   const projectColor = project?.color || "#fef3c7";
+  const projectForegroundColor = project?.foreground_color || "#78350f";
 
   if (!card) return <p>No cards due.</p>;
   return (
     <div className="grid gap-4">
-      <CardFlip front={card.front} back={card.back} color={projectColor} />
+      <CardFlip front={card.front} back={card.back} color={projectColor} foregroundColor={projectForegroundColor} />
       <Form method="post" className="flex gap-2">
         <input type="hidden" name="cardId" value={card.id} />
         <button name="result" value="again" className="border rounded px-3 py-2">

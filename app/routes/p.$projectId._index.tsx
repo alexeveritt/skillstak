@@ -21,7 +21,15 @@ export default function ProjectDetail() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-3">{project?.name}</h1>
+      <div className="flex items-center gap-2 mb-3">
+        <h1 className="text-2xl font-semibold">{project?.name}</h1>
+        {project?.color && (
+          <span
+            className="w-6 h-6 rounded-full border-2 border-gray-300"
+            style={{ backgroundColor: projectColor }}
+          ></span>
+        )}
+      </div>
       <div className="flex gap-2 mb-3">
         <Link to="cards/new" className="underline">
           Add card
@@ -33,13 +41,6 @@ export default function ProjectDetail() {
           Edit Project
         </Link>
       </div>
-      {project?.color && (
-        <div className="mb-3 text-sm text-slate-600">
-          Project color:{" "}
-          <span className="inline-block w-4 h-4 rounded border" style={{ backgroundColor: projectColor }}></span>{" "}
-          {projectColor}
-        </div>
-      )}
       <ul className="grid gap-3">
         {cards.map((c) => (
           <li key={c.id} className="border rounded p-3" style={{ backgroundColor: projectColor }}>
