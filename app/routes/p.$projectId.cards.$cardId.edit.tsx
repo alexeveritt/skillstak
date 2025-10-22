@@ -2,8 +2,9 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { Form, Link, redirect, useActionData, useLoaderData } from "react-router";
 import { requireUserId } from "../server/session";
-import { q, run } from "../server/db";
 import { cardSchema } from "../lib/z";
+import * as projectService from "../services/project.service";
+import * as cardService from "../services/card.service";
 
 type LoaderData = {
   project: { id: string; name: string } | null;
@@ -11,7 +12,6 @@ type LoaderData = {
     id: string;
     front: string;
     back: string;
-    color: string | null;
   } | null;
 };
 
@@ -25,25 +25,13 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const cardId = params.cardId!;
 
   // Ensure the project belongs to the current user and load the card.
-  const project = (
-    await q<{ id: string; name: string }>(
-      context.cloudflare.env,
-      "SELECT id, name FROM project WHERE id = ? AND user_id = ?",
-      [projectId, userId]
-    )
-  )[0];
+  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
 
   if (!project) {
     throw new Response("Project not found", { status: 404 });
   }
 
-  const card = (
-    await q<{ id: string; front: string; back: string; color: string | null }>(
-      context.cloudflare.env,
-      "SELECT id, front, back, color FROM card WHERE id = ? AND project_id = ?",
-      [cardId, projectId]
-    )
-  )[0];
+  const card = await cardService.getCard(context.cloudflare.env, cardId, projectId);
 
   if (!card) {
     throw new Response("Card not found", { status: 404 });
@@ -63,16 +51,7 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
   const cardId = params.cardId!;
 
   // Check ownership first (protect updates/deletes)
-  const owns = (
-    await q<{ ok: number }>(
-      env,
-      `SELECT COUNT(*) AS ok
-       FROM project p
-       JOIN card c ON c.project_id = p.id
-       WHERE p.id = ? AND p.user_id = ? AND c.id = ?`,
-      [projectId, userId, cardId]
-    )
-  )[0]?.ok;
+  const owns = await cardService.verifyCardOwnership(env, cardId, projectId, userId);
   if (!owns) {
     throw new Response("Not found", { status: 404 });
   }
@@ -81,9 +60,7 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
   const intent = String(fd.get("intent") || "save");
 
   if (intent === "delete") {
-    // Remove schedule first (FK-friendly), then card
-    await run(env, "DELETE FROM card_schedule WHERE card_id = ?", [cardId]);
-    await run(env, "DELETE FROM card WHERE id = ? AND project_id = ?", [cardId, projectId]);
+    await cardService.deleteCard(env, cardId, projectId);
     return redirect(`/p/${projectId}`);
   }
 
@@ -91,20 +68,13 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
   const data = {
     front: String(fd.get("front") || ""),
     back: String(fd.get("back") || ""),
-    color: (String(fd.get("color") || "") || undefined) as string | undefined,
   };
   const parsed = cardSchema.safeParse(data);
   if (!parsed.success) {
     return { error: "Front and back are required", values: data };
   }
 
-  await run(env, "UPDATE card SET front = ?, back = ?, color = ? WHERE id = ? AND project_id = ?", [
-    data.front,
-    data.back,
-    data.color ?? null,
-    cardId,
-    projectId,
-  ]);
+  await cardService.updateCard(env, cardId, projectId, data.front, data.back);
 
   return redirect(`/p/${projectId}`);
 }
@@ -112,13 +82,12 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
 export default function EditCard() {
   const { project, card } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>() as
-    | { error?: string; values?: { front: string; back: string; color?: string } }
+    | { error?: string; values?: { front: string; back: string } }
     | undefined;
 
   const defaults = {
     front: actionData?.values?.front ?? card?.front ?? "",
     back: actionData?.values?.back ?? card?.back ?? "",
-    color: actionData?.values?.color ?? card?.color ?? "",
   };
 
   return (
@@ -140,9 +109,6 @@ export default function EditCard() {
           className="border p-2 rounded min-h-[120px]"
           placeholder="Back"
         />
-
-        <label className="text-sm">Color (optional)</label>
-        <input name="color" defaultValue={defaults.color || ""} className="border p-2 rounded" placeholder="#fef3c7" />
 
         <div className="flex items-center gap-2 mt-2">
           <button name="intent" value="save" className="bg-black text-white rounded px-4 py-2">

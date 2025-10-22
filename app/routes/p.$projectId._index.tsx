@@ -2,26 +2,23 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import { requireUserId } from "../server/session";
-import { q } from "../server/db";
+import * as projectService from "../services/project.service";
+import * as cardService from "../services/card.service";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
   const projectId = params.projectId!;
-  const [project] = await q<{ id: string; name: string }>(
-    context.cloudflare.env,
-    "SELECT id, name FROM project WHERE id = ? AND user_id = ?",
-    [projectId, userId]
-  );
-  const cards = await q<{ id: string; front: string; back: string; color: string | null }>(
-    context.cloudflare.env,
-    "SELECT id, front, back, color FROM card WHERE project_id = ? ORDER BY created_at DESC",
-    [projectId]
-  );
+
+  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
+  const cards = await cardService.listCards(context.cloudflare.env, projectId);
+
   return { project, cards };
 }
 
 export default function ProjectDetail() {
   const { project, cards } = useLoaderData<typeof loader>();
+  const projectColor = project?.color || "#fef3c7";
+
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-3">{project?.name}</h1>
@@ -32,11 +29,20 @@ export default function ProjectDetail() {
         <Link to="review" className="underline">
           Practice
         </Link>
+        <Link to="edit" className="underline">
+          Edit Project
+        </Link>
       </div>
+      {project?.color && (
+        <div className="mb-3 text-sm text-slate-600">
+          Project color:{" "}
+          <span className="inline-block w-4 h-4 rounded border" style={{ backgroundColor: projectColor }}></span>{" "}
+          {projectColor}
+        </div>
+      )}
       <ul className="grid gap-3">
         {cards.map((c) => (
-          <li key={c.id} className="border rounded p-3">
-            <div className="text-sm text-slate-600">{c.color || "#fef3c7"}</div>
+          <li key={c.id} className="border rounded p-3" style={{ backgroundColor: projectColor }}>
             <div className="font-medium">{c.front}</div>
             <div className="text-slate-700">{c.back}</div>
             <Link to={`cards/${c.id}/edit`} className="text-sm underline">

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS project (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
   name TEXT NOT NULL,
+  color TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY(user_id) REFERENCES user(id)
 );
@@ -31,7 +32,6 @@ CREATE TABLE IF NOT EXISTS card (
   project_id TEXT NOT NULL,
   front TEXT NOT NULL,
   back TEXT NOT NULL,
-  color TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY(project_id) REFERENCES project(id)
 );

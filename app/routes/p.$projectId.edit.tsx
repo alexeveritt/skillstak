@@ -1,18 +1,14 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, redirect, useLoaderData } from "react-router";
 import { requireUserId } from "../server/session";
-import { q } from "../server/db";
 import { DeleteProjectModal } from "../components/DeleteProjectModal";
+import * as projectService from "../services/project.service";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
   const projectId = params.projectId!;
 
-  const [project] = await q<{ id: string; name: string }>(
-    context.cloudflare.env,
-    "SELECT id, name FROM project WHERE id = ? AND user_id = ?",
-    [projectId, userId]
-  );
+  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
 
   if (!project) {
     throw new Response("Project not found", { status: 404 });
@@ -28,21 +24,18 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
   const intent = formData.get("intent");
 
   if (intent === "delete") {
-    await q(context.cloudflare.env, "DELETE FROM card WHERE project_id = ?", [projectId]);
-    await q(context.cloudflare.env, "DELETE FROM project WHERE id = ? AND user_id = ?", [projectId, userId]);
+    await projectService.deleteProject(context.cloudflare.env, projectId, userId);
     return redirect("/");
   }
 
   const name = formData.get("name") as string;
+  const color = (formData.get("color") as string) || undefined;
+
   if (!name || name.trim().length === 0) {
     return { error: "Project name is required" };
   }
 
-  await q(context.cloudflare.env, "UPDATE project SET name = ? WHERE id = ? AND user_id = ?", [
-    name.trim(),
-    projectId,
-    userId,
-  ]);
+  await projectService.updateProject(context.cloudflare.env, projectId, userId, name.trim(), color);
   return redirect(`/p/${projectId}`);
 }
 
@@ -64,6 +57,19 @@ export default function EditProject() {
             defaultValue={project.name}
             className="w-full border rounded px-3 py-2"
             required
+          />
+        </div>
+        <div>
+          <label htmlFor="color" className="block text-sm font-medium mb-1">
+            Color (optional)
+          </label>
+          <input
+            type="text"
+            id="color"
+            name="color"
+            defaultValue={project.color || ""}
+            placeholder="#fef3c7"
+            className="w-full border rounded px-3 py-2"
           />
         </div>
         <div className="flex gap-2">

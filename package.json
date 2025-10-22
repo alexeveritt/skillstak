@@ -15,6 +15,8 @@
     "d1:export-local": "node scripts/export-local-db.js",
     "d1:delete-local": "rm -rf .wrangler/state/",
     "d1:reset-local": "npm run d1:delete-local && npm run d1:apply:local",
+    "migrate:local": "node scripts/migrate-local.js",
+    "migrate:prod": "node scripts/migrate-prod.js",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
