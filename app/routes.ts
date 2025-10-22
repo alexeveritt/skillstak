@@ -11,6 +11,7 @@ export default [
   route("p/:projectId", "routes/p.$projectId._index.tsx"),
   route("p/:projectId/edit", "routes/p.$projectId.edit.tsx"),
   route("p/:projectId/review", "routes/p.$projectId.review.tsx"),
+  route("p/:projectId/cards", "routes/p.$projectId.cards._index.tsx"),
   route("p/:projectId/cards/new", "routes/p.$projectId.cards.new.tsx"),
   route("p/:projectId/cards/:cardId/edit", "routes/p.$projectId.cards.$cardId.edit.tsx"),
   // Catch-all for .well-known and other 404s

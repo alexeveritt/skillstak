@@ -3,7 +3,6 @@ import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import { requireUserId } from "../server/session";
 import * as projectService from "../services/project.service";
-import * as cardService from "../services/card.service";
 import * as reviewService from "../services/review.service";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
@@ -11,30 +10,56 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const projectId = params.projectId!;
 
   const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
-  const cards = await cardService.listCards(context.cloudflare.env, projectId);
   const stats = await reviewService.getProjectStats(context.cloudflare.env, projectId, userId);
 
-  return { project, cards, stats };
+  return { project, stats };
 }
 
 export default function ProjectDetail() {
-  const { project, cards, stats } = useLoaderData<typeof loader>();
+  const { project, stats } = useLoaderData<typeof loader>();
   const projectColor = project?.color || "#fef3c7";
   const projectForegroundColor = project?.foreground_color || "#78350f";
 
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <h1 className="text-3xl font-bold" style={{ color: projectForegroundColor }}>
-          {project?.name}
-        </h1>
-        {project?.color && (
-          <span
-            className="w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm"
-            style={{ backgroundColor: projectColor }}
-          ></span>
-        )}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold" style={{ color: projectForegroundColor }}>
+            {project?.name}
+          </h1>
+          {project?.color && (
+            <span
+              className="w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm"
+              style={{ backgroundColor: projectColor }}
+            ></span>
+          )}
+        </div>
+
+        {/* Edit Menu */}
+        <div className="relative group">
+          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="1"></circle>
+              <circle cx="12" cy="5" r="1"></circle>
+              <circle cx="12" cy="19" r="1"></circle>
+            </svg>
+          </button>
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+            <Link
+              to="edit"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
+            >
+              ✏️ Edit Project
+            </Link>
+            <Link
+              to="cards"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
+            >
+              📚 View Cards List
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Stats Dashboard */}
@@ -142,16 +167,9 @@ export default function ProjectDetail() {
         </Link>
       </div>
 
-      {/* Cards List */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-800">All Cards</h2>
-          <Link to="edit" className="text-sm text-gray-600 hover:text-gray-800 underline">
-            Edit Project
-          </Link>
-        </div>
-
-        {cards.length === 0 ? (
+      {/* Empty State when no cards */}
+      {stats && stats.total_cards === 0 && (
+        <div className="bg-white rounded-xl shadow-md p-6">
           <div className="text-center py-12">
             <div className="text-5xl mb-3">📝</div>
             <p className="text-gray-600 mb-4">No cards yet! Add your first card to get started.</p>
@@ -162,31 +180,8 @@ export default function ProjectDetail() {
               ➕ Add First Card
             </Link>
           </div>
-        ) : (
-          <ul className="grid gap-3">
-            {cards.map((c) => (
-              <li
-                key={c.id}
-                className="border-2 rounded-lg p-4 hover:shadow-md transition-shadow"
-                style={{
-                  borderColor: projectColor,
-                  backgroundColor: `${projectColor}20`,
-                }}
-              >
-                <div className="font-semibold text-gray-800 mb-1">{c.front}</div>
-                <div className="text-gray-600 text-sm mb-2">{c.back}</div>
-                <Link
-                  to={`cards/${c.id}/edit`}
-                  className="text-sm font-medium hover:underline"
-                  style={{ color: projectForegroundColor }}
-                >
-                  ✏️ Edit
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

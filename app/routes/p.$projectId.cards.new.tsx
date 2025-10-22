@@ -23,7 +23,7 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
 
   await cardService.createCard(context.cloudflare.env, projectId, data.front, data.back);
 
-  return redirect(`/p/${projectId}`);
+  return redirect(`/p/${projectId}/cards`);
 }
 
 export default function NewCard() {
