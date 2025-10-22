@@ -66,9 +66,14 @@ export default function Home() {
                 {p.due} due - {p.total} cards
               </div>
             </div>
-            <Link to={`/p/${p.id}/review`} className="text-sm underline">
-              Practice
-            </Link>
+            <div className="flex gap-2 items-center">
+              <Link to={`/p/${p.id}/review`} className="text-sm underline">
+                Practice
+              </Link>
+              <Link to={`/p/${p.id}/edit`} className="text-sm underline text-blue-600">
+                Edit
+              </Link>
+            </div>
           </li>
         ))}
       </ul>
