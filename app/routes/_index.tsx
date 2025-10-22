@@ -1,10 +1,11 @@
 // app/routes/_index.tsx
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { Form, Link, useLoaderData, redirect } from "react-router";
+import { Form, Link, useLoaderData, redirect, useActionData, useNavigation } from "react-router";
 import { getSession, requireUserId } from "../server/session";
 import { q, run } from "../server/db";
 import { projectSchema } from "../lib/z";
 import { newId } from "../lib/id";
+import { useState, useEffect, useRef } from "react";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   // Check if user is logged in, if not redirect to login
@@ -38,13 +39,22 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
 export default function Home() {
   const { projects } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const [name, setName] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Reset input when form is successfully submitted
+  useEffect(() => {
+    if (navigation.state === "idle" && !actionData?.error) {
+      setName("");
+      inputRef.current?.focus();
+    }
+  }, [navigation.state, actionData]);
+
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-4">Your projects</h1>
-      <Form method="post" className="flex gap-2 mb-4">
-        <input name="name" placeholder="New project" className="border p-2 rounded flex-1" />
-        <button className="bg-black text-white rounded px-4">Add</button>
-      </Form>
       <ul className="grid gap-3">
         {projects.map((p) => (
           <li key={p.id} className="border rounded p-3 flex items-center justify-between">
@@ -62,6 +72,18 @@ export default function Home() {
           </li>
         ))}
       </ul>
+      <Form method="post" className="flex gap-2 mt-4">
+        <input
+          ref={inputRef}
+          name="name"
+          placeholder="New project"
+          className="border p-2 rounded flex-1"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <button className="bg-black text-white rounded px-4">Add</button>
+      </Form>
+      {actionData?.error && <div className="text-red-600 mt-2">{actionData.error}</div>}
     </div>
   );
 }
