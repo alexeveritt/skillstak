@@ -1,27 +1,25 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useMatches } from "react-router";
 import { useState } from "react";
 import { requireUserId } from "../server/session";
-import * as projectService from "../services/project.service";
 import * as cardService from "../services/card.service";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
   const projectId = params.projectId!;
 
-  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
-
-  if (!project) {
-    throw new Response("Project not found", { status: 404 });
-  }
-
   const cards = await cardService.listCards(context.cloudflare.env, projectId);
 
-  return { project, cards };
+  return { cards };
 }
 
 export default function ExportCards() {
-  const { project, cards: allCards } = useLoaderData<typeof loader>();
+  const { cards: allCards } = useLoaderData<typeof loader>();
+  const matches = useMatches();
+  const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
+    | { project?: { id: string; name: string; color?: string; foreground_color?: string } }
+    | undefined;
+  const project = layoutData?.project;
   const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set(allCards.map((card) => card.id)));
 
   const handleToggleCard = (cardId: string) => {

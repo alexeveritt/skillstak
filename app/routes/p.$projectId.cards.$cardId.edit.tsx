@@ -1,19 +1,9 @@
 // app/routes/p.$projectId.cards.$cardId.edit.tsx
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { Form, Link, redirect, useActionData, useLoaderData } from "react-router";
+import { Form, Link, redirect, useActionData, useLoaderData, useMatches } from "react-router";
 import { requireUserId } from "../server/session";
 import { cardSchema } from "../lib/z";
-import * as projectService from "../services/project.service";
 import * as cardService from "../services/card.service";
-
-type LoaderData = {
-  project: { id: string; name: string } | null;
-  card: {
-    id: string;
-    front: string;
-    back: string;
-  } | null;
-};
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({
@@ -24,21 +14,13 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const projectId = params.projectId!;
   const cardId = params.cardId!;
 
-  // Ensure the project belongs to the current user and load the card.
-  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
-
-  if (!project) {
-    throw new Response("Project not found", { status: 404 });
-  }
-
   const card = await cardService.getCard(context.cloudflare.env, cardId, projectId);
 
   if (!card) {
     throw new Response("Card not found", { status: 404 });
   }
 
-  const data: LoaderData = { project, card };
-  return data;
+  return { card };
 }
 
 export async function action({ params, request, context }: ActionFunctionArgs) {
@@ -80,7 +62,12 @@ export async function action({ params, request, context }: ActionFunctionArgs) {
 }
 
 export default function EditCard() {
-  const { project, card } = useLoaderData<typeof loader>();
+  const { card } = useLoaderData<typeof loader>();
+  const matches = useMatches();
+  const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
+    | { project?: { id: string; name: string; color?: string; foreground_color?: string } }
+    | undefined;
+  const project = layoutData?.project;
   const actionData = useActionData<typeof action>() as
     | { error?: string; values?: { front: string; back: string } }
     | undefined;

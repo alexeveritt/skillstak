@@ -1,18 +1,16 @@
 // app/routes/p.$projectId._index.tsx
 import type { LoaderFunctionArgs } from "react-router";
-import { Link, useLoaderData } from "react-router";
+import { Link, useLoaderData, useMatches } from "react-router";
 import { requireUserId } from "../server/session";
-import * as projectService from "../services/project.service";
 import * as reviewService from "../services/review.service";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
   const projectId = params.projectId!;
 
-  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
   const stats = await reviewService.getProjectStats(context.cloudflare.env, projectId, userId);
 
-  return { project, stats };
+  return { stats };
 }
 
 function formatNextReviewTime(nextDueAt: string | null): string | null {
@@ -23,23 +21,23 @@ function formatNextReviewTime(nextDueAt: string | null): string | null {
   let dueDate: Date;
 
   try {
-    if (nextDueAt.endsWith('Z')) {
+    if (nextDueAt.endsWith("Z")) {
       dueDate = new Date(nextDueAt);
-    } else if (nextDueAt.includes('T')) {
+    } else if (nextDueAt.includes("T")) {
       // ISO format without Z
-      dueDate = new Date(nextDueAt + 'Z');
+      dueDate = new Date(nextDueAt + "Z");
     } else {
       // SQLite format 'YYYY-MM-DD HH:MM:SS' - replace space with T and add Z
-      dueDate = new Date(nextDueAt.replace(' ', 'T') + 'Z');
+      dueDate = new Date(nextDueAt.replace(" ", "T") + "Z");
     }
 
     // Check if date is valid
     if (isNaN(dueDate.getTime())) {
-      console.error('Invalid date format:', nextDueAt);
+      console.error("Invalid date format:", nextDueAt);
       return null;
     }
   } catch (error) {
-    console.error('Error parsing date:', nextDueAt, error);
+    console.error("Error parsing date:", nextDueAt, error);
     return null;
   }
 
@@ -57,27 +55,32 @@ function formatNextReviewTime(nextDueAt: string | null): string | null {
   const diffDays = Math.floor(diffHours / 24);
 
   if (diffMinutes < 60) {
-    return `in ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+    return `in ${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""}`;
   } else if (diffHours < 24) {
-    return `in ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+    return `in ${diffHours} hour${diffHours !== 1 ? "s" : ""}`;
   } else if (diffDays === 1) {
     return "tomorrow";
   } else if (diffDays < 7) {
     return `in ${diffDays} days`;
   } else {
     const weeks = Math.floor(diffDays / 7);
-    return `in ${weeks} week${weeks !== 1 ? 's' : ''}`;
+    return `in ${weeks} week${weeks !== 1 ? "s" : ""}`;
   }
 }
 
 export default function ProjectDetail() {
-  const { project, stats } = useLoaderData<typeof loader>();
+  const { stats } = useLoaderData<typeof loader>();
+  const matches = useMatches();
+  const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
+    | { project?: { id: string; name: string; color?: string; foreground_color?: string } }
+    | undefined;
+  const project = layoutData?.project;
   const projectColor = project?.color || "#fef3c7";
   const projectForegroundColor = project?.foreground_color || "#78350f";
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
+    <>
+      {/* Header with Edit Menu - Only on main project page */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold" style={{ color: projectForegroundColor }}>
@@ -220,7 +223,7 @@ export default function ProjectDetail() {
                 <span className="text-xl">Start Review Session</span>
               </div>
               <div className="text-sm opacity-90">
-                {stats.due_now} card{stats.due_now !== 1 ? 's' : ''} ready for spaced repetition review
+                {stats.due_now} card{stats.due_now !== 1 ? "s" : ""} ready for spaced repetition review
               </div>
             </Link>
 
@@ -249,7 +252,10 @@ export default function ProjectDetail() {
                   const nextReviewTime = formatNextReviewTime(stats?.next_due_at ?? null);
                   if (nextReviewTime) {
                     return (
-                      <>No cards are due for review right now. Your next review will be <strong>{nextReviewTime}</strong>.</>
+                      <>
+                        No cards are due for review right now. Your next review will be{" "}
+                        <strong>{nextReviewTime}</strong>.
+                      </>
                     );
                   } else if (stats?.next_due_at) {
                     return <>You're all done for now. Come back later to review more cards.</>;
@@ -292,6 +298,6 @@ export default function ProjectDetail() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

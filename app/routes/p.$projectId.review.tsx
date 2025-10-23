@@ -1,11 +1,10 @@
 // app/routes/p.$projectId.review.tsx
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { Form, useLoaderData, useActionData, Link } from "react-router";
+import { Form, useLoaderData, useActionData, Link, useMatches } from "react-router";
 import { useState, useEffect } from "react";
 import { requireUserId } from "../server/session";
 import { CardFlip } from "../components/CardFlip";
 import * as reviewService from "../services/review.service";
-import * as projectService from "../services/project.service";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
@@ -13,7 +12,6 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const mode = url.searchParams.get("mode") || "review"; // "review" or "practice"
 
-  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
   const stats = await reviewService.getProjectStats(context.cloudflare.env, projectId, userId);
 
   let card = null;
@@ -26,7 +24,7 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     card = await reviewService.getNextDueCard(context.cloudflare.env, projectId, userId);
   }
 
-  return { card, practiceCards, project, stats, mode };
+  return { card, practiceCards, stats, mode };
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
@@ -63,8 +61,13 @@ function formatTimeUntil(dueAt: string | null): string {
 }
 
 export default function Review() {
-  const { card, practiceCards, project, stats, mode } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
+  const { card, practiceCards, stats, mode } = useLoaderData<typeof loader>();
+  const matches = useMatches();
+  // Find the layout route data
+  const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
+    | { project?: { id: string; name: string; color?: string; foreground_color?: string } }
+    | undefined;
+  const project = layoutData?.project;
   const projectColor = project?.color || "#fef3c7";
   const projectForegroundColor = project?.foreground_color || "#78350f";
 
@@ -79,8 +82,8 @@ export default function Review() {
 
   // Calculate score directly from answers array - no useMemo needed
   const score = {
-    correct: answers.filter(a => a === "good").length,
-    incorrect: answers.filter(a => a === "again").length
+    correct: answers.filter((a) => a === "good").length,
+    incorrect: answers.filter((a) => a === "again").length,
   };
 
   // Handle auto-advance after answer is recorded
@@ -92,7 +95,7 @@ export default function Review() {
       const timer = setTimeout(() => {
         if (currentCardIndex < practiceCards.length - 1) {
           setIsFlipped(false);
-          setCurrentCardIndex(prev => prev + 1);
+          setCurrentCardIndex((prev) => prev + 1);
           setTimeout(() => setIsTransitioning(false), 50);
         } else {
           setSessionComplete(true);
@@ -151,10 +154,6 @@ export default function Review() {
           >
             Practice Again
           </Link>
-
-          <Link to={`/p/${project?.id}`} className="block text-center text-gray-600 hover:text-gray-800 underline mt-4">
-            Back to Project
-          </Link>
         </div>
       </div>
     );
@@ -195,9 +194,7 @@ export default function Review() {
 
         {/* Card */}
         <div className="mb-4">
-          <div
-            className={`relative transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
-          >
+          <div className={`relative transition-opacity duration-300 ${isTransitioning ? "opacity-0" : "opacity-100"}`}>
             <CardFlip
               front={currentCard.front}
               back={currentCard.back}
@@ -215,10 +212,7 @@ export default function Review() {
         </div>
 
         {/* Action Buttons */}
-        <Form
-          method="post"
-          className="flex gap-4"
-        >
+        <Form method="post" className="flex gap-4">
           <input type="hidden" name="cardId" value={currentCard.id} />
           <input type="hidden" name="mode" value="practice" />
 
@@ -235,9 +229,9 @@ export default function Review() {
               formData.append("result", "again");
               formData.append("mode", "practice");
               fetch(window.location.pathname, {
-                method: 'POST',
-                body: formData
-              }).catch(err => console.error('Failed to save:', err));
+                method: "POST",
+                body: formData,
+              }).catch((err) => console.error("Failed to save:", err));
             }}
             className="flex-1 bg-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
@@ -258,9 +252,9 @@ export default function Review() {
               formData.append("result", "good");
               formData.append("mode", "practice");
               fetch(window.location.pathname, {
-                method: 'POST',
-                body: formData
-              }).catch(err => console.error('Failed to save:', err));
+                method: "POST",
+                body: formData,
+              }).catch((err) => console.error("Failed to save:", err));
             }}
             className="flex-1 bg-green-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
@@ -268,10 +262,6 @@ export default function Review() {
             <div className="text-lg">I Got This!</div>
           </button>
         </Form>
-
-        <Link to={`/p/${project?.id}`} className="block text-center text-gray-600 hover:text-gray-800 underline mt-6">
-          Back to Project
-        </Link>
       </div>
     );
   }
@@ -343,21 +333,6 @@ export default function Review() {
                 </div>
               )}
             </div>
-
-            {/* Practice Mode Button */}
-            <Link
-              to={`?mode=practice`}
-              className="block w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center font-bold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-            >
-              Practice Random Cards
-            </Link>
-
-            <Link
-              to={`/p/${project?.id}`}
-              className="block w-full text-center text-gray-600 hover:text-gray-800 underline mt-4"
-            >
-              Back to Project
-            </Link>
           </div>
         )}
 
@@ -445,10 +420,6 @@ export default function Review() {
           <div className="text-lg">I Got This!</div>
         </button>
       </Form>
-
-      <Link to={`/p/${project?.id}`} className="block text-center text-gray-600 hover:text-gray-800 underline mt-6">
-        Back to Project
-      </Link>
     </div>
   );
 }

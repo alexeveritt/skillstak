@@ -180,7 +180,10 @@ export default function Home() {
         <>
           <div className="grid gap-4">
             {projects.map((p) => (
-              <Card key={p.id} className="group hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer">
+              <Card
+                key={p.id}
+                className="group hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              >
                 <Link to={`/p/${p.id}`} className="block">
                   <CardHeader className="relative pb-3">
                     <div className="flex items-start justify-between gap-3">
@@ -237,9 +240,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                             {p.stats.mastered_cards}
                           </div>
-                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">
-                            ⭐ Mastered
-                          </div>
+                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">⭐ Mastered</div>
                         </div>
 
                         {/* Learning Cards */}
@@ -257,9 +258,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                             {p.stats.new_cards}
                           </div>
-                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">
-                            ✨ New
-                          </div>
+                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">✨ New</div>
                         </div>
                       </div>
 
