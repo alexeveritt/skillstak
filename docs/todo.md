@@ -1,5 +1,3 @@
-on delete all projects an error thrown
-
 
 Allow switch testing e.g. front to back or back to front
 make background and all pages a bit more colorful
