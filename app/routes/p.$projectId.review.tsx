@@ -71,36 +71,64 @@ export default function Review() {
   // Practice mode state
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [score, setScore] = useState({ correct: 0, incorrect: 0 });
+  const [answers, setAnswers] = useState<("good" | "again")[]>([]); // Track all answers
   const [sessionComplete, setSessionComplete] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const isPracticeMode = mode === "practice";
 
-  // Handle auto-advance after action in practice mode
+  // Calculate score directly from answers array - no useMemo needed
+  const score = {
+    correct: answers.filter(a => a === "good").length,
+    incorrect: answers.filter(a => a === "again").length
+  };
+
+  console.log('=== SCORE CALCULATION ===');
+  console.log('answers array:', answers);
+  console.log('score.correct:', score.correct);
+  console.log('score.incorrect:', score.incorrect);
+  console.log('answers.length:', answers.length);
+
+  // Handle auto-advance after answer is recorded
   useEffect(() => {
-    if (actionData?.ok && isPracticeMode && practiceCards) {
+    if (isPracticeMode && practiceCards && answers.length > currentCardIndex) {
+      console.log('Auto-advance triggered, answers:', answers.length, 'currentIndex:', currentCardIndex);
+      // Start transition
+      setIsTransitioning(true);
+
       const timer = setTimeout(() => {
         if (currentCardIndex < practiceCards.length - 1) {
-          setCurrentCardIndex((prev) => prev + 1);
           setIsFlipped(false);
+          setCurrentCardIndex(prev => prev + 1);
+          setTimeout(() => setIsTransitioning(false), 50);
         } else {
           setSessionComplete(true);
+          setIsTransitioning(false);
         }
-      }, 500);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [actionData, isPracticeMode, currentCardIndex, practiceCards]);
+  }, [answers.length, isPracticeMode, practiceCards, currentCardIndex]);
 
   const handleCardFlip = () => {
     setIsFlipped((prev) => !prev);
   };
 
   const handleAnswer = (result: "again" | "good") => {
-    if (result === "good") {
-      setScore((prev) => ({ ...prev, correct: prev.correct + 1 }));
-    } else {
-      setScore((prev) => ({ ...prev, incorrect: prev.incorrect + 1 }));
-    }
+    console.log('=== handleAnswer DEBUG ===');
+    console.log('handleAnswer called with result:', result);
+    console.log('result type:', typeof result);
+    console.log('result === "good":', result === "good");
+    console.log('result === "again":', result === "again");
+    console.log('Current answers:', answers);
+
+    // Add this answer to the array
+    setAnswers((prev) => {
+      const newAnswers = [...prev, result];
+      console.log('New answers after adding:', newAnswers);
+      console.log('Each answer:', newAnswers.map((a, i) => `[${i}]: "${a}" (type: ${typeof a})`));
+      return newAnswers;
+    });
   };
 
   // Practice mode - session complete
@@ -134,7 +162,7 @@ export default function Review() {
             to={`?mode=practice`}
             onClick={() => {
               setCurrentCardIndex(0);
-              setScore({ correct: 0, incorrect: 0 });
+              setAnswers([]);
               setSessionComplete(false);
               setIsFlipped(false);
             }}
@@ -155,8 +183,10 @@ export default function Review() {
   if (isPracticeMode && practiceCards && practiceCards.length > 0) {
     const currentCard = practiceCards[currentCardIndex];
 
+    console.log('Rendering card, current answers:', answers, 'calculated score:', score);
+
     return (
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto" key={`card-${currentCardIndex}-${answers.length}`}>
         {/* Progress Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
@@ -172,7 +202,7 @@ export default function Review() {
                 Card {currentCardIndex + 1} of {practiceCards.length}
               </span>
               <span className="text-sm text-gray-600">
-                Score: {score.correct} / {score.correct + score.incorrect}
+                Score: {score.correct} / {score.correct + score.incorrect} (Total answers: {answers.length})
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -186,46 +216,50 @@ export default function Review() {
 
         {/* Card */}
         <div className="mb-4">
-          <div className="text-center text-sm font-medium text-gray-500 mb-2">{isFlipped ? "Answer" : "Question"}</div>
-          <div onClick={handleCardFlip}>
+          <div
+            className={`relative transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
+          >
             <CardFlip
               front={currentCard.front}
               back={currentCard.back}
               color={projectColor}
               foregroundColor={projectForegroundColor}
+              flipped={isFlipped}
+              onFlip={handleCardFlip}
             />
+            <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
+              <span className="text-blue-600 underline text-sm font-medium opacity-80">
+                {isFlipped ? "Click to view question" : "Click to view answer"}
+              </span>
+            </div>
           </div>
         </div>
-
-        {/* See Answer Button */}
-        {!isFlipped && (
-          <div className="mb-4">
-            <button
-              onClick={handleCardFlip}
-              className="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-            >
-              Show Answer
-            </button>
-          </div>
-        )}
 
         {/* Action Buttons */}
         <Form
           method="post"
           className="flex gap-4"
-          onSubmit={(e) => {
-            const formData = new FormData(e.currentTarget);
-            const result = formData.get("result") as "again" | "good";
-            handleAnswer(result);
-          }}
         >
           <input type="hidden" name="cardId" value={currentCard.id} />
           <input type="hidden" name="mode" value="practice" />
 
           <button
+            type="button"
             name="result"
             value="again"
             disabled={!isFlipped}
+            onClick={() => {
+              handleAnswer("again");
+              // Submit to server in the background for persistence
+              const formData = new FormData();
+              formData.append("cardId", currentCard.id);
+              formData.append("result", "again");
+              formData.append("mode", "practice");
+              fetch(window.location.pathname, {
+                method: 'POST',
+                body: formData
+              }).catch(err => console.error('Failed to save:', err));
+            }}
             className="flex-1 bg-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             <div className="text-sm mb-1">I need to review this</div>
@@ -233,9 +267,22 @@ export default function Review() {
           </button>
 
           <button
+            type="button"
             name="result"
             value="good"
             disabled={!isFlipped}
+            onClick={() => {
+              handleAnswer("good");
+              // Submit to server in the background for persistence
+              const formData = new FormData();
+              formData.append("cardId", currentCard.id);
+              formData.append("result", "good");
+              formData.append("mode", "practice");
+              fetch(window.location.pathname, {
+                method: 'POST',
+                body: formData
+              }).catch(err => console.error('Failed to save:', err));
+            }}
             className="flex-1 bg-green-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             <div className="text-sm mb-1">I know this well</div>
@@ -377,22 +424,22 @@ export default function Review() {
 
       <div className="mb-4">
         <div className="text-center text-sm font-medium text-gray-500 mb-2">{isFlipped ? "Answer" : "Question"}</div>
-        <div onClick={handleCardFlip}>
-          <CardFlip front={card.front} back={card.back} color={projectColor} foregroundColor={projectForegroundColor} />
+        <div className="relative">
+          <CardFlip
+            front={card.front}
+            back={card.back}
+            color={projectColor}
+            foregroundColor={projectForegroundColor}
+            flipped={isFlipped}
+            onFlip={handleCardFlip}
+          />
+          <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
+            <span className="text-blue-600 underline text-sm font-medium opacity-80">
+              {isFlipped ? "Click to view question" : "Click to view answer"}
+            </span>
+          </div>
         </div>
       </div>
-
-      {/* See Answer Button */}
-      {!isFlipped && (
-        <div className="mb-4">
-          <button
-            onClick={handleCardFlip}
-            className="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            Show Answer
-          </button>
-        </div>
-      )}
 
       {/* Button Form */}
       <Form method="post" className="flex gap-4">

@@ -7,18 +7,38 @@ export function CardFlip({
   back,
   color = "#fef3c7",
   foregroundColor = "#78350f",
+  flipped: controlledFlipped,
+  onFlip,
 }: {
   front: string;
   back: string;
   color?: string;
   foregroundColor?: string;
+  flipped?: boolean;
+  onFlip?: () => void;
 }) {
-  const [flipped, setFlipped] = useState(false);
+  const [uncontrolledFlipped, setUncontrolledFlipped] = useState(false);
+
+  // Use controlled flipped if provided, otherwise use internal state
+  const isFlipped =
+    controlledFlipped !== undefined ? controlledFlipped : uncontrolledFlipped;
+
+  const handleClick = () => {
+    if (onFlip) {
+      onFlip();
+    } else {
+      setUncontrolledFlipped((v) => !v);
+    }
+  };
+
   return (
     <div className="card3d w-full">
       <div
-        className={clsx("card-inner w-full rounded-2xl shadow p-6 min-h-[220px] cursor-pointer", flipped && "flipped")}
-        onClick={() => setFlipped((v) => !v)}
+        className={clsx(
+          "card-inner w-full rounded-2xl shadow p-6 min-h-[220px] cursor-pointer",
+          isFlipped && "flipped"
+        )}
+        onClick={handleClick}
         style={{ background: color, color: foregroundColor }}
       >
         <div className="card-face">
