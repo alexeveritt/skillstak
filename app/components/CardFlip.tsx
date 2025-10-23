@@ -20,8 +20,7 @@ export function CardFlip({
   const [uncontrolledFlipped, setUncontrolledFlipped] = useState(false);
 
   // Use controlled flipped if provided, otherwise use internal state
-  const isFlipped =
-    controlledFlipped !== undefined ? controlledFlipped : uncontrolledFlipped;
+  const isFlipped = controlledFlipped !== undefined ? controlledFlipped : uncontrolledFlipped;
 
   const handleClick = () => {
     if (onFlip) {

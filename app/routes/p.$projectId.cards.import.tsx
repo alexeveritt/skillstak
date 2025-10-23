@@ -1,8 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, redirect, useActionData, useLoaderData } from "react-router";
+import { Form, redirect, useActionData, useLoaderData, useMatches } from "react-router";
 import { useState, useEffect } from "react";
 import { requireUserId } from "../server/session";
-import * as projectService from "../services/project.service";
 import * as cardService from "../services/card.service";
 
 type ImportCard = {
@@ -12,16 +11,8 @@ type ImportCard = {
 };
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
-  const projectId = params.projectId!;
-
-  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
-
-  if (!project) {
-    throw new Response("Project not found", { status: 404 });
-  }
-
-  return { project };
+  await requireUserId({ request, cloudflare: context.cloudflare });
+  return {};
 }
 
 export async function action({ params, context, request }: ActionFunctionArgs) {
@@ -115,7 +106,11 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
 }
 
 export default function ImportCards() {
-  const { project } = useLoaderData<typeof loader>();
+  const matches = useMatches();
+  const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
+    | { project?: { id: string; name: string; color?: string; foreground_color?: string } }
+    | undefined;
+  const project = layoutData?.project;
   const actionData = useActionData<typeof action>();
   const [cards, setCards] = useState<ImportCard[]>(actionData?.cards || []);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
