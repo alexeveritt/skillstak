@@ -99,6 +99,27 @@ export default function EditProject() {
       </Form>
       <hr className="my-8" />
       <div>
+        <h2 className="text-lg font-semibold mb-2">Import & Export Cards</h2>
+        <p className="text-sm text-gray-600 mb-3">
+          Import cards from a JSON file or export your existing cards to share or backup.
+        </p>
+        <div className="flex items-center gap-2">
+          <a
+            href={`/p/${project.id}/cards/import`}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Import Cards
+          </a>
+          <a
+            href={`/p/${project.id}/cards/export`}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Export Cards
+          </a>
+        </div>
+      </div>
+      <hr className="my-8" />
+      <div>
         <h2 className="text-lg font-semibold mb-2 text-red-600">Danger Zone</h2>
         <p className="text-sm text-gray-600 mb-3">
           Deleting this project will also delete all its cards. This action cannot be undone.
