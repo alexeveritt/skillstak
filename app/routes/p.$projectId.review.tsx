@@ -56,9 +56,9 @@ function formatTimeUntil(dueAt: string | null): string {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''}`;
-  if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''}`;
-  if (diffMins > 0) return `${diffMins} minute${diffMins > 1 ? 's' : ''}`;
+  if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? "s" : ""}`;
+  if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? "s" : ""}`;
+  if (diffMins > 0) return `${diffMins} minute${diffMins > 1 ? "s" : ""}`;
   return "Soon!";
 }
 
@@ -81,7 +81,7 @@ export default function Review() {
     if (actionData?.ok && isPracticeMode && practiceCards) {
       const timer = setTimeout(() => {
         if (currentCardIndex < practiceCards.length - 1) {
-          setCurrentCardIndex(prev => prev + 1);
+          setCurrentCardIndex((prev) => prev + 1);
           setIsFlipped(false);
         } else {
           setSessionComplete(true);
@@ -92,14 +92,14 @@ export default function Review() {
   }, [actionData, isPracticeMode, currentCardIndex, practiceCards]);
 
   const handleCardFlip = () => {
-    setIsFlipped(prev => !prev);
+    setIsFlipped((prev) => !prev);
   };
 
   const handleAnswer = (result: "again" | "good") => {
     if (result === "good") {
-      setScore(prev => ({ ...prev, correct: prev.correct + 1 }));
+      setScore((prev) => ({ ...prev, correct: prev.correct + 1 }));
     } else {
-      setScore(prev => ({ ...prev, incorrect: prev.incorrect + 1 }));
+      setScore((prev) => ({ ...prev, incorrect: prev.incorrect + 1 }));
     }
   };
 
@@ -143,10 +143,7 @@ export default function Review() {
             Practice Again
           </Link>
 
-          <Link
-            to={`/p/${project?.id}`}
-            className="block text-center text-gray-600 hover:text-gray-800 underline mt-4"
-          >
+          <Link to={`/p/${project?.id}`} className="block text-center text-gray-600 hover:text-gray-800 underline mt-4">
             Back to Project
           </Link>
         </div>
@@ -163,13 +160,8 @@ export default function Review() {
         {/* Progress Header */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-sm font-medium text-gray-600">
-              Practice Mode
-            </div>
-            <Link
-              to={`?mode=review`}
-              className="text-sm text-blue-600 hover:text-blue-800 underline"
-            >
+            <div className="text-sm font-medium text-gray-600">Practice Mode</div>
+            <Link to={`?mode=review`} className="text-sm text-blue-600 hover:text-blue-800 underline">
               Switch to Review
             </Link>
           </div>
@@ -194,9 +186,7 @@ export default function Review() {
 
         {/* Card */}
         <div className="mb-4">
-          <div className="text-center text-sm font-medium text-gray-500 mb-2">
-            {isFlipped ? "Answer" : "Question"}
-          </div>
+          <div className="text-center text-sm font-medium text-gray-500 mb-2">{isFlipped ? "Answer" : "Question"}</div>
           <div onClick={handleCardFlip}>
             <CardFlip
               front={currentCard.front}
@@ -220,11 +210,15 @@ export default function Review() {
         )}
 
         {/* Action Buttons */}
-        <Form method="post" className="flex gap-4" onSubmit={(e) => {
-          const formData = new FormData(e.currentTarget);
-          const result = formData.get("result") as "again" | "good";
-          handleAnswer(result);
-        }}>
+        <Form
+          method="post"
+          className="flex gap-4"
+          onSubmit={(e) => {
+            const formData = new FormData(e.currentTarget);
+            const result = formData.get("result") as "again" | "good";
+            handleAnswer(result);
+          }}
+        >
           <input type="hidden" name="cardId" value={currentCard.id} />
           <input type="hidden" name="mode" value="practice" />
 
@@ -249,10 +243,7 @@ export default function Review() {
           </button>
         </Form>
 
-        <Link
-          to={`/p/${project?.id}`}
-          className="block text-center text-gray-600 hover:text-gray-800 underline mt-6"
-        >
+        <Link to={`/p/${project?.id}`} className="block text-center text-gray-600 hover:text-gray-800 underline mt-6">
           Back to Project
         </Link>
       </div>
@@ -266,9 +257,7 @@ export default function Review() {
         <h1 className="text-3xl font-bold mb-4" style={{ color: projectForegroundColor }}>
           No Cards Available
         </h1>
-        <p className="text-lg text-gray-700 mb-6">
-          Add some cards to start practicing!
-        </p>
+        <p className="text-lg text-gray-700 mb-6">Add some cards to start practicing!</p>
         <Link
           to={`/p/${project?.id}/cards/new`}
           className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
@@ -387,9 +376,7 @@ export default function Review() {
       )}
 
       <div className="mb-4">
-        <div className="text-center text-sm font-medium text-gray-500 mb-2">
-          {isFlipped ? "Answer" : "Question"}
-        </div>
+        <div className="text-center text-sm font-medium text-gray-500 mb-2">{isFlipped ? "Answer" : "Question"}</div>
         <div onClick={handleCardFlip}>
           <CardFlip front={card.front} back={card.back} color={projectColor} foregroundColor={projectForegroundColor} />
         </div>
@@ -433,10 +420,7 @@ export default function Review() {
         </button>
       </Form>
 
-      <Link
-        to={`/p/${project?.id}`}
-        className="block text-center text-gray-600 hover:text-gray-800 underline mt-6"
-      >
+      <Link to={`/p/${project?.id}`} className="block text-center text-gray-600 hover:text-gray-800 underline mt-6">
         Back to Project
       </Link>
     </div>

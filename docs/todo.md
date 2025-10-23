@@ -1,7 +1,9 @@
 on delete all projects an error thrown
+
+
+Allow switch testing e.g. front to back or back to front
 make background and all pages a bit more colorful
 current theme a bit tacky
-Allow switch testing e.g. front to back or back to front
 
 Import and export a project
 

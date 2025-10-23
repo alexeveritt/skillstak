@@ -57,10 +57,23 @@ export async function updateCard(
 }
 
 export async function deleteCard(env: Env, cardId: string, projectId: string): Promise<void> {
+  // Delete related records first to avoid foreign key constraint violations
+  await run(env, "DELETE FROM card_schedule WHERE card_id = ?", [cardId]);
+  await run(env, "DELETE FROM review WHERE card_id = ?", [cardId]);
+
+  // Now delete the card itself
   await run(env, "DELETE FROM card WHERE id = ? AND project_id = ?", [cardId, projectId]);
 }
 
 export async function deleteCardsByProjectId(env: Env, projectId: string): Promise<void> {
+  // Delete related records first to avoid foreign key constraint violations
+  // Delete card schedules for all cards in this project
+  await run(env, `DELETE FROM card_schedule WHERE card_id IN (SELECT id FROM card WHERE project_id = ?)`, [projectId]);
+
+  // Delete review history for all cards in this project
+  await run(env, `DELETE FROM review WHERE card_id IN (SELECT id FROM card WHERE project_id = ?)`, [projectId]);
+
+  // Now delete the cards themselves
   await run(env, "DELETE FROM card WHERE project_id = ?", [projectId]);
 }
 
@@ -113,7 +126,11 @@ export async function findCardSchedule(
   return rows[0] ?? null;
 }
 
-export async function findRandomCardForPractice(env: Env, projectId: string, userId: string): Promise<CardWithSchedule | null> {
+export async function findRandomCardForPractice(
+  env: Env,
+  projectId: string,
+  userId: string
+): Promise<CardWithSchedule | null> {
   const rows = await q<CardWithSchedule>(
     env,
     `SELECT c.id, c.front, c.back, s.interval_days, s.ease, s.streak, s.lapses
@@ -127,7 +144,12 @@ export async function findRandomCardForPractice(env: Env, projectId: string, use
   return rows[0] ?? null;
 }
 
-export async function findRandomCardsForPracticeSession(env: Env, projectId: string, userId: string, limit: number = 10): Promise<CardWithSchedule[]> {
+export async function findRandomCardsForPracticeSession(
+  env: Env,
+  projectId: string,
+  userId: string,
+  limit: number = 10
+): Promise<CardWithSchedule[]> {
   const rows = await q<CardWithSchedule>(
     env,
     `SELECT c.id, c.front, c.back, s.interval_days, s.ease, s.streak, s.lapses
@@ -141,7 +163,11 @@ export async function findRandomCardsForPracticeSession(env: Env, projectId: str
   return rows;
 }
 
-export async function getProjectStats(env: Env, projectId: string, userId: string): Promise<{
+export async function getProjectStats(
+  env: Env,
+  projectId: string,
+  userId: string
+): Promise<{
   total_cards: number;
   due_now: number;
   new_cards: number;

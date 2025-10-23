@@ -21,11 +21,20 @@ export async function getNextDueCard(env: Env, projectId: string, userId: string
   return await cardRepo.findNextDueCard(env, projectId, userId);
 }
 
-export async function getRandomCardForPractice(env: Env, projectId: string, userId: string): Promise<ReviewCard | null> {
+export async function getRandomCardForPractice(
+  env: Env,
+  projectId: string,
+  userId: string
+): Promise<ReviewCard | null> {
   return await cardRepo.findRandomCardForPractice(env, projectId, userId);
 }
 
-export async function getRandomCardsForPracticeSession(env: Env, projectId: string, userId: string, limit: number = 10): Promise<ReviewCard[]> {
+export async function getRandomCardsForPracticeSession(
+  env: Env,
+  projectId: string,
+  userId: string,
+  limit: number = 10
+): Promise<ReviewCard[]> {
   return await cardRepo.findRandomCardsForPracticeSession(env, projectId, userId, limit);
 }
 
@@ -77,7 +86,12 @@ export async function reviewCardGood(env: Env, cardId: string, isPracticeMode = 
   );
 }
 
-export async function reviewCardWithTypedAnswer(env: Env, cardId: string, answer: string, isPracticeMode = false): Promise<boolean> {
+export async function reviewCardWithTypedAnswer(
+  env: Env,
+  cardId: string,
+  answer: string,
+  isPracticeMode = false
+): Promise<boolean> {
   const schedule = await cardRepo.findCardSchedule(env, cardId);
   if (!schedule) return false;
 

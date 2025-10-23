@@ -39,23 +39,27 @@ export default function ProjectDetail() {
         {/* Edit Menu */}
         <div className="relative group">
           <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="12" cy="12" r="1"></circle>
               <circle cx="12" cy="5" r="1"></circle>
               <circle cx="12" cy="19" r="1"></circle>
             </svg>
           </button>
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-            <Link
-              to="edit"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg"
-            >
+            <Link to="edit" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg">
               ✏️ Edit Project
             </Link>
-            <Link
-              to="cards"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg"
-            >
+            <Link to="cards" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
               📚 View Cards List
             </Link>
           </div>
@@ -103,7 +107,9 @@ export default function ProjectDetail() {
                   className="bg-green-500 h-full flex items-center justify-center text-white text-xs font-bold"
                   style={{ width: `${(stats.mastered_cards / stats.total_cards) * 100}%` }}
                 >
-                  {stats.mastered_cards > 0 && Math.round((stats.mastered_cards / stats.total_cards) * 100) > 10 && `${Math.round((stats.mastered_cards / stats.total_cards) * 100)}%`}
+                  {stats.mastered_cards > 0 &&
+                    Math.round((stats.mastered_cards / stats.total_cards) * 100) > 10 &&
+                    `${Math.round((stats.mastered_cards / stats.total_cards) * 100)}%`}
                 </div>
               )}
               {stats.learning_cards > 0 && (
@@ -111,7 +117,9 @@ export default function ProjectDetail() {
                   className="bg-yellow-400 h-full flex items-center justify-center text-white text-xs font-bold"
                   style={{ width: `${(stats.learning_cards / stats.total_cards) * 100}%` }}
                 >
-                  {stats.learning_cards > 0 && Math.round((stats.learning_cards / stats.total_cards) * 100) > 10 && `${Math.round((stats.learning_cards / stats.total_cards) * 100)}%`}
+                  {stats.learning_cards > 0 &&
+                    Math.round((stats.learning_cards / stats.total_cards) * 100) > 10 &&
+                    `${Math.round((stats.learning_cards / stats.total_cards) * 100)}%`}
                 </div>
               )}
               {stats.new_cards > 0 && (
@@ -119,7 +127,9 @@ export default function ProjectDetail() {
                   className="bg-purple-400 h-full flex items-center justify-center text-white text-xs font-bold"
                   style={{ width: `${(stats.new_cards / stats.total_cards) * 100}%` }}
                 >
-                  {stats.new_cards > 0 && Math.round((stats.new_cards / stats.total_cards) * 100) > 10 && `${Math.round((stats.new_cards / stats.total_cards) * 100)}%`}
+                  {stats.new_cards > 0 &&
+                    Math.round((stats.new_cards / stats.total_cards) * 100) > 10 &&
+                    `${Math.round((stats.new_cards / stats.total_cards) * 100)}%`}
                 </div>
               )}
             </div>
