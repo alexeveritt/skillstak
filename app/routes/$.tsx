@@ -1,9 +1,11 @@
 // app/routes/$.tsx
+import { ErrorPage } from "~/components/ErrorPage";
+
 export function loader() {
   // Return 404 for unmatched routes without logging errors
-  return new Response(null, { status: 404 });
+  throw new Response(null, { status: 404 });
 }
 
 export default function NotFound() {
-  return null;
+  return <ErrorPage status={404} />;
 }

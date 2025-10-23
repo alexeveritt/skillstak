@@ -1,8 +1,18 @@
 import type { LinksFunction, LoaderFunctionArgs } from "react-router";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "react-router";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  useRouteError,
+  isRouteErrorResponse,
+} from "react-router";
 import stylesHref from "./styles.css?url";
 import { getSession } from "./server/session";
 import { Header } from "./components/Header";
+import { ErrorPage } from "./components/ErrorPage";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesHref }];
 
@@ -17,7 +27,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 export default function Root() {
   const { userId, adsense } = useLoaderData<typeof loader>();
   return (
-    <html lang="en" className="h-full bg-slate-50">
+    <html lang="en" className="h-full">
       <head>
         <Meta />
         <Links />
@@ -29,12 +39,53 @@ export default function Root() {
           ></script>
         ) : null}
       </head>
-      <body className="min-h-screen text-slate-900">
+      <body className="min-h-screen">
         <Header userId={userId} />
         <main className="mx-auto max-w-3xl p-4">
           <Outlet />
         </main>
         <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <html lang="en" className="h-full">
+        <head>
+          <title>Error {error.status} - SkillStak</title>
+          <Meta />
+          <Links />
+        </head>
+        <body className="min-h-screen">
+          <Header userId={null} />
+          <main className="mx-auto max-w-3xl p-4">
+            <ErrorPage status={error.status} statusText={error.statusText} message={error.data?.message} />
+          </main>
+          <Scripts />
+        </body>
+      </html>
+    );
+  }
+
+  // Handle unexpected errors
+  return (
+    <html lang="en" className="h-full">
+      <head>
+        <title>Error - SkillStak</title>
+        <Meta />
+        <Links />
+      </head>
+      <body className="min-h-screen">
+        <Header userId={null} />
+        <main className="mx-auto max-w-3xl p-4">
+          <ErrorPage status={500} message={error instanceof Error ? error.message : "An unexpected error occurred"} />
+        </main>
         <Scripts />
       </body>
     </html>

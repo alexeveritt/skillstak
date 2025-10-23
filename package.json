@@ -8,16 +8,15 @@
     "build": "react-router build",
     "start": "react-router start",
     "cf:pages": "wrangler pages dev --compatibility-date=2024-11-11 ./build/client",
-
     "d1:apply-prod": "wrangler d1 execute SKILLSTAK_DB --file=./db/schema.sql --remote",
     "d1:create-prod": "wrangler d1 create skillstak-db",
     "d1:export-prod": "node scripts/export-prod-db.js",
-
     "d1:apply:local": "wrangler d1 execute SKILLSTAK_DB --local --file=./db/schema.sql",
     "d1:export-local": "node scripts/export-local-db.js",
     "d1:delete-local": "rm -rf .wrangler/state/",
     "d1:reset-local": "npm run d1:delete-local && npm run d1:apply:local",
-
+    "migrate:local": "node scripts/migrate-local.js",
+    "migrate:prod": "node scripts/migrate-prod.js",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
@@ -25,14 +24,21 @@
     "kill-port": "node ./scripts/kill-port.cjs 8788"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
     "@react-router/cloudflare": "^7.0.0",
     "@react-router/dev": "^7.0.0",
     "@react-router/serve": "^7.0.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "isbot": "^5.1.31",
+    "lucide-react": "^0.546.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.9.4",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
     "ulidx": "^2.3.0",
     "zod": "^3.23.8"
   },

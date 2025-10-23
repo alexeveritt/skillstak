@@ -4,6 +4,10 @@ import type { ActionFunctionArgs } from "react-router";
 import { emailSchema } from "../lib/z";
 import { verifyPassword } from "../server/auth";
 import { createSession } from "../server/session";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const form = await request.formData();
@@ -24,16 +28,35 @@ export default function Login() {
   const data = useActionData<typeof action>();
   return (
     <div className="max-w-md mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Log in</h1>
-      {data?.error && <p className="text-red-600 mb-2">{data.error}</p>}
-      <Form method="post" className="flex flex-col gap-3">
-        <input name="email" type="email" placeholder="you@example.com" className="border p-2 rounded" />
-        <input name="password" type="password" placeholder="Password" className="border p-2 rounded" />
-        <button className="bg-black text-white rounded px-4 py-2">Log in</button>
-      </Form>
-      <p className="mt-2 text-sm">
-        <Link to="/reset">Forgot password?</Link>
-      </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Log in</CardTitle>
+          <CardDescription>Enter your credentials to access your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {data?.error && (
+            <p className="text-destructive text-sm mb-4 p-3 bg-destructive/10 rounded-md">{data.error}</p>
+          )}
+          <Form method="post" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" name="email" type="email" placeholder="you@example.com" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" name="password" type="password" placeholder="Password" />
+            </div>
+            <Button type="submit" className="w-full">
+              Log in
+            </Button>
+          </Form>
+          <p className="mt-4 text-sm text-center text-muted-foreground">
+            <Link to="/reset" className="hover:underline">
+              Forgot password?
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
