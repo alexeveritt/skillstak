@@ -83,16 +83,9 @@ export default function Review() {
     incorrect: answers.filter(a => a === "again").length
   };
 
-  console.log('=== SCORE CALCULATION ===');
-  console.log('answers array:', answers);
-  console.log('score.correct:', score.correct);
-  console.log('score.incorrect:', score.incorrect);
-  console.log('answers.length:', answers.length);
-
   // Handle auto-advance after answer is recorded
   useEffect(() => {
     if (isPracticeMode && practiceCards && answers.length > currentCardIndex) {
-      console.log('Auto-advance triggered, answers:', answers.length, 'currentIndex:', currentCardIndex);
       // Start transition
       setIsTransitioning(true);
 
@@ -115,20 +108,8 @@ export default function Review() {
   };
 
   const handleAnswer = (result: "again" | "good") => {
-    console.log('=== handleAnswer DEBUG ===');
-    console.log('handleAnswer called with result:', result);
-    console.log('result type:', typeof result);
-    console.log('result === "good":', result === "good");
-    console.log('result === "again":', result === "again");
-    console.log('Current answers:', answers);
-
     // Add this answer to the array
-    setAnswers((prev) => {
-      const newAnswers = [...prev, result];
-      console.log('New answers after adding:', newAnswers);
-      console.log('Each answer:', newAnswers.map((a, i) => `[${i}]: "${a}" (type: ${typeof a})`));
-      return newAnswers;
-    });
+    setAnswers((prev) => [...prev, result]);
   };
 
   // Practice mode - session complete
@@ -182,8 +163,6 @@ export default function Review() {
   // Practice mode - show current card from session
   if (isPracticeMode && practiceCards && practiceCards.length > 0) {
     const currentCard = practiceCards[currentCardIndex];
-
-    console.log('Rendering card, current answers:', answers, 'calculated score:', score);
 
     return (
       <div className="max-w-2xl mx-auto" key={`card-${currentCardIndex}-${answers.length}`}>
