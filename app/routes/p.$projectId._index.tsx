@@ -246,7 +246,7 @@ export default function ProjectDetail() {
               <div className="text-lg font-bold text-gray-700 mb-2">All Caught Up!</div>
               <div className="text-sm text-gray-600">
                 {(() => {
-                  const nextReviewTime = formatNextReviewTime(stats?.next_due_at);
+                  const nextReviewTime = formatNextReviewTime(stats?.next_due_at ?? null);
                   if (nextReviewTime) {
                     return (
                       <>No cards are due for review right now. Your next review will be <strong>{nextReviewTime}</strong>.</>
