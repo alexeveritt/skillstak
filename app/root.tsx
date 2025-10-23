@@ -29,6 +29,8 @@ export default function Root() {
   return (
     <html lang="en" className="h-full">
       <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <Meta />
         <Links />
         {adsense ? (
@@ -58,6 +60,8 @@ export function ErrorBoundary() {
     return (
       <html lang="en" className="h-full">
         <head>
+          <meta charSet="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>Error {error.status} - SkillStak</title>
           <Meta />
           <Links />
@@ -77,6 +81,8 @@ export function ErrorBoundary() {
   return (
     <html lang="en" className="h-full">
       <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Error - SkillStak</title>
         <Meta />
         <Links />

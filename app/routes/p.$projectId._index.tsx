@@ -15,6 +15,61 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   return { project, stats };
 }
 
+function formatNextReviewTime(nextDueAt: string | null): string | null {
+  if (!nextDueAt) return null;
+
+  // SQLite returns datetime in format 'YYYY-MM-DD HH:MM:SS' (UTC)
+  // We need to handle it properly whether it has a 'Z' suffix or not
+  let dueDate: Date;
+
+  try {
+    if (nextDueAt.endsWith('Z')) {
+      dueDate = new Date(nextDueAt);
+    } else if (nextDueAt.includes('T')) {
+      // ISO format without Z
+      dueDate = new Date(nextDueAt + 'Z');
+    } else {
+      // SQLite format 'YYYY-MM-DD HH:MM:SS' - replace space with T and add Z
+      dueDate = new Date(nextDueAt.replace(' ', 'T') + 'Z');
+    }
+
+    // Check if date is valid
+    if (isNaN(dueDate.getTime())) {
+      console.error('Invalid date format:', nextDueAt);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error parsing date:', nextDueAt, error);
+    return null;
+  }
+
+  const now = new Date();
+  const diffMs = dueDate.getTime() - now.getTime();
+
+  // If the difference is negative or very small (less than 1 minute), don't show a time
+  // This means cards should be due now, which is a data inconsistency
+  if (diffMs < 60000) {
+    return null;
+  }
+
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 60) {
+    return `in ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+  } else if (diffHours < 24) {
+    return `in ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+  } else if (diffDays === 1) {
+    return "tomorrow";
+  } else if (diffDays < 7) {
+    return `in ${diffDays} days`;
+  } else {
+    const weeks = Math.floor(diffDays / 7);
+    return `in ${weeks} week${weeks !== 1 ? 's' : ''}`;
+  }
+}
+
 export default function ProjectDetail() {
   const { project, stats } = useLoaderData<typeof loader>();
   const projectColor = project?.color || "#fef3c7";
@@ -60,7 +115,7 @@ export default function ProjectDetail() {
               ✏️ Edit Project
             </Link>
             <Link to="cards" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg">
-              📚 View Cards List
+              📚 Manage Cards
             </Link>
           </div>
         </div>
@@ -152,29 +207,74 @@ export default function ProjectDetail() {
       )}
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-3 mb-6">
+      <div className="space-y-4 mb-6">
         {stats && stats.due_now > 0 ? (
-          <Link
-            to="review"
-            className="flex-1 min-w-[200px] bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-center font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            🚀 Start Review ({stats.due_now})
-          </Link>
-        ) : (
-          <Link
-            to="review?mode=practice"
-            className="flex-1 min-w-[200px] bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-          >
-            🎮 Practice Mode
-          </Link>
-        )}
+          <>
+            {/* Spaced Repetition Review */}
+            <Link
+              to="review"
+              className="block bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-center font-bold py-5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span className="text-2xl">🚀</span>
+                <span className="text-xl">Start Review Session</span>
+              </div>
+              <div className="text-sm opacity-90">
+                {stats.due_now} card{stats.due_now !== 1 ? 's' : ''} ready for spaced repetition review
+              </div>
+            </Link>
 
-        <Link
-          to="cards/new"
-          className="flex-1 min-w-[200px] bg-gradient-to-r from-green-500 to-emerald-500 text-white text-center font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
-        >
-          ➕ Add Card
-        </Link>
+            {/* Practice Mode */}
+            <Link
+              to="review?mode=practice"
+              className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span className="text-xl">🎮</span>
+                <span>Practice Mode</span>
+              </div>
+              <div className="text-xs opacity-90">
+                Review any cards without affecting your spaced repetition schedule
+              </div>
+            </Link>
+          </>
+        ) : (
+          <>
+            {/* No cards due - show next review time */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-300 rounded-xl p-6 text-center">
+              <div className="text-4xl mb-2">✅</div>
+              <div className="text-lg font-bold text-gray-700 mb-2">All Caught Up!</div>
+              <div className="text-sm text-gray-600">
+                {(() => {
+                  const nextReviewTime = formatNextReviewTime(stats?.next_due_at ?? null);
+                  if (nextReviewTime) {
+                    return (
+                      <>No cards are due for review right now. Your next review will be <strong>{nextReviewTime}</strong>.</>
+                    );
+                  } else if (stats?.next_due_at) {
+                    return <>You're all done for now. Come back later to review more cards.</>;
+                  } else {
+                    return <>You have no cards scheduled for review yet.</>;
+                  }
+                })()}
+              </div>
+            </div>
+
+            {/* Practice Mode */}
+            <Link
+              to="review?mode=practice"
+              className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center font-bold py-5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+            >
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <span className="text-2xl">🎮</span>
+                <span className="text-xl">Practice Mode</span>
+              </div>
+              <div className="text-sm opacity-90">
+                Review any cards for fun without affecting your spaced repetition schedule
+              </div>
+            </Link>
+          </>
+        )}
       </div>
 
       {/* Empty State when no cards */}
@@ -182,12 +282,12 @@ export default function ProjectDetail() {
         <div className="bg-white rounded-xl shadow-md p-6">
           <div className="text-center py-12">
             <div className="text-5xl mb-3">📝</div>
-            <p className="text-gray-600 mb-4">No cards yet! Add your first card to get started.</p>
+            <p className="text-gray-600 mb-4">No cards yet! Get started by adding your first card.</p>
             <Link
-              to="cards/new"
-              className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-2 px-6 rounded-lg hover:shadow-lg transition-all"
+              to="cards"
+              className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg transition-all"
             >
-              ➕ Add First Card
+              📚 Go to Cards List
             </Link>
           </div>
         </div>

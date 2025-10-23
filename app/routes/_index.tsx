@@ -16,8 +16,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { Plus, BookOpen } from "lucide-react";
+import { Plus, BookOpen, MoreVertical, ChevronRight } from "lucide-react";
 import * as projectService from "../services/project.service";
+import * as reviewService from "../services/review.service";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   // Check if user is logged in, if not redirect to login
@@ -28,7 +29,19 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
   const userId = session.userId;
   const projects = await projectService.listProjects(context.cloudflare.env, userId);
-  return { projects };
+
+  // Fetch detailed stats for each project
+  const projectsWithStats = await Promise.all(
+    projects.map(async (project) => {
+      const stats = await reviewService.getProjectStats(context.cloudflare.env, project.id, userId);
+      return {
+        ...project,
+        stats,
+      };
+    })
+  );
+
+  return { projects: projectsWithStats };
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
@@ -167,25 +180,117 @@ export default function Home() {
         <>
           <div className="grid gap-4">
             {projects.map((p) => (
-              <Card key={p.id}>
-                <CardHeader>
-                  <CardTitle className="text-xl">
-                    <Link to={`/p/${p.id}`} className="hover:underline">
-                      {p.name}
-                    </Link>
-                  </CardTitle>
-                  <CardDescription>
-                    {p.due} due · {p.total} cards total
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex gap-2">
-                  <Button variant="default" size="sm" asChild>
-                    <Link to={`/p/${p.id}/review`}>Practice</Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={`/p/${p.id}/edit`}>Edit</Link>
-                  </Button>
-                </CardContent>
+              <Card key={p.id} className="group hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer">
+                <Link to={`/p/${p.id}`} className="block">
+                  <CardHeader className="relative pb-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-xl group-hover:text-primary transition-colors flex items-center gap-2">
+                          <span className="truncate">{p.name}</span>
+                          <ChevronRight className="h-5 w-5 flex-shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                        </CardTitle>
+                        <CardDescription className="mt-2">
+                          {p.stats && p.stats.total_cards > 0 ? (
+                            <>
+                              {p.stats.due_now > 0 && (
+                                <>
+                                  <span className="font-semibold text-destructive">{p.stats.due_now} due</span>
+                                  <span className="mx-2">·</span>
+                                </>
+                              )}
+                              <span>{p.stats.total_cards} cards total</span>
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground">No cards yet</span>
+                          )}
+                        </CardDescription>
+                      </div>
+                      <div className="relative group/menu flex-shrink-0">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                          className="p-2 hover:bg-accent rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                          aria-label="Project options"
+                        >
+                          <MoreVertical className="h-5 w-5" />
+                        </button>
+                        <div className="absolute right-0 mt-2 w-48 bg-background rounded-lg shadow-lg border opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10">
+                          <Link
+                            to={`/p/${p.id}/edit`}
+                            className="block px-4 py-2 text-sm hover:bg-accent rounded-lg"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            ✏️ Edit Project
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  {p.stats && p.stats.total_cards > 0 && (
+                    <CardContent className="pt-0">
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Mastered Cards */}
+                        <div className="flex flex-col items-center p-3 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                          <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+                            {p.stats.mastered_cards}
+                          </div>
+                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">
+                            ⭐ Mastered
+                          </div>
+                        </div>
+
+                        {/* Learning Cards */}
+                        <div className="flex flex-col items-center p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                          <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                            {p.stats.learning_cards}
+                          </div>
+                          <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 text-center">
+                            📖 Learning
+                          </div>
+                        </div>
+
+                        {/* New Cards */}
+                        <div className="flex flex-col items-center p-3 bg-purple-50 dark:bg-purple-950 rounded-lg border border-purple-200 dark:border-purple-800">
+                          <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                            {p.stats.new_cards}
+                          </div>
+                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">
+                            ✨ New
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      {p.stats.total_cards > 0 && (
+                        <div className="mt-3">
+                          <div className="flex items-center gap-2 h-2 bg-muted rounded-full overflow-hidden">
+                            {p.stats.mastered_cards > 0 && (
+                              <div
+                                className="bg-green-500 h-full transition-all"
+                                style={{ width: `${(p.stats.mastered_cards / p.stats.total_cards) * 100}%` }}
+                              />
+                            )}
+                            {p.stats.learning_cards > 0 && (
+                              <div
+                                className="bg-yellow-400 h-full transition-all"
+                                style={{ width: `${(p.stats.learning_cards / p.stats.total_cards) * 100}%` }}
+                              />
+                            )}
+                            {p.stats.new_cards > 0 && (
+                              <div
+                                className="bg-purple-400 h-full transition-all"
+                                style={{ width: `${(p.stats.new_cards / p.stats.total_cards) * 100}%` }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  )}
+                </Link>
               </Card>
             ))}
           </div>
