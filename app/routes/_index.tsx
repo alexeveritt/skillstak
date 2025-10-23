@@ -82,45 +82,13 @@ export default function Home() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Your projects</h1>
-          <p className="text-muted-foreground">Manage your learning projects and flashcards</p>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Project
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Project</DialogTitle>
-              <DialogDescription>
-                Start a new learning project to organize your flashcards by topic or subject.
-              </DialogDescription>
-            </DialogHeader>
-            <Form method="post" className="space-y-4">
-              <div className="space-y-2">
-                <Input
-                  ref={inputRef}
-                  name="name"
-                  placeholder="e.g., Spanish Vocabulary, React Hooks, Biology 101"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                {actionData?.error && <p className="text-destructive text-sm">{actionData.error}</p>}
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">Create Project</Button>
-              </DialogFooter>
-            </Form>
-          </DialogContent>
-        </Dialog>
+      <div className="text-center space-y-3 py-6">
+        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
+          Your Learning Journey
+        </h1>
+        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          Track your progress, master new skills, and build knowledge that lasts with spaced repetition
+        </p>
       </div>
 
       {!hasProjects ? (

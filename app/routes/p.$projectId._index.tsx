@@ -233,7 +233,6 @@ export default function ProjectDetail() {
               className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
             >
               <div className="flex items-center justify-center gap-2 mb-1">
-                <span className="text-xl">🎮</span>
                 <span>Practice Mode</span>
               </div>
               <div className="text-xs opacity-90">
@@ -272,7 +271,6 @@ export default function ProjectDetail() {
               className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center font-bold py-5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
             >
               <div className="flex items-center justify-center gap-2 mb-1">
-                <span className="text-2xl">🎮</span>
                 <span className="text-xl">Practice Mode</span>
               </div>
               <div className="text-sm opacity-90">
