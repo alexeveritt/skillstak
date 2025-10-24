@@ -15,7 +15,6 @@ export default [
     route("edit", "routes/p.$projectId.edit.tsx"),
     route("review", "routes/p.$projectId.review.tsx"),
     route("cards", "routes/p.$projectId.cards._index.tsx"),
-    route("cards/new", "routes/p.$projectId.cards.new.tsx"),
     route("cards/import", "routes/p.$projectId.cards.import.tsx"),
     route("cards/export", "routes/p.$projectId.cards.export.tsx"),
   ]),

@@ -6,6 +6,7 @@ import { requireUserId } from "../server/session";
 import * as cardService from "../services/card.service";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../components/ui/dialog";
 import { EditCardModal } from "../components/EditCardModal";
+import { AddCardModal } from "../components/AddCardModal";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
@@ -34,6 +35,12 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
     await cardService.updateCard(context.cloudflare.env, cardId, projectId, front, back);
   }
 
+  if (intent === "create") {
+    const front = String(formData.get("front") || "");
+    const back = String(formData.get("back") || "");
+    await cardService.createCard(context.cloudflare.env, projectId, front, back);
+  }
+
   return redirect(`/p/${projectId}/cards`);
 }
 
@@ -50,6 +57,7 @@ export default function CardsList() {
   const [viewCardId, setViewCardId] = useState<string | null>(null);
   const [deleteCardId, setDeleteCardId] = useState<string | null>(null);
   const [editCardId, setEditCardId] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const viewCard = cards.find((c) => c.id === viewCardId);
   const deleteCard = cards.find((c) => c.id === deleteCardId);
@@ -62,25 +70,27 @@ export default function CardsList() {
         <div className="bg-white rounded-xl shadow-md p-12 text-center">
           <div className="text-5xl mb-3">📝</div>
           <p className="text-gray-600 mb-4">No cards yet! Add your first card to get started.</p>
-          <Link
-            to="new"
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
             className="inline-block bg-gradient-to-r from-blue-100 to-indigo-200 text-blue-800 font-semibold py-2 px-6 rounded-lg border border-blue-300 hover:shadow-md hover:from-blue-200 hover:to-indigo-300 transition-all"
           >
             ➕ Add First Card
-          </Link>
+          </button>
         </div>
       ) : (
         <>
           {/* Header with title and action button */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-800">All Cards ({cards.length})</h2>
-            <Link
-              to="new"
+            <button
+              type="button"
+              onClick={() => setShowAddModal(true)}
               className="bg-gradient-to-r from-green-100 to-emerald-200 text-green-800 font-semibold py-2 px-4 rounded-lg border border-green-300 hover:shadow-md hover:from-green-200 hover:to-emerald-300 transition-all flex items-center gap-1"
             >
               <span className="text-lg">➕</span>
               <span>Add Card</span>
-            </Link>
+            </button>
           </div>
 
           {/* Cards Grid */}
@@ -215,10 +225,13 @@ export default function CardsList() {
       <EditCardModal
         open={!!editCardId}
         onOpenChange={(open) => !open && setEditCardId(null)}
-        card={editCard}
+        card={editCard || null}
         projectColor={projectColor}
         projectForegroundColor={projectForegroundColor}
       />
+
+      {/* Add Card Modal */}
+      <AddCardModal open={showAddModal} onOpenChange={setShowAddModal} />
     </>
   );
 }

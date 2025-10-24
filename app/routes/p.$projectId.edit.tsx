@@ -15,6 +15,7 @@ import { requireUserId } from "../server/session";
 import { DeleteProjectModal } from "../components/DeleteProjectModal";
 import { ColorPicker } from "../components/ColorPicker";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs";
+import { EditCardModal } from "../components/EditCardModal";
 import * as projectService from "../services/project.service";
 import * as cardService from "../services/card.service";
 import { projectSchema, cardSchema } from "../lib/z";
@@ -73,6 +74,16 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
     return redirect(`/p/${projectId}/edit?tab=cards`);
   }
 
+  if (intent === "update") {
+    const cardId = formData.get("cardId") as string;
+    const front = String(formData.get("front") || "");
+    const back = String(formData.get("back") || "");
+    if (cardId) {
+      await cardService.updateCard(context.cloudflare.env, cardId, projectId, front, back);
+    }
+    return redirect(`/p/${projectId}/edit?tab=cards`);
+  }
+
   const name = formData.get("name") as string;
   const color = (formData.get("color") as string) || undefined;
   const foregroundColor = (formData.get("foregroundColor") as string) || undefined;
@@ -108,6 +119,7 @@ export default function EditProject() {
   const activeTab = searchParams.get("tab") || "settings";
   const [viewCardId, setViewCardId] = useState<string | null>(null);
   const [deleteCardId, setDeleteCardId] = useState<string | null>(null);
+  const [editCardId, setEditCardId] = useState<string | null>(null);
   const [isNewCardModalOpen, setIsNewCardModalOpen] = useState(false);
   const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
 
@@ -115,6 +127,7 @@ export default function EditProject() {
   const projectForegroundColor = project.foreground_color || "#78350f";
   const viewCard = cards.find((c) => c.id === viewCardId);
   const deleteCard = cards.find((c) => c.id === deleteCardId);
+  const editCard = cards.find((c) => c.id === editCardId);
 
   // Track previous fetcher state to detect transitions
   const prevFetcherStateRef = useRef(fetcher.state);
@@ -332,13 +345,14 @@ export default function EditProject() {
                         <Eye className="w-4 h-4" />
                         <span>View</span>
                       </button>
-                      <Link
-                        to={`/p/${project.id}/cards/${card.id}/edit`}
+                      <button
+                        type="button"
+                        onClick={() => setEditCardId(card.id)}
                         className="flex-1 py-2.5 text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors flex items-center justify-center gap-1.5"
                       >
                         <Pencil className="w-4 h-4" />
                         <span>Change</span>
-                      </Link>
+                      </button>
                       <button
                         type="button"
                         onClick={() => setDeleteCardId(card.id)}
@@ -630,6 +644,15 @@ export default function EditProject() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Card Modal */}
+      <EditCardModal
+        open={!!editCardId}
+        onOpenChange={(open) => !open && setEditCardId(null)}
+        card={editCard || null}
+        projectColor={projectColor}
+        projectForegroundColor={projectForegroundColor}
+      />
     </div>
   );
 }
