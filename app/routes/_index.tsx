@@ -129,7 +129,9 @@ export default function Home() {
                         placeholder="e.g., Spanish Vocabulary, React Hooks, Biology 101"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        maxLength={50}
                       />
+                      <div className="text-xs text-gray-500 mt-1">Max 50 characters</div>
                       {actionData?.error && <p className="text-destructive text-sm">{actionData.error}</p>}
                     </div>
                     <DialogFooter>
@@ -284,7 +286,9 @@ export default function Home() {
                     placeholder="e.g., Spanish Vocabulary, React Hooks, Biology 101"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    maxLength={50}
                   />
+                  <div className="text-xs text-gray-500 mt-1">Max 50 characters</div>
                   {actionData?.error && <p className="text-destructive text-sm">{actionData.error}</p>}
                 </div>
                 <DialogFooter>
