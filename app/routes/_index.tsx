@@ -1,9 +1,9 @@
 // app/routes/_index.tsx
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { Form, Link, useLoaderData, redirect, useActionData, useNavigation } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
 import { getSession, requireUserId } from "../server/session";
 import { projectSchema } from "../lib/z";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -16,9 +16,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { Plus, BookOpen, MoreVertical, ChevronRight, Edit, Library } from "lucide-react";
+import { BookOpen, ChevronRight, Plus } from "lucide-react";
 import * as projectService from "../services/project.service";
 import * as reviewService from "../services/review.service";
+import { EditMenu } from "~/components/EditMenu";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   // Check if user is logged in, if not redirect to login
@@ -178,36 +179,7 @@ export default function Home() {
                           )}
                         </CardDescription>
                       </div>
-                      <div className="relative group/menu flex-shrink-0">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}
-                          className="p-2 hover:bg-accent rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                          aria-label="Card Pack options"
-                        >
-                          <MoreVertical className="h-5 w-5" />
-                        </button>
-                        <div className="absolute right-0 top-full mt-1 w-48 bg-background rounded-lg shadow-lg border opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10">
-                          <Link
-                            to={`/p/${p.id}/edit`}
-                            className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-accent rounded-t-lg transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Edit className="h-4 w-4" />
-                            Manage Card Pack
-                          </Link>
-                          <Link
-                            to={`/p/${p.id}/cards`}
-                            className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-accent rounded-b-lg transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Library className="h-4 w-4" />
-                            Manage Cards
-                          </Link>
-                        </div>
-                      </div>
+                      <EditMenu projectId={p.id} />
                     </div>
                   </CardHeader>
                   {p.stats && p.stats.total_cards > 0 && (

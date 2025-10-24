@@ -167,13 +167,6 @@ export default function Review() {
       <div className="max-w-2xl mx-auto" key={`card-${currentCardIndex}-${answers.length}`}>
         {/* Progress Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm font-medium text-gray-600">Practice Mode</div>
-            <Link to={`?mode=review`} className="text-sm text-blue-600 hover:text-blue-800 underline">
-              Switch to Review
-            </Link>
-          </div>
-
           <div className="bg-white rounded-xl shadow p-4 mb-2">
             <div className="flex items-center justify-between mb-2">
               <span className="text-lg font-bold">
@@ -355,17 +348,6 @@ export default function Review() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Mode Indicator */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-lg">Review Mode</span>
-        </div>
-        <Link
-          to={`?mode=practice`}
-          className="text-sm bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200"
-        >
-          Practice Mode
-        </Link>
-      </div>
 
       {/* Progress indicator */}
       {stats && (
