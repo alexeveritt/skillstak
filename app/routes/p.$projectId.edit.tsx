@@ -69,7 +69,7 @@ export default function EditProject() {
   return (
     <div className="max-w-2xl mx-auto">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
+        <TabsList className="mb-1">
           <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="w-4 h-4" />
             <span className="hidden sm:inline">Settings</span>
