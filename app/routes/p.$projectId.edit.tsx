@@ -58,11 +58,11 @@ export default function EditProject() {
 
   return (
     <div className="max-w-md">
-      <h1 className="text-xl font-semibold mb-2">Edit Project</h1>
+      <h1 className="text-xl font-semibold mb-2">Manage Card Pack</h1>
       <Form method="post" className="grid gap-2">
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">
-            Project Name
+            Card Pack Name
           </label>
           <input
             type="text"
@@ -128,7 +128,7 @@ export default function EditProject() {
       <div>
         <h2 className="text-lg font-semibold mb-2 text-red-600">Danger Zone</h2>
         <p className="text-sm text-gray-600 mb-3">
-          Deleting this project will also delete all its cards. This action cannot be undone.
+          Deleting this card pack will also delete all its cards. This action cannot be undone.
         </p>
         <DeleteProjectModal projectName={project.name} />
       </div>

@@ -33,14 +33,14 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button type="button" className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-          Delete Project
+          Delete Card Pack
         </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-red-600">Delete Project</DialogTitle>
+          <DialogTitle className="text-red-600">Delete Card Pack</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the project <strong>{projectName}</strong> and
+            This action cannot be undone. This will permanently delete the card pack <strong>{projectName}</strong> and
             all its cards.
           </DialogDescription>
         </DialogHeader>
@@ -56,7 +56,7 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
                 type="text"
                 value={confirmName}
                 onChange={(e) => setConfirmName(e.target.value)}
-                placeholder="Enter project name"
+                placeholder="Enter card pack name"
                 className="mt-2"
                 autoComplete="off"
               />
@@ -71,7 +71,7 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
                 disabled={!isValid}
                 className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Delete Project
+                Delete Card Pack
               </Button>
             </DialogFooter>
           </div>

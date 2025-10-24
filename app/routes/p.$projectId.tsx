@@ -39,7 +39,7 @@ export default function ProjectLayout() {
     if (location.pathname.includes("/cards/import")) return "Import Cards";
     if (location.pathname.includes("/cards/export")) return "Export Cards";
     if (location.pathname.includes("/cards")) return "Cards";
-    if (location.pathname.includes("/edit")) return "Edit Project";
+    if (location.pathname.includes("/edit")) return "Manage Card Pack";
     return null;
   };
 
@@ -54,7 +54,7 @@ export default function ProjectLayout() {
             <Link
               to={`/p/${project.id}`}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              title="Back to Project"
+              title="Back to Card Pack"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
