@@ -35,7 +35,6 @@ export default function ProjectLayout() {
       const mode = searchParams.get("mode");
       return mode === "practice" ? "Practice Mode" : "Review Session";
     }
-    if (location.pathname.includes("/cards/new")) return "New Card";
     if (location.pathname.includes("/cards/") && location.pathname.includes("/edit")) return "Edit Card";
     if (location.pathname.includes("/cards/import")) return "Import Cards";
     if (location.pathname.includes("/cards/export")) return "Export Cards";
