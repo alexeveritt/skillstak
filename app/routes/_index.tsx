@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { Plus, BookOpen, MoreVertical, ChevronRight } from "lucide-react";
+import { Plus, BookOpen, MoreVertical, ChevronRight, Edit, Library } from "lucide-react";
 import * as projectService from "../services/project.service";
 import * as reviewService from "../services/review.service";
 
@@ -189,13 +189,22 @@ export default function Home() {
                         >
                           <MoreVertical className="h-5 w-5" />
                         </button>
-                        <div className="absolute right-0 mt-2 w-48 bg-background rounded-lg shadow-lg border opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10">
+                        <div className="absolute right-0 top-full mt-1 w-48 bg-background rounded-lg shadow-lg border opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10">
                           <Link
                             to={`/p/${p.id}/edit`}
-                            className="block px-4 py-2 text-sm hover:bg-accent rounded-lg"
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-accent rounded-t-lg transition-colors"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            ✏️ Edit Project
+                            <Edit className="h-4 w-4" />
+                            Edit Project
+                          </Link>
+                          <Link
+                            to={`/p/${p.id}/cards`}
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-accent rounded-b-lg transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Library className="h-4 w-4" />
+                            Manage Cards
                           </Link>
                         </div>
                       </div>
