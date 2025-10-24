@@ -216,27 +216,38 @@ export default function ProjectDetail() {
             {/* Spaced Repetition Review */}
             <Link
               to="review"
-              className="block bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-center font-bold py-5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+              className="block bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] p-5"
             >
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <span className="text-2xl">🚀</span>
-                <span className="text-xl">Start Review Session</span>
-              </div>
-              <div className="text-sm opacity-90">
-                {stats.due_now} card{stats.due_now !== 1 ? "s" : ""} ready for spaced repetition review
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl font-bold">Start Review Session</span>
+                  </div>
+                  <div className="text-sm opacity-90">
+                    {stats.due_now} card{stats.due_now !== 1 ? "s" : ""} ready for spaced repetition review
+                  </div>
+                </div>
+                <div className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-blue-50 transition-colors">
+                  Start
+                </div>
               </div>
             </Link>
 
             {/* Practice Mode */}
             <Link
               to="review?mode=practice"
-              className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+              className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] p-5"
             >
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <span>Practice Mode</span>
-              </div>
-              <div className="text-xs opacity-90">
-                Review any cards without affecting your spaced repetition schedule
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="text-lg font-bold mb-2">Practice Mode</div>
+                  <div className="text-xs opacity-90">
+                    Review any cards without affecting your spaced repetition schedule
+                  </div>
+                </div>
+                <div className="bg-white text-purple-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-purple-50 transition-colors">
+                  Start
+                </div>
               </div>
             </Link>
           </>
@@ -268,13 +279,18 @@ export default function ProjectDetail() {
             {/* Practice Mode */}
             <Link
               to="review?mode=practice"
-              className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center font-bold py-5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02]"
+              className="block bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] p-5"
             >
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <span className="text-xl">Practice Mode</span>
-              </div>
-              <div className="text-sm opacity-90">
-                Review any cards for fun without affecting your spaced repetition schedule
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="text-lg font-bold mb-2">Practice Mode</div>
+                  <div className="text-sm opacity-90">
+                    Review any cards for fun without affecting your spaced repetition schedule
+                  </div>
+                </div>
+                <div className="bg-white text-purple-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-purple-50 transition-colors">
+                  Start
+                </div>
               </div>
             </Link>
           </>
