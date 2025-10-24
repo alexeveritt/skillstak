@@ -5,6 +5,7 @@ import { requireUserId } from "../server/session";
 import { DeleteProjectModal } from "../components/DeleteProjectModal";
 import { ColorPicker } from "../components/ColorPicker";
 import * as projectService from "../services/project.service";
+import { projectSchema } from "../lib/z";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   await requireUserId({ request, cloudflare: context.cloudflare });
@@ -26,8 +27,10 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
   const color = (formData.get("color") as string) || undefined;
   const foregroundColor = (formData.get("foregroundColor") as string) || undefined;
 
-  if (!name || name.trim().length === 0) {
-    return { error: "Project name is required" };
+  const parsed = projectSchema.safeParse({ name });
+  if (!parsed.success) {
+    const errorMsg = parsed.error.errors.map((e) => e.message).join("; ");
+    return { error: errorMsg };
   }
 
   await projectService.updateProject(context.cloudflare.env, projectId, userId, name.trim(), color, foregroundColor);
@@ -68,7 +71,9 @@ export default function EditProject() {
             defaultValue={project.name}
             className="w-full border rounded px-3 py-2"
             required
+            maxLength={50}
           />
+          <div className="text-xs text-gray-500 mt-1">Max 50 characters</div>
         </div>
 
         <div className="mt-2">
