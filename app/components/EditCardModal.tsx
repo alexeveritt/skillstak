@@ -57,12 +57,15 @@ export function EditCardModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
         <DialogHeader
-          className="px-6 pt-6 pb-4 relative"
+          className="relative px-6 pt-6 pb-4"
           style={{
             backgroundColor: `${projectColor}20`,
             borderBottom: `2px solid ${projectColor}`,
           }}
         >
+          <DialogTitle className="text-2xl font-bold" style={{ color: projectForegroundColor }}>
+            📝 Edit Card
+          </DialogTitle>
           <button
             type="button"
             onClick={() => onOpenChange(false)}
@@ -72,9 +75,6 @@ export function EditCardModal({
           >
             <X className="w-5 h-5" />
           </button>
-          <DialogTitle className="text-2xl font-bold pr-10" style={{ color: projectForegroundColor }}>
-            ✏️ Edit Card
-          </DialogTitle>
         </DialogHeader>
 
         <div className="px-6 pb-6">

@@ -42,8 +42,18 @@ export function AddCardModal({ open, onOpenChange }: AddCardModalProps) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Create New Card</DialogTitle>
+        <DialogHeader className="relative h-16">
+          <DialogTitle className="absolute left-0 right-0 top-1/2 -translate-y-1/2 text-2xl font-bold text-center">
+            ✨ Add New Card
+          </DialogTitle>
+          <button
+            type="button"
+            onClick={() => handleOpenChange(false)}
+            className="absolute right-4 top-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Close modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </DialogHeader>
 
         {error && (
