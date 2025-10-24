@@ -122,12 +122,17 @@ export default function EditProject() {
   const [editCardId, setEditCardId] = useState<string | null>(null);
   const [isNewCardModalOpen, setIsNewCardModalOpen] = useState(false);
   const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
+  const [newCardFront, setNewCardFront] = useState("");
+  const [newCardBack, setNewCardBack] = useState("");
 
   const projectColor = project.color || "#fef3c7";
   const projectForegroundColor = project.foreground_color || "#78350f";
   const viewCard = cards.find((c) => c.id === viewCardId);
   const deleteCard = cards.find((c) => c.id === deleteCardId);
   const editCard = cards.find((c) => c.id === editCardId);
+
+  // Check if new card form is valid
+  const isNewCardValid = newCardFront.trim() !== "" && newCardBack.trim() !== "";
 
   // Track previous fetcher state to detect transitions
   const prevFetcherStateRef = useRef(fetcher.state);
@@ -144,14 +149,13 @@ export default function EditProject() {
     ) {
       // Add Another button - clear form and show toast, keep modal open
       toast.success("Card added! 🎉");
-      const form = document.querySelector('form[data-card-form="true"]') as HTMLFormElement;
-      if (form) {
-        form.reset();
-        // Re-focus the first field
-        const firstField = form.querySelector('textarea[name="front"]') as HTMLTextAreaElement;
-        if (firstField) {
-          firstField.focus();
-        }
+      // Clear the state-controlled form fields
+      setNewCardFront("");
+      setNewCardBack("");
+      // Re-focus the first field
+      const firstField = document.querySelector('textarea[name="front"]') as HTMLTextAreaElement;
+      if (firstField) {
+        firstField.focus();
       }
     }
 
@@ -182,11 +186,7 @@ export default function EditProject() {
 
   // Helper function to check if form has content
   const hasFormContent = () => {
-    const form = document.querySelector('form[data-card-form="true"]') as HTMLFormElement;
-    if (!form) return false;
-    const frontValue = (form.querySelector('textarea[name="front"]') as HTMLTextAreaElement)?.value || "";
-    const backValue = (form.querySelector('textarea[name="back"]') as HTMLTextAreaElement)?.value || "";
-    return frontValue.trim() !== "" || backValue.trim() !== "";
+    return newCardFront.trim() !== "" || newCardBack.trim() !== "";
   };
 
   // Handle close button click
@@ -194,16 +194,14 @@ export default function EditProject() {
     if (hasFormContent()) {
       setShowCloseConfirmation(true);
     } else {
-      const form = document.querySelector('form[data-card-form="true"]') as HTMLFormElement;
-      if (form) form.reset();
       setIsNewCardModalOpen(false);
     }
   };
 
   // Confirm close and discard changes
   const confirmClose = () => {
-    const form = document.querySelector('form[data-card-form="true"]') as HTMLFormElement;
-    if (form) form.reset();
+    setNewCardFront("");
+    setNewCardBack("");
     setShowCloseConfirmation(false);
     setIsNewCardModalOpen(false);
   };
@@ -475,6 +473,8 @@ export default function EditProject() {
                   required
                   autoFocus
                   key={fetcher.state} // Force re-render to clear on success
+                  value={newCardFront}
+                  onChange={(e) => setNewCardFront(e.target.value)}
                 />
                 <div className="text-xs text-gray-500 mt-1">Max 200 characters</div>
               </div>
@@ -492,6 +492,8 @@ export default function EditProject() {
                   className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all text-sm"
                   required
                   key={fetcher.state} // Force re-render to clear on success
+                  value={newCardBack}
+                  onChange={(e) => setNewCardBack(e.target.value)}
                 />
                 <div className="text-xs text-gray-500 mt-1">Max 200 characters</div>
               </div>
@@ -499,11 +501,7 @@ export default function EditProject() {
               <div className="flex flex-col sm:flex-row items-stretch gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    const form = document.querySelector('form[data-card-form="true"]') as HTMLFormElement;
-                    if (form) form.reset();
-                    setIsNewCardModalOpen(false);
-                  }}
+                  onClick={handleCloseModal}
                   className="sm:flex-shrink-0 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
                 >
                   Cancel
@@ -512,8 +510,13 @@ export default function EditProject() {
                   type="submit"
                   name="intent"
                   value="createCardAndNew"
-                  disabled={fetcher.state === "submitting"}
-                  className="flex-1 px-3 py-2.5 text-sm font-semibold bg-white hover:bg-purple-50 text-purple-700 rounded-lg border-2 border-purple-300 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  disabled={!isNewCardValid || fetcher.state === "submitting"}
+                  className="flex-1 px-3 py-2.5 text-sm font-semibold rounded-lg border-2 transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    backgroundColor: isNewCardValid ? "white" : "#f3f4f6",
+                    color: isNewCardValid ? "#7c3aed" : "#9ca3af",
+                    borderColor: isNewCardValid ? "#a78bfa" : "#d1d5db",
+                  }}
                 >
                   <Plus className="w-4 h-4 flex-shrink-0" />
                   <span className="whitespace-nowrap">
@@ -524,11 +527,11 @@ export default function EditProject() {
                   type="submit"
                   name="intent"
                   value="createCard"
-                  disabled={fetcher.state === "submitting"}
-                  className="flex-1 px-3 py-2.5 text-sm font-bold text-white rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  disabled={!isNewCardValid || fetcher.state === "submitting"}
+                  className="flex-1 px-3 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    backgroundColor: projectColor,
-                    color: projectForegroundColor,
+                    backgroundColor: isNewCardValid ? projectColor : "#d1d5db",
+                    color: isNewCardValid ? projectForegroundColor : "#6b7280",
                   }}
                 >
                   <span>{fetcher.state === "submitting" ? "Saving..." : "Save"}</span>
@@ -621,24 +624,24 @@ export default function EditProject() {
       <Dialog open={showCloseConfirmation} onOpenChange={(open) => setShowCloseConfirmation(open)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Discard Changes?</DialogTitle>
+            <DialogTitle>Leave without saving?</DialogTitle>
           </DialogHeader>
           <div className="py-4 text-center">
             <p className="text-sm text-gray-600 mb-4">
-              You have unsaved changes. Are you sure you want to discard them?
+              Heads up! You've made some changes that haven't been saved yet. Want to go back and save them?
             </p>
             <div className="flex gap-2 justify-center">
               <button
                 onClick={() => setShowCloseConfirmation(false)}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
               >
-                Cancel
+                Keep Editing
               </button>
               <button
                 onClick={confirmClose}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
               >
-                Discard Changes
+                Leave Anyway
               </button>
             </div>
           </div>

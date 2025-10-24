@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Form } from "react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Button } from "./ui/button";
+import { X } from "lucide-react";
 
 interface AddCardModalProps {
   open: boolean;
@@ -12,14 +11,32 @@ interface AddCardModalProps {
 export function AddCardModal({ open, onOpenChange }: AddCardModalProps) {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
+  const [error, setError] = useState("");
+
+  // Check if both fields have content (trimmed)
+  const isValid = front.trim() !== "" && back.trim() !== "";
 
   // Reset form when modal closes
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setFront("");
       setBack("");
+      setError("");
     }
     onOpenChange(newOpen);
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Validate both fields are filled
+    if (!front.trim() || !back.trim()) {
+      setError("Both question and answer are required");
+      return;
+    }
+
+    // If validation passes, submit the form
+    e.currentTarget.submit();
   };
 
   return (
@@ -28,18 +45,28 @@ export function AddCardModal({ open, onOpenChange }: AddCardModalProps) {
         <DialogHeader>
           <DialogTitle>Create New Card</DialogTitle>
         </DialogHeader>
-        <Form method="post" className="space-y-4 py-4">
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+            <span className="font-semibold">Error:</span> {error}
+          </div>
+        )}
+
+        <Form method="post" onSubmit={handleSubmit} className="space-y-4 py-4">
           <input type="hidden" name="intent" value="create" />
 
           <div>
-            <Label htmlFor="new-front" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="new-front" className="block text-sm font-medium text-gray-700 mb-2">
               Front of Card
-            </Label>
+            </label>
             <textarea
               id="new-front"
               name="front"
               value={front}
-              onChange={(e) => setFront(e.target.value)}
+              onChange={(e) => {
+                setFront(e.target.value);
+                if (error) setError("");
+              }}
               placeholder="Enter the question or prompt..."
               rows={4}
               maxLength={200}
@@ -49,14 +76,17 @@ export function AddCardModal({ open, onOpenChange }: AddCardModalProps) {
           </div>
 
           <div>
-            <Label htmlFor="new-back" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="new-back" className="block text-sm font-medium text-gray-700 mb-2">
               Back of Card
-            </Label>
+            </label>
             <textarea
               id="new-back"
               name="back"
               value={back}
-              onChange={(e) => setBack(e.target.value)}
+              onChange={(e) => {
+                setBack(e.target.value);
+                if (error) setError("");
+              }}
               placeholder="Enter the answer or response..."
               rows={4}
               maxLength={200}
@@ -66,12 +96,24 @@ export function AddCardModal({ open, onOpenChange }: AddCardModalProps) {
           </div>
 
           <div className="flex gap-3 justify-end pt-2">
-            <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+            <button
+              type="button"
+              onClick={() => handleOpenChange(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
+            >
               Cancel
-            </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            </button>
+            <button
+              type="submit"
+              disabled={!isValid}
+              className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-all ${
+                isValid
+                  ? "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                  : "bg-gray-300 cursor-not-allowed opacity-60"
+              }`}
+            >
               Save Card
-            </Button>
+            </button>
           </div>
         </Form>
       </DialogContent>
