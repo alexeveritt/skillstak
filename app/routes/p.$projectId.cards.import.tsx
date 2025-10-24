@@ -176,6 +176,20 @@ export default function ImportCards() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [clientError, setClientError] = useState<string>("");
 
+  // If project is not available, show error state
+  if (!project) {
+    return (
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          Project not found. Please try again.
+        </div>
+        <a href="/" className="text-blue-600 hover:text-blue-800 underline">
+          Go to Home
+        </a>
+      </div>
+    );
+  }
+
   // Update cards state when action data changes
   useEffect(() => {
     if (actionData?.cards) {

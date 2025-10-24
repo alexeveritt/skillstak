@@ -149,10 +149,7 @@ export default function EditProject() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">Card Overview</h2>
-                <Link
-                  to={`/p/${project.id}/cards`}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-                >
+                <Link to={`/p/${project.id}/cards`} className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                   Manage All →
                 </Link>
               </div>
@@ -243,7 +240,8 @@ export default function EditProject() {
               <h2 className="text-xl font-semibold text-red-600">Danger Zone</h2>
             </div>
             <p className="text-sm text-gray-600 mb-4">
-              Deleting this card pack will permanently remove all {stats?.total_cards || 0} cards. This action cannot be undone.
+              Deleting this card pack will permanently remove all {stats?.total_cards || 0} cards. This action cannot be
+              undone.
             </p>
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
               <p className="text-sm text-red-800 font-medium">

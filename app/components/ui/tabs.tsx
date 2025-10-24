@@ -59,16 +59,14 @@ const TabsTrigger = React.forwardRef<
 });
 TabsTrigger.displayName = "TabsTrigger";
 
-const TabsContent = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { value: string }
->(({ className, value, ...props }, ref) => {
-  const context = React.useContext(TabsContext);
-  if (context.value !== value) return null;
+const TabsContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { value: string }>(
+  ({ className, value, ...props }, ref) => {
+    const context = React.useContext(TabsContext);
+    if (context.value !== value) return null;
 
-  return <div ref={ref} className={cn("mt-4", className)} {...props} />;
-});
+    return <div ref={ref} className={cn("mt-4", className)} {...props} />;
+  }
+);
 TabsContent.displayName = "TabsContent";
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };
-

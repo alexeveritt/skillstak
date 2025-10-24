@@ -167,13 +167,6 @@ export default function Review() {
       <div className="max-w-2xl mx-auto" key={`card-${currentCardIndex}-${answers.length}`}>
         {/* Progress Header */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm font-medium text-gray-600">Practice Mode</div>
-            <Link to={`?mode=review`} className="text-sm text-blue-600 hover:text-blue-800 underline">
-              Switch to Review
-            </Link>
-          </div>
-
           <div className="bg-white rounded-xl shadow p-4 mb-2">
             <div className="flex items-center justify-between mb-2">
               <span className="text-lg font-bold">

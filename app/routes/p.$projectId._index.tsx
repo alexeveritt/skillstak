@@ -3,7 +3,8 @@ import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData, useMatches } from "react-router";
 import { requireUserId } from "../server/session";
 import * as reviewService from "../services/review.service";
-import { Edit, Library, MoreVertical } from "lucide-react";
+import { Library } from "lucide-react";
+import { EditMenu } from "~/components/EditMenu";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
@@ -96,27 +97,7 @@ export default function ProjectDetail() {
         </div>
 
         {/* Edit Menu */}
-        <div className="relative group">
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <MoreVertical className="w-5 h-5" />
-          </button>
-          <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-            <Link
-              to="edit"
-              className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-              Manage Card Pack
-            </Link>
-            <Link
-              to="cards"
-              className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-b-lg transition-colors"
-            >
-              <Library className="w-4 h-4" />
-              Manage Cards
-            </Link>
-          </div>
-        </div>
+        {project && <EditMenu projectId={project.id} />}
       </div>
 
       {/* Stats Dashboard */}
