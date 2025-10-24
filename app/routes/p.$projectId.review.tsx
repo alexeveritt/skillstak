@@ -348,17 +348,6 @@ export default function Review() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Mode Indicator */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-lg">Review Mode</span>
-        </div>
-        <Link
-          to={`?mode=practice`}
-          className="text-sm bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200"
-        >
-          Practice Mode
-        </Link>
-      </div>
 
       {/* Progress indicator */}
       {stats && (

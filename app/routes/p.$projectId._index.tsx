@@ -85,15 +85,15 @@ export default function ProjectDetail() {
       {/* Header with Edit Menu - Only on main project page */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold" style={{ color: projectForegroundColor }}>
-            {project?.name}
-          </h1>
           {project?.color && (
             <span
-              className="w-8 h-8 rounded-full border-2 border-gray-300 shadow-sm"
+              className="w-8 h-8 rounded-full border-2 border-gray-400 shadow-sm"
               style={{ backgroundColor: projectColor }}
             ></span>
           )}
+          <h1 className="text-3xl font-semibold" style={{ color: projectForegroundColor }}>
+            {project?.name}
+          </h1>
         </div>
 
         {/* Edit Menu */}
