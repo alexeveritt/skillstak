@@ -1,7 +1,8 @@
 // app/components/Header.tsx
-import { Form, NavLink } from "react-router";
+import { NavLink } from "react-router";
 import { Button } from "~/components/ui/button";
 import { BookOpen, Sparkles } from "lucide-react";
+import { UserMenu } from "~/components/UserMenu";
 
 export function Header({ userId }: { userId?: string | null }) {
   return (
@@ -19,11 +20,7 @@ export function Header({ userId }: { userId?: string | null }) {
         </NavLink>
         <nav className="flex gap-2 text-sm items-center">
           {userId ? (
-            <Form method="post" action="/logout">
-              <Button variant="ghost" size="sm" className="font-medium">
-                Logout
-              </Button>
-            </Form>
+            <UserMenu />
           ) : (
             <>
               <Button variant="ghost" size="sm" className="font-medium" asChild>
