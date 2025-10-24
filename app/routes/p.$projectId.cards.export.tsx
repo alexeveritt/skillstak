@@ -22,6 +22,10 @@ export default function ExportCards() {
   const project = layoutData?.project;
   const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set(allCards.map((card) => card.id)));
 
+  if (!project) {
+    throw new Error("Card Pack not found");
+  }
+
   const handleToggleCard = (cardId: string) => {
     setSelectedCardIds((prev) => {
       const next = new Set(prev);
@@ -77,12 +81,12 @@ export default function ExportCards() {
         </p>
 
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
-          This project has no cards to export.
+          This card pack has no cards to export.
         </div>
 
         <div className="mt-4">
           <a href={`/p/${project.id}/edit`} className="text-blue-600 hover:text-blue-800 underline">
-            Back to Edit Project
+            Back to Manage Card Pack
           </a>
         </div>
       </div>
@@ -143,7 +147,7 @@ export default function ExportCards() {
           <div className="text-center py-4">
             <p className="text-gray-600 mb-4">Please select at least one card to export.</p>
             <a href={`/p/${project.id}/edit`} className="text-blue-600 hover:text-blue-800 underline">
-              Back to Edit Project
+              Back to Manage Card Pack
             </a>
           </div>
         ) : (

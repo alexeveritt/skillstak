@@ -106,7 +106,7 @@ export default function ProjectDetail() {
               className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-t-lg transition-colors"
             >
               <Edit className="w-4 h-4" />
-              Edit Project
+              Manage Card Pack
             </Link>
             <Link
               to="cards"

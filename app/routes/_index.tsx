@@ -103,7 +103,7 @@ export default function Home() {
           <CardContent className="text-center space-y-4">
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
               SkillStak uses spaced repetition to help you learn and retain information more effectively. Create your
-              first project to organize flashcards by topic, then add cards with questions and answers. Our algorithm
+              first card pack to organize flashcards by topic, then add cards with questions and answers. Our algorithm
               will schedule reviews at optimal intervals to maximize retention.
             </p>
             <div className="pt-2">
@@ -111,14 +111,14 @@ export default function Home() {
                 <DialogTrigger asChild>
                   <Button size="lg">
                     <Plus className="mr-2 h-4 w-4" />
-                    Create Your First Project
+                    Create Your First Card Pack
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Create New Project</DialogTitle>
+                    <DialogTitle>Create New Card Pack</DialogTitle>
                     <DialogDescription>
-                      Start a new learning project to organize your flashcards by topic or subject.
+                      Start a new learning card pack to organize your flashcards by topic or subject.
                     </DialogDescription>
                   </DialogHeader>
                   <Form method="post" className="space-y-4">
@@ -138,7 +138,7 @@ export default function Home() {
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                         Cancel
                       </Button>
-                      <Button type="submit">Create Project</Button>
+                      <Button type="submit">Create Card Pack</Button>
                     </DialogFooter>
                   </Form>
                 </DialogContent>
@@ -185,7 +185,7 @@ export default function Home() {
                             e.stopPropagation();
                           }}
                           className="p-2 hover:bg-accent rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                          aria-label="Project options"
+                          aria-label="Card Pack options"
                         >
                           <MoreVertical className="h-5 w-5" />
                         </button>
@@ -196,7 +196,7 @@ export default function Home() {
                             onClick={(e) => e.stopPropagation()}
                           >
                             <Edit className="h-4 w-4" />
-                            Edit Project
+                            Manage Card Pack
                           </Link>
                           <Link
                             to={`/p/${p.id}/cards`}
@@ -277,14 +277,14 @@ export default function Home() {
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full" size="lg">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Another Project
+                Add Another Card Pack
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New Project</DialogTitle>
+                <DialogTitle>Create New Card Pack</DialogTitle>
                 <DialogDescription>
-                  Start a new learning project to organize your flashcards by topic or subject.
+                  Start a new learning card pack to organize your flashcards by topic or subject.
                 </DialogDescription>
               </DialogHeader>
               <Form method="post" className="space-y-4">
@@ -304,7 +304,7 @@ export default function Home() {
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit">Create Project</Button>
+                  <Button type="submit">Create Card Pack</Button>
                 </DialogFooter>
               </Form>
             </DialogContent>
