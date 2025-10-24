@@ -13,6 +13,7 @@ import stylesHref from "./styles.css?url";
 import { getSession } from "./server/session";
 import { Header } from "./components/Header";
 import { ErrorPage } from "./components/ErrorPage";
+import { Toaster } from "sonner";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesHref }];
 
@@ -46,6 +47,7 @@ export default function Root() {
         <main className="mx-auto max-w-3xl p-4">
           <Outlet />
         </main>
+        <Toaster position="top-center" richColors />
         <ScrollRestoration />
         <Scripts />
       </body>

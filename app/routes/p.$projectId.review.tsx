@@ -268,7 +268,7 @@ export default function Review() {
         </h1>
         <p className="text-lg text-gray-700 mb-6">Add some cards to start practicing!</p>
         <Link
-          to={`/p/${project?.id}/cards/new`}
+          to={`/p/${project?.id}/edit?tab=cards`}
           className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
         >
           Add Your First Card
@@ -333,7 +333,7 @@ export default function Review() {
           <div className="text-center py-12">
             <p className="text-xl text-gray-600 mb-6">No cards yet! Let's create some.</p>
             <Link
-              to={`/p/${project?.id}/cards/new`}
+              to={`/p/${project?.id}/edit?tab=cards`}
               className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
             >
               Add Your First Card

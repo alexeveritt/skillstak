@@ -18,7 +18,6 @@ export default [
     route("cards/new", "routes/p.$projectId.cards.new.tsx"),
     route("cards/import", "routes/p.$projectId.cards.import.tsx"),
     route("cards/export", "routes/p.$projectId.cards.export.tsx"),
-    route("cards/:cardId/edit", "routes/p.$projectId.cards.$cardId.edit.tsx"),
   ]),
 
   // Catch-all for .well-known and other 404s

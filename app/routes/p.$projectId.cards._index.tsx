@@ -5,6 +5,7 @@ import { useState } from "react";
 import { requireUserId } from "../server/session";
 import * as cardService from "../services/card.service";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../components/ui/dialog";
+import { EditCardModal } from "../components/EditCardModal";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
@@ -27,6 +28,12 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
     await cardService.deleteCard(context.cloudflare.env, cardId, projectId);
   }
 
+  if (intent === "update" && cardId) {
+    const front = String(formData.get("front") || "");
+    const back = String(formData.get("back") || "");
+    await cardService.updateCard(context.cloudflare.env, cardId, projectId, front, back);
+  }
+
   return redirect(`/p/${projectId}/cards`);
 }
 
@@ -42,9 +49,11 @@ export default function CardsList() {
 
   const [viewCardId, setViewCardId] = useState<string | null>(null);
   const [deleteCardId, setDeleteCardId] = useState<string | null>(null);
+  const [editCardId, setEditCardId] = useState<string | null>(null);
 
   const viewCard = cards.find((c) => c.id === viewCardId);
   const deleteCard = cards.find((c) => c.id === deleteCardId);
+  const editCard = cards.find((c) => c.id === editCardId);
 
   return (
     <>
@@ -83,10 +92,7 @@ export default function CardsList() {
                 style={{ borderColor: projectColor }}
               >
                 {/* Card Content */}
-                <div
-                  className="p-4 flex-1 flex flex-col"
-                  style={{ backgroundColor: `${projectColor}40` }}
-                >
+                <div className="p-4 flex-1 flex flex-col" style={{ backgroundColor: `${projectColor}40` }}>
                   <div className="mb-3 flex-1">
                     <div
                       className="font-semibold text-gray-800 mb-2 line-clamp-1"
@@ -111,13 +117,14 @@ export default function CardsList() {
                     <Eye className="w-4 h-4" />
                     <span>View</span>
                   </button>
-                  <Link
-                    to={`${card.id}/edit`}
+                  <button
+                    type="button"
+                    onClick={() => setEditCardId(card.id)}
                     className="flex-1 py-2.5 text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Pencil className="w-4 h-4" />
                     <span>Change</span>
-                  </Link>
+                  </button>
                   <button
                     type="button"
                     onClick={() => setDeleteCardId(card.id)}
@@ -203,6 +210,15 @@ export default function CardsList() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Edit Card Modal */}
+      <EditCardModal
+        open={!!editCardId}
+        onOpenChange={(open) => !open && setEditCardId(null)}
+        card={editCard}
+        projectColor={projectColor}
+        projectForegroundColor={projectForegroundColor}
+      />
     </>
   );
 }

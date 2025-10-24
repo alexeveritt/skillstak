@@ -40,17 +40,14 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
         <DialogHeader>
           <DialogTitle className="text-red-600">Delete Card Pack</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the card pack <strong>{projectName}</strong> and
-            all its cards.
+            {`This action cannot be undone. This will permanently delete the card pack ${projectName} and all its cards.`}
           </DialogDescription>
         </DialogHeader>
         <Form method="post" onSubmit={handleSubmit}>
           <input type="hidden" name="intent" value="delete" />
           <div className="space-y-4">
             <div>
-              <Label htmlFor="confirmName">
-                Please type <strong>{projectName}</strong> to confirm
-              </Label>
+              <Label htmlFor="confirmName">{`Please type ${projectName} to confirm`}</Label>
               <Input
                 id="confirmName"
                 type="text"
