@@ -127,7 +127,7 @@ export default function EditProject() {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
+                  className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-6 py-2.5 rounded-lg font-medium border border-blue-300 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -180,7 +180,7 @@ export default function EditProject() {
                   <div className="pt-2 space-y-2">
                     <Link
                       to={`/p/${project.id}/cards/new`}
-                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-3 rounded-lg font-medium transition-colors"
+                      className="block w-full bg-blue-100 hover:bg-blue-200 text-blue-800 text-center px-4 py-3 rounded-lg font-medium border border-blue-300 transition-colors"
                     >
                       + Add New Card
                     </Link>
@@ -198,7 +198,7 @@ export default function EditProject() {
                   <p className="text-gray-600 mb-4">No cards yet in this pack</p>
                   <Link
                     to={`/p/${project.id}/cards/new`}
-                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                    className="inline-block bg-blue-100 hover:bg-blue-200 text-blue-800 px-6 py-3 rounded-lg font-medium border border-blue-300 transition-colors"
                   >
                     Create Your First Card
                   </Link>
@@ -215,14 +215,14 @@ export default function EditProject() {
               <div className="grid sm:grid-cols-2 gap-3">
                 <Link
                   to={`/p/${project.id}/cards/import`}
-                  className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                  className="flex items-center justify-center gap-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-3 rounded-lg font-medium border border-blue-300 transition-colors"
                 >
                   <FileUp className="w-4 h-4" />
                   Import Cards
                 </Link>
                 <Link
                   to={`/p/${project.id}/cards/export`}
-                  className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+                  className="flex items-center justify-center gap-2 bg-green-100 hover:bg-green-200 text-green-800 px-4 py-3 rounded-lg font-medium border border-green-300 transition-colors"
                 >
                   <FileDown className="w-4 h-4" />
                   Export Cards
