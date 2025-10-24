@@ -10,6 +10,43 @@ type ImportCard = {
   tempId?: string;
 };
 
+// File validation constants
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+const ALLOWED_MIME_TYPES = ["application/json", "text/json"];
+const ALLOWED_EXTENSIONS = [".json"];
+
+// Helper function to validate file type
+function isValidFileType(file: File): boolean {
+  const hasValidMimeType = ALLOWED_MIME_TYPES.includes(file.type);
+  const hasValidExtension = ALLOWED_EXTENSIONS.some((ext) => file.name.toLowerCase().endsWith(ext));
+  return hasValidMimeType || hasValidExtension; // Accept if either matches (some systems don't set MIME type correctly)
+}
+
+// Helper function to pre-check if content looks like JSON
+async function preValidateJsonContent(file: File): Promise<{ valid: boolean; error?: string }> {
+  try {
+    // Read first 1KB to check if it looks like JSON array
+    const firstChunk = await file.slice(0, 1024).text();
+    const trimmed = firstChunk.trim();
+
+    // Check if it starts with [ (JSON array)
+    if (!trimmed.startsWith("[")) {
+      return { valid: false, error: "Invalid file format. Please upload a valid cards file." };
+    }
+
+    // Basic check for valid JSON characters (no binary data)
+    // JSON should only contain printable ASCII, whitespace, and specific Unicode
+    const binaryPattern = /[\x00-\x08\x0B\x0C\x0E-\x1F]/;
+    if (binaryPattern.test(trimmed)) {
+      return { valid: false, error: "This file type is not supported. Please upload a text-based cards file." };
+    }
+
+    return { valid: true };
+  } catch (error) {
+    return { valid: false, error: "Failed to read file content" };
+  }
+}
+
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   await requireUserId({ request, cloudflare: context.cloudflare });
   return {};
@@ -28,8 +65,31 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
       return { error: "Please select a file to import" };
     }
 
+    // Server-side validation: Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      return { error: `File is too large (${sizeMB}MB). Maximum allowed size is 5MB.` };
+    }
+
+    // Server-side validation: Check file type
+    if (!isValidFileType(file)) {
+      return { error: "Invalid file type. Please upload a JSON file (.json)" };
+    }
+
+    // Server-side validation: Pre-check content
+    const preValidation = await preValidateJsonContent(file);
+    if (!preValidation.valid) {
+      return { error: preValidation.error };
+    }
+
     try {
       const text = await file.text();
+
+      // Additional check: ensure file isn't too large when read as text
+      if (text.length > MAX_FILE_SIZE) {
+        return { error: "File content is too large. Maximum allowed size is 5MB." };
+      }
+
       const parsed = JSON.parse(text);
 
       if (!Array.isArray(parsed)) {
@@ -114,6 +174,7 @@ export default function ImportCards() {
   const actionData = useActionData<typeof action>();
   const [cards, setCards] = useState<ImportCard[]>(actionData?.cards || []);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [clientError, setClientError] = useState<string>("");
 
   // Update cards state when action data changes
   useEffect(() => {
@@ -122,9 +183,46 @@ export default function ImportCards() {
     }
   }, [actionData?.cards]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    setSelectedFile(file || null);
+    setClientError("");
+
+    if (!file) {
+      setSelectedFile(null);
+      setCards([]);
+      return;
+    }
+
+    // Client-side validation: Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      setClientError(`File is too large (${sizeMB}MB). Maximum allowed size is 5MB.`);
+      e.target.value = ""; // Clear the input
+      setSelectedFile(null);
+      setCards([]);
+      return;
+    }
+
+    // Client-side validation: Check file type
+    if (!isValidFileType(file)) {
+      setClientError("Invalid file type. Please upload a JSON file (.json)");
+      e.target.value = ""; // Clear the input
+      setSelectedFile(null);
+      setCards([]);
+      return;
+    }
+
+    // Client-side validation: Pre-check content
+    const preValidation = await preValidateJsonContent(file);
+    if (!preValidation.valid) {
+      setClientError(preValidation.error || "Invalid file content");
+      e.target.value = ""; // Clear the input
+      setSelectedFile(null);
+      setCards([]);
+      return;
+    }
+
+    setSelectedFile(file);
     setCards([]);
   };
 
@@ -141,8 +239,10 @@ export default function ImportCards() {
         Import cards into <strong>{project.name}</strong>
       </p>
 
-      {actionData?.error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">{actionData.error}</div>
+      {(actionData?.error || clientError) && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          {actionData?.error || clientError}
+        </div>
       )}
 
       {actionData?.validationErrors && (
@@ -166,6 +266,15 @@ export default function ImportCards() {
             </code>
           </p>
 
+          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded mb-4 text-sm">
+            <p className="font-medium mb-1">File Requirements:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>File type: JSON (.json)</li>
+              <li>Maximum size: 5MB</li>
+              <li>Format: Array of objects with 'f' (front) and 'b' (back) properties</li>
+            </ul>
+          </div>
+
           <Form method="post" encType="multipart/form-data">
             <input type="hidden" name="intent" value="parse" />
 
@@ -177,12 +286,17 @@ export default function ImportCards() {
                 onChange={handleFileChange}
                 className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
+              {selectedFile && !clientError && (
+                <p className="text-sm text-green-600 mt-2">
+                  ✓ {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                </p>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
               <button
                 type="submit"
-                disabled={!selectedFile}
+                disabled={!selectedFile || !!clientError}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg px-6 py-2.5 transition-colors"
               >
                 Upload and Preview
@@ -249,12 +363,6 @@ export default function ImportCards() {
                   className="text-gray-600 hover:text-gray-800 underline transition-colors"
                 >
                   Start Over
-                </a>
-                <a
-                  href={`/p/${project.id}/edit`}
-                  className="text-gray-600 hover:text-gray-800 underline transition-colors"
-                >
-                  Cancel
                 </a>
               </div>
             </Form>
