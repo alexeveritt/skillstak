@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 import { Button } from "~/components/ui/button";
 import { BookOpen, Sparkles } from "lucide-react";
 import { UserMenu } from "~/components/UserMenu";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Header({ userId }: { userId?: string | null }) {
   return (
@@ -35,6 +36,7 @@ export function Header({ userId }: { userId?: string | null }) {
               </Button>
             </>
           )}
+          <LanguageSwitcher />
         </nav>
       </div>
     </header>

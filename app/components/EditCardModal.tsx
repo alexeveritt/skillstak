@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Form } from "react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface EditCardModalProps {
   card: {
@@ -22,6 +23,7 @@ export function EditCardModal({
   projectColor = "#fef3c7",
   projectForegroundColor = "#78350f",
 }: EditCardModalProps) {
+  const { t } = useTranslation();
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
   const [error, setError] = useState("");
@@ -43,7 +45,7 @@ export function EditCardModal({
 
     // Validate both fields are filled
     if (!front.trim() || !back.trim()) {
-      setError("Both question and answer are required");
+      setError(t("editCardModal.errorRequired"));
       return;
     }
 
@@ -64,14 +66,14 @@ export function EditCardModal({
           }}
         >
           <DialogTitle className="text-2xl font-bold" style={{ color: projectForegroundColor }}>
-            📝 Edit Card
+            {t("editCardModal.title")}
           </DialogTitle>
           <button
             type="button"
             onClick={() => onOpenChange(false)}
             className="absolute right-4 top-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             style={{ color: projectForegroundColor }}
-            aria-label="Close modal"
+            aria-label={t("editCardModal.close")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -80,7 +82,7 @@ export function EditCardModal({
         <div className="px-6 pb-6">
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-              <span className="font-semibold">Error:</span> {error}
+              <span className="font-semibold">{t("editCardModal.error")}</span> {error}
             </div>
           )}
 
@@ -90,7 +92,7 @@ export function EditCardModal({
 
             <div>
               <label htmlFor="edit-front" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                Question 🤔
+                {t("editCardModal.questionLabel")}
               </label>
               <textarea
                 id="edit-front"
@@ -100,19 +102,19 @@ export function EditCardModal({
                   setFront(e.target.value);
                   if (error) setError(""); // Clear error on change
                 }}
-                placeholder="What's on the front of your card?"
+                placeholder={t("editCardModal.questionPlaceholder")}
                 rows={3}
                 maxLength={200}
                 className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all text-sm"
                 required
                 autoFocus
               />
-              <div className="text-xs text-gray-500 mt-1">Max 200 characters</div>
+              <div className="text-xs text-gray-500 mt-1">{t("editCardModal.maxChars")}</div>
             </div>
 
             <div>
               <label htmlFor="edit-back" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                Answer 💡
+                {t("editCardModal.answerLabel")}
               </label>
               <textarea
                 id="edit-back"
@@ -122,13 +124,13 @@ export function EditCardModal({
                   setBack(e.target.value);
                   if (error) setError(""); // Clear error on change
                 }}
-                placeholder="What's the answer?"
+                placeholder={t("editCardModal.answerPlaceholder")}
                 rows={3}
                 maxLength={200}
                 className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all text-sm"
                 required
               />
-              <div className="text-xs text-gray-500 mt-1">Max 200 characters</div>
+              <div className="text-xs text-gray-500 mt-1">{t("editCardModal.maxChars")}</div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch gap-2 pt-2">
@@ -137,7 +139,7 @@ export function EditCardModal({
                 onClick={() => onOpenChange(false)}
                 className="sm:flex-shrink-0 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
               >
-                Cancel
+                {t("editCardModal.cancel")}
               </button>
               <button
                 type="submit"
@@ -148,7 +150,7 @@ export function EditCardModal({
                   color: isValid ? projectForegroundColor : "#6b7280",
                 }}
               >
-                <span>Update Card</span>
+                <span>{t("editCardModal.update")}</span>
               </button>
             </div>
           </Form>
