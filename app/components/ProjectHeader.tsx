@@ -25,4 +25,3 @@ export function ProjectHeader({ name, color, foregroundColor, id }: ProjectHeade
     </div>
   );
 }
-

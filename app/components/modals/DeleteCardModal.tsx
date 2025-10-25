@@ -1,0 +1,57 @@
+import { Form } from "react-router";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+
+interface Card {
+  id: string;
+  front: string;
+  back: string;
+}
+
+interface DeleteCardModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  card: Card | null;
+  onCancel: () => void;
+}
+
+export function DeleteCardModal({ open, onOpenChange, card, onCancel }: DeleteCardModalProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Card</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this card? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        {card && (
+          <div className="space-y-4 py-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm font-medium text-red-800 mb-2">{card.front}</p>
+              <p className="text-sm text-red-600">{card.back}</p>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <Form method="post" onSubmit={onCancel}>
+                <input type="hidden" name="intent" value="deleteCard" />
+                <input type="hidden" name="cardId" value={card.id} />
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                >
+                  Delete Card
+                </button>
+              </Form>
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}

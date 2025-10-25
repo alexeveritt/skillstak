@@ -88,4 +88,3 @@ export function ProjectStatsDashboard({ stats, projectColor, projectForegroundCo
     </div>
   );
 }
-

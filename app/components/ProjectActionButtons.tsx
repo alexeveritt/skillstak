@@ -94,4 +94,3 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
     </div>
   );
 }
-

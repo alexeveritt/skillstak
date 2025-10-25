@@ -93,9 +93,7 @@ export default function ProjectDetail() {
       />
 
       {/* Empty State when no cards - show immediately */}
-      {stats && stats.total_cards === 0 && (
-        <ProjectEmptyState projectId={project?.id} projectName={project?.name} />
-      )}
+      {stats && stats.total_cards === 0 && <ProjectEmptyState projectId={project?.id} projectName={project?.name} />}
 
       {/* Stats Dashboard - Only show when there are cards */}
       {stats && stats.total_cards > 0 && (

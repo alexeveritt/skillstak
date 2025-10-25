@@ -19,7 +19,8 @@ export function ProjectEmptyState({ projectId, projectName }: ProjectEmptyStateP
         </h2>
         <p className="text-gray-600 text-lg mb-2">You don't have any flashcards yet.</p>
         <p className="text-gray-500 mb-6 max-w-md mx-auto">
-          Create your first flashcard to start learning with spaced repetition. Each card can have a question on the front and an answer on the back.
+          Create your first flashcard to start learning with spaced repetition. Each card can have a question on the
+          front and an answer on the back.
         </p>
         <Link
           to={`/p/${projectId}/edit?tab=cards`}
@@ -31,4 +32,3 @@ export function ProjectEmptyState({ projectId, projectName }: ProjectEmptyStateP
     </div>
   );
 }
-
