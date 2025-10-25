@@ -21,7 +21,7 @@ export function DeleteCardModal({ open, onOpenChange, card, onCancel }: DeleteCa
       <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
         <ModalHeader title="Delete Card" onClose={onCancel} projectColor="#fee2e2" projectForegroundColor="#991b1b" />
 
-        <div className="px-6 pb-6">
+        <div className="px-6 pb-6 pt-4">
           <DialogDescription className="mb-4">
             Are you sure you want to delete this card? This action cannot be undone.
           </DialogDescription>
