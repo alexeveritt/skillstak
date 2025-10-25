@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { BookOpen, ChevronRight, Plus } from "lucide-react";
+import { BookOpen, ChevronRight, Plus, Brain, TrendingUp, Zap } from "lucide-react";
 import * as projectService from "../services/project.service";
 import * as reviewService from "../services/review.service";
 import { EditMenu } from "~/components/EditMenu";
@@ -83,35 +83,88 @@ export default function Home() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-3 py-6">
-        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
-          Your Learning Journey
-        </h1>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Track your progress, master new skills, and build knowledge that lasts with spaced repetition
-        </p>
-      </div>
+      {hasProjects && (
+        <div className="text-center space-y-3 py-6">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
+            Your Learning Journey
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Track your progress, master new skills, and build knowledge that lasts with spaced repetition
+          </p>
+        </div>
+      )}
 
       {!hasProjects ? (
-        <Card className="border-dashed">
-          <CardHeader className="text-center pb-4">
-            <div className="flex justify-center mb-4">
-              <BookOpen className="h-16 w-16 text-muted-foreground" />
+        <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-purple-200 dark:border-purple-800 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 shadow-lg">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-200 dark:bg-purple-800 rounded-full opacity-20 blur-3xl -translate-y-32 translate-x-32" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-200 dark:bg-blue-800 rounded-full opacity-20 blur-3xl translate-y-32 -translate-x-32" />
+
+          <div className="relative px-8 py-12 text-center space-y-6">
+            {/* Icon section with gradient background */}
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full blur-xl opacity-50" />
+                <div className="relative bg-white dark:bg-gray-900 rounded-full p-6 shadow-xl">
+                  <BookOpen className="h-16 w-16 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600" strokeWidth={2} stroke="url(#gradient)" />
+                  <svg width="0" height="0">
+                    <defs>
+                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#2563eb" />
+                        <stop offset="50%" stopColor="#9333ea" />
+                        <stop offset="100%" stopColor="#ec4899" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+              </div>
             </div>
-            <CardTitle className="text-2xl">Welcome to SkillStak!</CardTitle>
-            <CardDescription className="text-base">Get started with spaced repetition learning</CardDescription>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-sm text-muted-foreground max-w-md mx-auto">
-              SkillStak uses spaced repetition to help you learn and retain information more effectively. Create your
-              first card pack to organize flashcards by topic, then add cards with questions and answers. Our algorithm
-              will schedule reviews at optimal intervals to maximize retention.
-            </p>
-            <div className="pt-2">
+
+            {/* Heading */}
+            <div className="space-y-3">
+              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
+                Welcome to SkillStak! 👋
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Hey there! SkillStak helps you learn and remember things better using a proven technique called spaced repetition.
+                Think of it like having a personal study buddy that knows exactly when you should review your flashcards to keep
+                information fresh in your brain. Create your first card pack to get started!
+              </p>
+            </div>
+
+            {/* Feature highlights */}
+            <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto py-4">
+              <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur rounded-xl p-4 border border-blue-200 dark:border-blue-800 shadow-sm">
+                <div className="flex justify-center mb-2">
+                  <Brain className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="font-semibold text-sm mb-1 text-blue-700 dark:text-blue-300">Smart Learning</h3>
+                <p className="text-xs text-muted-foreground">Algorithm-driven reviews at optimal intervals</p>
+              </div>
+
+              <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur rounded-xl p-4 border border-purple-200 dark:border-purple-800 shadow-sm">
+                <div className="flex justify-center mb-2">
+                  <TrendingUp className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="font-semibold text-sm mb-1 text-purple-700 dark:text-purple-300">Track Progress</h3>
+                <p className="text-xs text-muted-foreground">Watch your knowledge grow with detailed stats</p>
+              </div>
+
+              <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur rounded-xl p-4 border border-pink-200 dark:border-pink-800 shadow-sm">
+                <div className="flex justify-center mb-2">
+                  <Zap className="w-8 h-8 text-pink-600 dark:text-pink-400" />
+                </div>
+                <h3 className="font-semibold text-sm mb-1 text-pink-700 dark:text-pink-300">Stay Consistent</h3>
+                <p className="text-xs text-muted-foreground">Build lasting knowledge through daily practice</p>
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="pt-4">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="lg">
-                    <Plus className="mr-2 h-4 w-4" />
+                  <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95">
+                    <Plus className="mr-2 h-5 w-5" />
                     Create Your First Card Pack
                   </Button>
                 </DialogTrigger>
@@ -145,8 +198,8 @@ export default function Home() {
                 </DialogContent>
               </Dialog>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <>
           <div className="grid gap-4">
