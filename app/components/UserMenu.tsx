@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from "react";
-import { Form, Link, useMatches } from "react-router";
 import { User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Form, Link, useMatches } from "react-router";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
 export function UserMenu() {

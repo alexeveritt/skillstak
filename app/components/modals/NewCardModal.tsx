@@ -1,6 +1,7 @@
-import { useFetcher } from "react-router";
 import { Plus, X } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { useFetcher } from "react-router";
+import { ModalHeader } from "../ModalHeader";
+import { Dialog, DialogContent } from "../ui/dialog";
 
 interface NewCardModalProps {
   open: boolean;
@@ -45,26 +46,12 @@ export function NewCardModal({
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader
-          className="px-6 pt-6 pb-4 relative"
-          style={{
-            backgroundColor: `${projectColor}20`,
-            borderBottom: `2px solid ${projectColor}`,
-          }}
-        >
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-4 top-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            style={{ color: projectForegroundColor }}
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <DialogTitle className="text-2xl font-bold pr-10" style={{ color: projectForegroundColor }}>
-            ✨ Add New Card
-          </DialogTitle>
-        </DialogHeader>
+        <ModalHeader
+          title="✨ Add New Card"
+          onClose={onClose}
+          projectColor={projectColor}
+          projectForegroundColor={projectForegroundColor}
+        />
 
         <div className="px-6 pb-6">
           {actionError && (actionIntent === "createCard" || actionIntent === "createCardAndNew") && (

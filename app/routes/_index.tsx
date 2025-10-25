@@ -1,11 +1,21 @@
 // app/routes/_index.tsx
-import { ActionFunctionArgs, Link, LoaderFunctionArgs } from "react-router";
-import { Form, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
-import { getSession, requireUserId } from "../server/session";
-import { projectSchema } from "../lib/z";
+
+import { BookOpen, Brain, ChevronRight, Plus, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  type ActionFunctionArgs,
+  Form,
+  Link,
+  type LoaderFunctionArgs,
+  redirect,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "react-router";
+import { EditMenu } from "~/components/EditMenu";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -15,12 +25,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { BookOpen, Brain, ChevronRight, Plus, TrendingUp, Zap } from "lucide-react";
+import { Input } from "~/components/ui/input";
+import { projectSchema } from "../lib/z";
+import { getSession, requireUserId } from "../server/session";
 import * as projectService from "../services/project.service";
 import * as reviewService from "../services/review.service";
-import { useTranslation } from "react-i18next";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { EditMenu } from "~/components/EditMenu";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   // Check if user is logged in, if not redirect to login

@@ -1,5 +1,5 @@
-import type { Env } from "./types";
 import { ulid } from "ulidx";
+import type { Env } from "./types";
 
 export async function createResetToken(env: Env, userId: string) {
   const token = ulid();

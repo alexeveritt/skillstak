@@ -1,5 +1,5 @@
 // app/routes.ts
-import { index, route, layout } from "@react-router/dev/routes";
+import { index, layout, route } from "@react-router/dev/routes";
 
 export default [
   index("routes/_index.tsx"),

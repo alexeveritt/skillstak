@@ -1,6 +1,7 @@
 // app/components/CardFlip.tsx
-import { useState } from "react";
+
 import { clsx } from "clsx";
+import { useState } from "react";
 
 export function CardFlip({
   front,

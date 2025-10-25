@@ -1,4 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { ModalHeader } from "../ModalHeader";
+import { Dialog, DialogContent } from "../ui/dialog";
 
 interface Card {
   id: string;
@@ -17,12 +18,16 @@ interface ViewCardModalProps {
 export function ViewCardModal({ open, onOpenChange, card, projectColor, projectForegroundColor }: ViewCardModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Card Details</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
+        <ModalHeader
+          title="Card Details"
+          onClose={() => onOpenChange(false)}
+          projectColor={projectColor}
+          projectForegroundColor={projectForegroundColor}
+        />
+
         {card && (
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 px-6 pb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Front</label>
               <div

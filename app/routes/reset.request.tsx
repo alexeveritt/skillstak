@@ -1,9 +1,10 @@
 // app/routes/reset.request.tsx
-import { Form, useActionData } from "react-router";
+
 import type { ActionFunctionArgs } from "react-router";
+import { Form, useActionData } from "react-router";
 import { emailSchema } from "../lib/z";
-import { createResetToken, sendResetEmail } from "../server/email";
 import { findUserByEmail } from "../server/auth";
+import { createResetToken, sendResetEmail } from "../server/email";
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const form = await request.formData();

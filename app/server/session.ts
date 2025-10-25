@@ -1,6 +1,6 @@
-import type { Env } from "./types";
-import { createCookie, type CookieOptions, type CookieSerializeOptions } from "react-router";
+import { type CookieOptions, type CookieSerializeOptions, createCookie } from "react-router";
 import { ulid } from "ulidx";
+import type { Env } from "./types";
 
 const SESSION_COOKIE = createCookie("sr.sid", {
   httpOnly: true,

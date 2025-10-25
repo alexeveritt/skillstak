@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { clsx } from "clsx";
+import { useState } from "react";
 
 // Color pairs: [background, foreground/text color, name]
 const COLOR_OPTIONS = [

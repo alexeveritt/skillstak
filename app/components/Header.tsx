@@ -1,8 +1,9 @@
 // app/components/Header.tsx
-import { NavLink } from "react-router";
-import { Button } from "~/components/ui/button";
+
 import { BookOpen, Sparkles } from "lucide-react";
+import { NavLink } from "react-router";
 import { UserMenu } from "~/components/UserMenu";
+import { Button } from "~/components/ui/button";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Header({ userId }: { userId?: string | null }) {

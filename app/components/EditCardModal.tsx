@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { Form } from "react-router";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Form } from "react-router";
+import { ModalHeader } from "./ModalHeader";
+import { Dialog, DialogContent } from "./ui/dialog";
 
 interface EditCardModalProps {
   card: {
@@ -58,26 +58,12 @@ export function EditCardModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
-        <DialogHeader
-          className="relative px-6 pt-6 pb-4"
-          style={{
-            backgroundColor: `${projectColor}20`,
-            borderBottom: `2px solid ${projectColor}`,
-          }}
-        >
-          <DialogTitle className="text-2xl font-bold" style={{ color: projectForegroundColor }}>
-            {t("editCardModal.title")}
-          </DialogTitle>
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="absolute right-4 top-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            style={{ color: projectForegroundColor }}
-            aria-label={t("editCardModal.close")}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </DialogHeader>
+        <ModalHeader
+          title={t("editCardModal.title")}
+          onClose={() => onOpenChange(false)}
+          projectColor={projectColor}
+          projectForegroundColor={projectForegroundColor}
+        />
 
         <div className="px-6 pb-6">
           {error && (

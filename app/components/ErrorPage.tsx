@@ -1,9 +1,10 @@
 // app/components/ErrorPage.tsx
+
+import { AlertCircle, Home, LogIn, RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { AlertCircle, Home, LogIn, RefreshCw } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 interface ErrorPageProps {
   status?: number;

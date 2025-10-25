@@ -1,9 +1,9 @@
 // app/routes/p.$projectId.tsx
 import type { LoaderFunctionArgs } from "react-router";
 import { Link, Outlet, useLoaderData, useLocation } from "react-router";
+import { EditMenu } from "~/components/EditMenu";
 import { requireUserId } from "../server/session";
 import * as projectService from "../services/project.service";
-import { EditMenu } from "~/components/EditMenu";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });

@@ -1,5 +1,6 @@
 import { Form } from "react-router";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
+import { ModalHeader } from "../ModalHeader";
+import { Dialog, DialogContent, DialogDescription } from "../ui/dialog";
 
 interface Card {
   id: string;
@@ -17,40 +18,42 @@ interface DeleteCardModalProps {
 export function DeleteCardModal({ open, onOpenChange, card, onCancel }: DeleteCardModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete Card</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+        <ModalHeader title="Delete Card" onClose={onCancel} projectColor="#fee2e2" projectForegroundColor="#991b1b" />
+
+        <div className="px-6 pb-6">
+          <DialogDescription className="mb-4">
             Are you sure you want to delete this card? This action cannot be undone.
           </DialogDescription>
-        </DialogHeader>
-        {card && (
-          <div className="space-y-4 py-4">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm font-medium text-red-800 mb-2">{card.front}</p>
-              <p className="text-sm text-red-600">{card.back}</p>
-            </div>
-            <div className="flex gap-3 justify-end">
-              <button
-                type="button"
-                onClick={onCancel}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <Form method="post" onSubmit={onCancel}>
-                <input type="hidden" name="intent" value="deleteCard" />
-                <input type="hidden" name="cardId" value={card.id} />
+
+          {card && (
+            <div className="space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-sm font-medium text-red-800 mb-2">{card.front}</p>
+                <p className="text-sm text-red-600">{card.back}</p>
+              </div>
+              <div className="flex gap-3 justify-end">
                 <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  type="button"
+                  onClick={onCancel}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  Delete Card
+                  Cancel
                 </button>
-              </Form>
+                <Form method="post" onSubmit={onCancel}>
+                  <input type="hidden" name="intent" value="deleteCard" />
+                  <input type="hidden" name="cardId" value={card.id} />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                  >
+                    Delete Card
+                  </button>
+                </Form>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

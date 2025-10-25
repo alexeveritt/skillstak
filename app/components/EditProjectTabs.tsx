@@ -1,5 +1,5 @@
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import { Settings, Library, Trash2 } from "lucide-react";
+import { Library, Settings, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export interface EditProjectTabsProps {
   activeTab: string;

@@ -1,12 +1,12 @@
 // app/routes/p.$projectId._index.tsx
 import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData, useMatches } from "react-router";
+import { ProjectActionButtons } from "../components/ProjectActionButtons";
+import { ProjectEmptyState } from "../components/ProjectEmptyState";
+import { ProjectHeader } from "../components/ProjectHeader";
+import { ProjectStatsDashboard } from "../components/ProjectStatsDashboard";
 import { requireUserId } from "../server/session";
 import * as reviewService from "../services/review.service";
-import { ProjectHeader } from "../components/ProjectHeader";
-import { ProjectEmptyState } from "../components/ProjectEmptyState";
-import { ProjectStatsDashboard } from "../components/ProjectStatsDashboard";
-import { ProjectActionButtons } from "../components/ProjectActionButtons";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });

@@ -1,5 +1,7 @@
+import { I18nextProvider } from "react-i18next";
 import type { LinksFunction, LoaderFunctionArgs } from "react-router";
 import {
+  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
@@ -7,15 +9,13 @@ import {
   ScrollRestoration,
   useLoaderData,
   useRouteError,
-  isRouteErrorResponse,
 } from "react-router";
-import stylesHref from "./styles.css?url";
-import { getSession } from "./server/session";
-import { Header } from "./components/Header";
-import { ErrorPage } from "./components/ErrorPage";
 import { Toaster } from "sonner";
-import { I18nextProvider } from "react-i18next";
+import { ErrorPage } from "./components/ErrorPage";
+import { Header } from "./components/Header";
 import i18n from "./lib/i18n";
+import { getSession } from "./server/session";
+import stylesHref from "./styles.css?url";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesHref }];
 
