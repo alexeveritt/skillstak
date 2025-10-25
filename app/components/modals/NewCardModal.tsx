@@ -2,6 +2,7 @@ import { Plus, X } from "lucide-react";
 import { useFetcher } from "react-router";
 import { ModalHeader } from "../ModalHeader";
 import { Dialog, DialogContent } from "../ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface NewCardModalProps {
   open: boolean;
@@ -30,6 +31,7 @@ export function NewCardModal({
   actionError,
   actionIntent,
 }: NewCardModalProps) {
+  const { t } = useTranslation();
   const fetcher = useFetcher();
   const isValid = front.trim() !== "" && back.trim() !== "";
 
@@ -47,7 +49,7 @@ export function NewCardModal({
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <ModalHeader
-          title="✨ Add New Card"
+          title={t("addCardModal.title")}
           onClose={onClose}
           projectColor={projectColor}
           projectForegroundColor={projectForegroundColor}
@@ -56,7 +58,7 @@ export function NewCardModal({
         <div className="px-6 pb-6">
           {actionError && (actionIntent === "createCard" || actionIntent === "createCardAndNew") && (
             <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-              <span className="font-semibold">Oops!</span> {actionError}
+              <span className="font-semibold">{t("addCardModal.oops")}</span> {actionError}
             </div>
           )}
 
@@ -65,12 +67,12 @@ export function NewCardModal({
 
             <div>
               <label htmlFor="front" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                Question 🤔
+                {t("addCardModal.questionLabel")}
               </label>
               <textarea
                 id="front"
                 name="front"
-                placeholder="What's on the front of your card?"
+                placeholder={t("addCardModal.questionPlaceholder")}
                 rows={3}
                 maxLength={200}
                 className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all text-sm"
@@ -80,17 +82,17 @@ export function NewCardModal({
                 value={front}
                 onChange={(e) => onFrontChange(e.target.value)}
               />
-              <div className="text-xs text-gray-500 mt-1">Max 200 characters</div>
+              <div className="text-xs text-gray-500 mt-1">{t("addCardModal.maxChars")}</div>
             </div>
 
             <div>
               <label htmlFor="back" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                Answer 💡
+                {t("addCardModal.answerLabel")}
               </label>
               <textarea
                 id="back"
                 name="back"
-                placeholder="What's the answer?"
+                placeholder={t("addCardModal.answerPlaceholder")}
                 rows={3}
                 maxLength={200}
                 className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all text-sm"
@@ -99,7 +101,7 @@ export function NewCardModal({
                 value={back}
                 onChange={(e) => onBackChange(e.target.value)}
               />
-              <div className="text-xs text-gray-500 mt-1">Max 200 characters</div>
+              <div className="text-xs text-gray-500 mt-1">{t("addCardModal.maxChars")}</div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch gap-2 pt-2">
@@ -108,7 +110,7 @@ export function NewCardModal({
                 onClick={onClose}
                 className="sm:flex-shrink-0 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
               >
-                Cancel
+                {t("addCardModal.cancel")}
               </button>
               <button
                 type="submit"
@@ -124,7 +126,7 @@ export function NewCardModal({
               >
                 <Plus className="w-4 h-4 flex-shrink-0" />
                 <span className="whitespace-nowrap">
-                  {fetcher.state === "submitting" ? "Adding..." : "Add Another"}
+                  {fetcher.state === "submitting" ? t("addCardModal.adding") : t("addCardModal.addAnother")}
                 </span>
               </button>
               <button
@@ -138,7 +140,7 @@ export function NewCardModal({
                   color: isValid ? projectForegroundColor : "#6b7280",
                 }}
               >
-                <span>{fetcher.state === "submitting" ? "Saving..." : "Save"}</span>
+                <span>{fetcher.state === "submitting" ? t("addCardModal.saving") : t("addCardModal.save")}</span>
               </button>
             </div>
           </fetcher.Form>

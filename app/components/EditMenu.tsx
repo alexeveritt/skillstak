@@ -1,5 +1,6 @@
 import { Edit, MoreVertical } from "lucide-react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 
 interface EditMenuProps {
   projectId: string;
@@ -7,6 +8,8 @@ interface EditMenuProps {
 }
 
 export function EditMenu({ projectId, onMenuClick }: EditMenuProps) {
+  const { t } = useTranslation();
+
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -22,7 +25,7 @@ export function EditMenu({ projectId, onMenuClick }: EditMenuProps) {
       <button
         onClick={handleButtonClick}
         className="p-2 hover:bg-accent rounded-lg transition-colors"
-        aria-label="Card Pack options"
+        aria-label={t("editMenu.optionsAriaLabel")}
       >
         <MoreVertical className="h-5 w-5" />
       </button>
@@ -33,7 +36,7 @@ export function EditMenu({ projectId, onMenuClick }: EditMenuProps) {
           onClick={handleLinkClick}
         >
           <Edit className="h-4 w-4" />
-          Manage Card Pack
+          {t("editMenu.manageCardPack")}
         </Link>
       </div>
     </div>

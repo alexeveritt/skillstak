@@ -8,8 +8,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useTranslation } from "react-i18next";
 
 export function UserMenu() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const matches = useMatches();
@@ -42,7 +44,7 @@ export function UserMenu() {
         <DropdownMenuTrigger
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all shadow-sm hover:shadow-md"
-          aria-label="User menu"
+          aria-label={t("userMenu.ariaLabel")}
         >
           <User className="w-5 h-5 text-white" />
         </DropdownMenuTrigger>
@@ -51,7 +53,7 @@ export function UserMenu() {
           <DropdownMenuContent align="end">
             <Link to="/" onClick={() => setIsOpen(false)}>
               <DropdownMenuItem>
-                <span className="font-medium">My Card Packs</span>
+                <span className="font-medium">{t("userMenu.myCardPacks")}</span>
               </DropdownMenuItem>
             </Link>
 
@@ -60,17 +62,17 @@ export function UserMenu() {
                 <DropdownMenuSeparator />
                 <Link to={`/p/${project.id}`} onClick={() => setIsOpen(false)}>
                   <DropdownMenuItem>
-                    <span>Card Pack Home</span>
+                    <span>{t("userMenu.cardPackHome")}</span>
                   </DropdownMenuItem>
                 </Link>
                 <Link to={`/p/${project.id}/review?mode=practice`} onClick={() => setIsOpen(false)}>
                   <DropdownMenuItem>
-                    <span>Quick Practice</span>
+                    <span>{t("userMenu.quickPractice")}</span>
                   </DropdownMenuItem>
                 </Link>
                 <Link to={`/p/${project.id}/edit`} onClick={() => setIsOpen(false)}>
                   <DropdownMenuItem>
-                    <span>Manage Card Pack</span>
+                    <span>{t("userMenu.manageCardPack")}</span>
                   </DropdownMenuItem>
                 </Link>
               </>
@@ -80,7 +82,7 @@ export function UserMenu() {
             <Form method="post" action="/logout">
               <DropdownMenuItem asChild>
                 <button type="submit" className="w-full text-left text-red-600 hover:text-red-700">
-                  Log Out
+                  {t("userMenu.logOut")}
                 </button>
               </DropdownMenuItem>
             </Form>

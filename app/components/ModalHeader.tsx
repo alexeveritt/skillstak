@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { DialogHeader, DialogTitle } from "./ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface ModalHeaderProps {
   title: string;
@@ -24,6 +25,7 @@ export function ModalHeader({
     : undefined;
 
   const titleStyle = projectForegroundColor ? { color: projectForegroundColor } : undefined;
+  const { t } = useTranslation();
 
   return (
     <DialogHeader className="px-6 pt-6 pb-4 relative" style={headerStyle}>
@@ -36,7 +38,7 @@ export function ModalHeader({
           onClick={onClose}
           className="absolute right-4 top-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
           style={titleStyle}
-          aria-label="Close modal"
+          aria-label={t("modalHeader.close")}
         >
           <X className="w-5 h-5" />
         </button>

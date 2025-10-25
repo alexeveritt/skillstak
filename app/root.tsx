@@ -61,6 +61,7 @@ export default function Root() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  const { t } = require("react-i18next");
 
   if (isRouteErrorResponse(error)) {
     return (
@@ -68,14 +69,14 @@ export function ErrorBoundary() {
         <head>
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <title>Error {error.status} - SkillStak</title>
+          <title>{t("error.title", { status: error.status })}</title>
           <Meta />
           <Links />
         </head>
         <body className="min-h-screen">
           <Header userId={null} />
           <main className="mx-auto max-w-3xl p-4">
-            <ErrorPage status={error.status} statusText={error.statusText} message={error.data?.message} />
+            <ErrorPage status={error.status} statusText={error.statusText} message={error.data?.message ? t("error.message", { message: error.data?.message }) : undefined} />
           </main>
           <Scripts />
         </body>
@@ -89,14 +90,14 @@ export function ErrorBoundary() {
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Error - SkillStak</title>
+        <title>{t("error.titleDefault")}</title>
         <Meta />
         <Links />
       </head>
       <body className="min-h-screen">
         <Header userId={null} />
         <main className="mx-auto max-w-3xl p-4">
-          <ErrorPage status={500} message={error instanceof Error ? error.message : "An unexpected error occurred"} />
+          <ErrorPage status={500} message={error instanceof Error ? t("error.unexpected", { message: error.message }) : t("error.unexpectedDefault") } />
         </main>
         <Scripts />
       </body>

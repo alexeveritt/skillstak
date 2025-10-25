@@ -3,6 +3,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { Form, redirect, useActionData, useLoaderData, useMatches } from "react-router";
 import { requireUserId } from "../server/session";
 import * as cardService from "../services/card.service";
+import { useTranslation } from "react-i18next";
 
 type ImportCard = {
   f: string;
@@ -166,6 +167,7 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
 }
 
 export default function ImportCards() {
+  const { t } = useTranslation();
   const matches = useMatches();
   const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
     | { project?: { id: string; name: string; color?: string; foreground_color?: string } }
@@ -181,10 +183,10 @@ export default function ImportCards() {
     return (
       <div className="max-w-3xl mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-          Project not found. Please try again.
+          {t("importCards.projectNotFound")}
         </div>
         <a href="/" className="text-blue-600 hover:text-blue-800 underline">
-          Go to Home
+          {t("importCards.goHome")}
         </a>
       </div>
     );
@@ -248,9 +250,9 @@ export default function ImportCards() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Import Cards</h1>
+      <h1 className="text-3xl font-bold mb-2">{t("importCards.title")}</h1>
       <p className="text-gray-600 mb-6">
-        Import cards into <strong>{project.name}</strong>
+        {t("importCards.importInto")} <strong>{project.name}</strong>
       </p>
 
       {(actionData?.error || clientError) && (
@@ -261,7 +263,7 @@ export default function ImportCards() {
 
       {actionData?.validationErrors && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-4">
-          <p className="font-medium mb-2">Some cards had issues:</p>
+          <p className="font-medium mb-2">{t("importCards.validationIssues")}</p>
           <ul className="list-disc list-inside text-sm space-y-1">
             {actionData.validationErrors.map((error, i) => (
               <li key={i}>{error}</li>
@@ -272,20 +274,20 @@ export default function ImportCards() {
 
       {!showPreview ? (
         <div className="bg-white border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Upload Cards File</h2>
+          <h2 className="text-lg font-semibold mb-4">{t("importCards.uploadTitle")}</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Upload a JSON file with your cards. Format:{" "}
+            {t("importCards.uploadDescription")}
             <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-              [{"{"}"f":"Front", "b":"Back"{"}"}]
+              [{'{'}"f":"Front", "b":"Back"{'}'}]
             </code>
           </p>
 
           <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded mb-4 text-sm">
-            <p className="font-medium mb-1">File Requirements:</p>
+            <p className="font-medium mb-1">{t("importCards.fileRequirements")}</p>
             <ul className="list-disc list-inside space-y-1">
-              <li>File type: JSON (.json)</li>
-              <li>Maximum size: 5MB</li>
-              <li>Format: Array of objects with 'f' (front) and 'b' (back) properties</li>
+              <li>{t("importCards.fileType")}</li>
+              <li>{t("importCards.maxSize")}</li>
+              <li>{t("importCards.format")}</li>
             </ul>
           </div>
 
@@ -313,22 +315,22 @@ export default function ImportCards() {
                 disabled={!selectedFile || !!clientError}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg px-6 py-2.5 transition-colors"
               >
-                Upload and Preview
+                {t("importCards.uploadButton")}
               </button>
               <a
                 href={`/p/${project.id}/edit`}
                 className="text-gray-600 hover:text-gray-800 underline transition-colors"
               >
-                Cancel
+                {t("importCards.cancel")}
               </a>
             </div>
           </Form>
         </div>
       ) : (
         <div className="bg-white border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Preview Cards ({cards.length})</h2>
+          <h2 className="text-lg font-semibold mb-4">{t("importCards.previewTitle", { count: cards.length })}</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Review the cards below. You can remove any cards you don't want to import.
+            {t("importCards.previewDescription")}
           </p>
 
           <div className="space-y-3 mb-6 max-h-[600px] overflow-y-auto border rounded-lg p-4 bg-gray-50">
@@ -336,10 +338,10 @@ export default function ImportCards() {
               <div key={card.tempId} className="border rounded-lg p-4 bg-white flex items-start gap-3">
                 <div className="flex-1">
                   <div className="font-medium text-gray-900 mb-2">
-                    <span className="text-xs text-gray-500 uppercase">Front:</span> {card.f}
+                    <span className="text-xs text-gray-500 uppercase">{t("importCards.front")}</span> {card.f}
                   </div>
                   <div className="text-gray-700 text-sm">
-                    <span className="text-xs text-gray-500 uppercase">Back:</span> {card.b}
+                    <span className="text-xs text-gray-500 uppercase">{t("importCards.back")}</span> {card.b}
                   </div>
                 </div>
                 <button
@@ -347,7 +349,7 @@ export default function ImportCards() {
                   onClick={() => handleRemoveCard(card.tempId!)}
                   className="text-red-600 hover:text-red-800 text-sm font-medium px-3 py-1 rounded hover:bg-red-50"
                 >
-                  Remove
+                  {t("importCards.remove")}
                 </button>
               </div>
             ))}
@@ -355,9 +357,9 @@ export default function ImportCards() {
 
           {cards.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 mb-4">No cards left to import. Add some back or upload a different file.</p>
+              <p className="text-gray-600 mb-4">{t("importCards.noCardsLeft")}</p>
               <a href={`/p/${project.id}/cards/import`} className="text-blue-600 hover:text-blue-800 underline">
-                Start Over
+                {t("importCards.startOver")}
               </a>
             </div>
           ) : (
@@ -370,13 +372,13 @@ export default function ImportCards() {
                   type="submit"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-6 py-2.5 transition-colors"
                 >
-                  Import {cards.length} Card{cards.length !== 1 ? "s" : ""}
+                  {t("importCards.importButton", { count: cards.length })}
                 </button>
                 <a
                   href={`/p/${project.id}/cards/import`}
                   className="text-gray-600 hover:text-gray-800 underline transition-colors"
                 >
-                  Start Over
+                  {t("importCards.startOver")}
                 </a>
               </div>
             </Form>
@@ -385,7 +387,7 @@ export default function ImportCards() {
       )}
 
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-medium text-blue-900 mb-2">Example File Format</h3>
+        <h3 className="font-medium text-blue-900 mb-2">{t("importCards.exampleFormat")}</h3>
         <pre className="text-xs bg-white p-3 rounded border overflow-x-auto">
           {`[
   { "f": "What is 2 + 2?", "b": "4" },

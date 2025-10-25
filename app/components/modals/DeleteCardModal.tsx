@@ -1,6 +1,7 @@
 import { Form } from "react-router";
 import { ModalHeader } from "../ModalHeader";
 import { Dialog, DialogContent, DialogDescription } from "../ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface Card {
   id: string;
@@ -16,14 +17,20 @@ interface DeleteCardModalProps {
 }
 
 export function DeleteCardModal({ open, onOpenChange, card, onCancel }: DeleteCardModalProps) {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
-        <ModalHeader title="Delete Card" onClose={onCancel} projectColor="#fee2e2" projectForegroundColor="#991b1b" />
+        <ModalHeader
+          title={t("deleteCardModal.title")}
+          onClose={onCancel}
+          projectColor="#fee2e2"
+          projectForegroundColor="#991b1b"
+        />
 
         <div className="px-6 pb-6 pt-4">
           <DialogDescription className="mb-4">
-            Are you sure you want to delete this card? This action cannot be undone.
+            {t("deleteCardModal.confirmText")}
           </DialogDescription>
 
           {card && (
@@ -38,7 +45,7 @@ export function DeleteCardModal({ open, onOpenChange, card, onCancel }: DeleteCa
                   onClick={onCancel}
                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  Cancel
+                  {t("deleteCardModal.cancel")}
                 </button>
                 <Form method="post" onSubmit={onCancel}>
                   <input type="hidden" name="intent" value="deleteCard" />
@@ -47,7 +54,7 @@ export function DeleteCardModal({ open, onOpenChange, card, onCancel }: DeleteCa
                     type="submit"
                     className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
                   >
-                    Delete Card
+                    {t("deleteCardModal.deleteButton")}
                   </button>
                 </Form>
               </div>

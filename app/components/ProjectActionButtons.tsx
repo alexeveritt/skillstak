@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 
 export interface ProjectActionButtonsProps {
   stats: {
@@ -9,6 +10,8 @@ export interface ProjectActionButtonsProps {
 }
 
 export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectActionButtonsProps) {
+  const { t } = useTranslation();
+
   if (stats.due_now > 0) {
     return (
       <div className="space-y-4 mb-6">
@@ -20,14 +23,14 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl font-bold">Start Review Session</span>
+                <span className="text-xl font-bold">{t("projectActionButtons.startReviewSession")}</span>
               </div>
               <div className="text-sm opacity-90">
-                {stats.due_now} card{stats.due_now !== 1 ? "s" : ""} ready for spaced repetition review
+                {t("projectActionButtons.cardsReady", { count: stats.due_now })}
               </div>
             </div>
             <div className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-blue-50 transition-colors">
-              Start
+              {t("projectActionButtons.start")}
             </div>
           </div>
         </Link>
@@ -38,13 +41,13 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1">
-              <div className="text-lg font-bold mb-2">Practice Mode</div>
+              <div className="text-lg font-bold mb-2">{t("projectActionButtons.practiceMode")}</div>
               <div className="text-xs opacity-90">
-                Review any cards without affecting your spaced repetition schedule
+                {t("projectActionButtons.practiceDesc")}
               </div>
             </div>
             <div className="bg-white text-purple-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-purple-50 transition-colors">
-              Start
+              {t("projectActionButtons.start")}
             </div>
           </div>
         </Link>
@@ -56,14 +59,14 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
     <div className="space-y-4 mb-6">
       <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-300 rounded-xl p-6 text-center">
         <div className="text-4xl mb-2">✅</div>
-        <div className="text-lg font-bold text-gray-700 mb-2">All Caught Up!</div>
+        <div className="text-lg font-bold text-gray-700 mb-2">{t("projectActionButtons.caughtUp")}</div>
         <div className="text-sm text-gray-600">
           {(() => {
             const nextReviewTime = formatNextReviewTime(stats?.next_due_at ?? null);
             if (nextReviewTime) {
               return (
                 <>
-                  No cards are due for review right now. Your next review will be <strong>{nextReviewTime}</strong>.
+                  {t("projectActionButtons.nextReview")} <strong>{nextReviewTime}</strong>.
                 </>
               );
             } else if (stats?.next_due_at) {
@@ -81,13 +84,13 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
-            <div className="text-lg font-bold mb-2">Practice Mode</div>
+            <div className="text-lg font-bold mb-2">{t("projectActionButtons.practiceMode")}</div>
             <div className="text-sm opacity-90">
-              Review any cards for fun without affecting your spaced repetition schedule
+              {t("projectActionButtons.practiceDesc")}
             </div>
           </div>
           <div className="bg-white text-purple-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-purple-50 transition-colors">
-            Start
+            {t("projectActionButtons.start")}
           </div>
         </div>
       </Link>

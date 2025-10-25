@@ -1,29 +1,38 @@
-import { useState } from "react";
-import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData, useMatches } from "react-router";
-import { requireUserId } from "../server/session";
+import {useState} from "react";
+import type {LoaderFunctionArgs} from "react-router";
+import {useLoaderData, useMatches} from "react-router";
+import {requireUserId} from "../server/session";
 import * as cardService from "../services/card.service";
+import {useTranslation} from "react-i18next";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+export async function loader({params, context, request}: LoaderFunctionArgs) {
+  const userId = await requireUserId({request, cloudflare: context.cloudflare});
   const projectId = params.projectId!;
 
   const cards = await cardService.listCards(context.cloudflare.env, projectId);
 
-  return { cards };
+  return {cards};
 }
 
 export default function ExportCards() {
-  const { cards: allCards } = useLoaderData<typeof loader>();
+  const {t} = useTranslation();
+  const {cards: allCards} = useLoaderData<typeof loader>();
   const matches = useMatches();
   const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
-    | { project?: { id: string; name: string; color?: string; foreground_color?: string } }
+    | {
+    project?: {
+      id: string;
+      name: string;
+      color?: string;
+      foreground_color?: string
+    }
+  }
     | undefined;
   const project = layoutData?.project;
   const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set(allCards.map((card) => card.id)));
 
   if (!project) {
-    throw new Error("Card Pack not found");
+    throw new Error(t("exportCards.noCards"));
   }
 
   const handleToggleCard = (cardId: string) => {
@@ -59,7 +68,7 @@ export default function ExportCards() {
     }
 
     const json = JSON.stringify(cardsToExport, null, 2);
-    const blob = new Blob([json], { type: "application/json" });
+    const blob = new Blob([json], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -75,19 +84,12 @@ export default function ExportCards() {
   if (allCards.length === 0) {
     return (
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Export Cards</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("exportCards.title")}</h1>
         <p className="text-gray-600 mb-6">
-          Export cards from <strong>{project.name}</strong>
+          {t("exportCards.exportFrom")} <strong>{project.name}</strong>
         </p>
-
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded">
-          This card pack has no cards to export.
-        </div>
-
-        <div className="mt-4">
-          <a href={`/p/${project.id}/edit`} className="text-blue-600 hover:text-blue-800 underline">
-            Back to Manage Card Pack
-          </a>
+          {t("exportCards.noCards")}
         </div>
       </div>
     );
@@ -95,25 +97,23 @@ export default function ExportCards() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">Export Cards</h1>
+      <h1 className="text-3xl font-bold mb-2">{t("exportCards.title")}</h1>
       <p className="text-gray-600 mb-6">
-        Export cards from <strong>{project.name}</strong>
+        {t("exportCards.exportFrom")} <strong>{project.name}</strong>
       </p>
-
       <div className="bg-white border rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">
-            Select Cards to Export ({selectedCount} of {allCards.length})
+            {t("exportCards.selectCards")} ({selectedCount} of {allCards.length})
           </h2>
           <button
             type="button"
             onClick={handleToggleAll}
             className="text-sm text-blue-600 hover:text-blue-800 underline"
           >
-            {selectedCount === allCards.length ? "Deselect All" : "Select All"}
+            {selectedCount === allCards.length ? t("exportCards.deselectAll") : t("exportCards.selectAll")}
           </button>
         </div>
-
         <div className="space-y-3 mb-6 max-h-[600px] overflow-y-auto border rounded-lg p-4 bg-gray-50">
           {allCards.map((card) => {
             const isSelected = selectedCardIds.has(card.id);
@@ -132,22 +132,21 @@ export default function ExportCards() {
                 />
                 <div className="flex-1">
                   <div className="font-medium text-gray-900 mb-2">
-                    <span className="text-xs text-gray-500 uppercase">Front:</span> {card.front}
+                    <span className="text-xs text-gray-500 uppercase">{t("exportCards.front")}</span> {card.front}
                   </div>
                   <div className="text-gray-700 text-sm">
-                    <span className="text-xs text-gray-500 uppercase">Back:</span> {card.back}
+                    <span className="text-xs text-gray-500 uppercase">{t("exportCards.back")}</span> {card.back}
                   </div>
                 </div>
               </label>
             );
           })}
         </div>
-
         {selectedCount === 0 ? (
           <div className="text-center py-4">
-            <p className="text-gray-600 mb-4">Please select at least one card to export.</p>
+            <p className="text-gray-600 mb-4">{t("exportCards.pleaseSelect")}</p>
             <a href={`/p/${project.id}/edit`} className="text-blue-600 hover:text-blue-800 underline">
-              Back to Manage Card Pack
+              {t("exportCards.backToManage")}
             </a>
           </div>
         ) : (
@@ -157,21 +156,20 @@ export default function ExportCards() {
               onClick={handleExport}
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-6 py-2.5 transition-colors"
             >
-              Export {selectedCount} Card{selectedCount !== 1 ? "s" : ""}
+              {t("exportCards.exportButton", {count: selectedCount})}
             </button>
             <a href={`/p/${project.id}/edit`} className="text-gray-600 hover:text-gray-800 underline transition-colors">
-              Cancel
+              {t("exportCards.cancel")}
             </a>
           </div>
         )}
       </div>
-
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-medium text-blue-900 mb-2">Export Format</h3>
+        <h3 className="font-medium text-blue-900 mb-2">{t("exportCards.formatTitle")}</h3>
         <p className="text-sm text-gray-700">
-          Cards will be exported as a JSON file with the format:{" "}
+          {t("exportCards.formatDesc")}
           <code className="bg-white px-2 py-1 rounded text-xs">
-            [{"{"}"f":"Front", "b":"Back"{"}"}]
+            [{'{'}"f":"Front", "b":"Back"{'}'}]
           </code>
         </p>
       </div>

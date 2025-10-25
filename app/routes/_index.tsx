@@ -60,7 +60,8 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const form = await request.formData();
   const name = String(form.get("name") || "");
   const parsed = projectSchema.safeParse({ name });
-  if (!parsed.success) return { error: "Enter a name" };
+  // Use translation key for error
+  if (!parsed.success) return { error: "home.nameError" };
 
   await projectService.createProject(context.cloudflare.env, userId, name);
   return null;
@@ -195,13 +196,17 @@ export default function Home() {
                       <Input
                         ref={inputRef}
                         name="name"
-                        placeholder={t("home.packNamePlaceholder")}
+                        placeholder={t("home.packNameExample")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         maxLength={50}
                       />
                       <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
-                      {actionData?.error && <p className="text-destructive text-sm">{t("home.nameError")}</p>}
+                      {actionData?.error && (
+                        <div className="text-red-600 text-sm font-medium mb-2">
+                          {t(actionData.error)}
+                        </div>
+                      )}
                     </div>
                     <DialogFooter>
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -236,14 +241,14 @@ export default function Home() {
                             <>
                               {p.stats.due_now > 0 && (
                                 <>
-                                  <span className="font-semibold text-destructive">{p.stats.due_now} due</span>
+                                  <span className="font-semibold text-destructive">{p.stats.due_now} {t("home.due")}</span>
                                   <span className="mx-2">·</span>
                                 </>
                               )}
-                              <span>{p.stats.total_cards} cards total</span>
+                              <span>{p.stats.total_cards} {t("home.cardsTotal")}</span>
                             </>
                           ) : (
-                            <span className="text-muted-foreground">No cards yet</span>
+                            <span className="text-muted-foreground">{t("home.noCardsYet")}</span>
                           )}
                         </CardDescription>
                       </div>
@@ -259,7 +264,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                             {p.stats.mastered_cards}
                           </div>
-                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">⭐ Mastered</div>
+                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">{t("home.mastered")}</div>
                         </div>
 
                         {/* Learning Cards */}
@@ -267,9 +272,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
                             {p.stats.learning_cards}
                           </div>
-                          <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 text-center">
-                            📖 Learning
-                          </div>
+                          <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 text-center">{t("home.learning")}</div>
                         </div>
 
                         {/* New Cards */}
@@ -277,7 +280,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                             {p.stats.new_cards}
                           </div>
-                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">✨ New</div>
+                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">{t("home.new")}</div>
                         </div>
                       </div>
 
@@ -317,34 +320,36 @@ export default function Home() {
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full" size="lg">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Another Card Pack
+                {t("home.addAnotherPack")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New Card Pack</DialogTitle>
-                <DialogDescription>
-                  Start a new learning card pack to organize your flashcards by topic or subject.
-                </DialogDescription>
+                <DialogTitle>{t("home.createNewPackTitle")}</DialogTitle>
+                <DialogDescription>{t("home.createNewPackDesc")}</DialogDescription>
               </DialogHeader>
               <Form method="post" className="space-y-4">
                 <div className="space-y-2">
                   <Input
                     ref={inputRef}
                     name="name"
-                    placeholder="e.g., Spanish Vocabulary, React Hooks, Biology 101"
+                    placeholder={t("home.packNameExample")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     maxLength={50}
                   />
-                  <div className="text-xs text-gray-500 mt-1">Max 50 characters</div>
-                  {actionData?.error && <p className="text-destructive text-sm">{actionData.error}</p>}
+                  <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
+                  {actionData?.error && (
+                    <div className="text-red-600 text-sm font-medium mb-2">
+                      {t(actionData.error)}
+                    </div>
+                  )}
                 </div>
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
+                    {t("home.cancel")}
                   </Button>
-                  <Button type="submit">Create Card Pack</Button>
+                  <Button type="submit">{t("home.create")}</Button>
                 </DialogFooter>
               </Form>
             </DialogContent>

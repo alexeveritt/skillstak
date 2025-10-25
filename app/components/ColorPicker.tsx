@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 // Color pairs: [background, foreground/text color, name]
 const COLOR_OPTIONS = [
@@ -32,6 +33,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
   const [showCustom, setShowCustom] = useState(false);
   const [customBg, setCustomBg] = useState("");
   const [customFg, setCustomFg] = useState("#000000");
+  const { t } = useTranslation();
 
   // Find if current value matches a preset
   const selectedIndex = COLOR_OPTIONS.findIndex(([bg]) => bg === value);
@@ -49,7 +51,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
 
   return (
     <div className="space-y-3">
-      <div className="text-sm font-medium mb-2">Choose a card color</div>
+      <div className="text-sm font-medium mb-2">{t("colorPicker.chooseColor")}</div>
 
       {/* Color Swatches */}
       <div className="grid grid-cols-6 gap-2">
@@ -63,7 +65,8 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
               selectedIndex === index ? "border-black ring-2 ring-black" : "border-gray-300 hover:border-gray-400"
             )}
             style={{ backgroundColor: bg }}
-            title={name}
+            title={t(`colorPicker.${name.replace(/\s+/g, "").toLowerCase()}`)}
+            aria-label={t(`colorPicker.${name.replace(/\s+/g, "").toLowerCase()}`)}
           >
             {/* Preview text */}
             <span
@@ -95,14 +98,14 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
           onClick={() => setShowCustom(!showCustom)}
           className="text-sm text-slate-600 underline hover:text-slate-800"
         >
-          {showCustom ? "Hide custom color" : "Use custom color"}
+          {showCustom ? t("colorPicker.hideCustomColor") : t("colorPicker.useCustomColor")}
         </button>
 
         {showCustom && (
           <div className="mt-3 p-3 border rounded bg-slate-50 space-y-2">
             <div>
               <label htmlFor="custom-bg" className="block text-xs font-medium text-slate-700 mb-1">
-                Background Color (hex code)
+                {t("colorPicker.customBgLabel")}
               </label>
               <input
                 type="text"
@@ -115,7 +118,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
             </div>
             <div>
               <label htmlFor="custom-fg" className="block text-xs font-medium text-slate-700 mb-1">
-                Text Color (hex code)
+                {t("colorPicker.customFgLabel")}
               </label>
               <input
                 type="text"

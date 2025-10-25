@@ -1,4 +1,5 @@
 import { Eye, Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface EditProjectCardGridItemProps {
   card: { id: string; front: string; back: string };
@@ -17,6 +18,8 @@ export function EditProjectCardGridItem({
   onEdit,
   onDelete,
 }: EditProjectCardGridItemProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       key={card.id}
@@ -46,7 +49,7 @@ export function EditProjectCardGridItem({
           className="flex-1 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
         >
           <Eye className="w-4 h-4" />
-          <span>View</span>
+          <span>{t("editProjectCardGridItem.view")}</span>
         </button>
         <button
           type="button"
@@ -54,7 +57,7 @@ export function EditProjectCardGridItem({
           className="flex-1 py-2.5 text-sm font-medium text-blue-700 hover:bg-blue-50 transition-colors flex items-center justify-center gap-1.5"
         >
           <Pencil className="w-4 h-4" />
-          <span>Change</span>
+          <span>{t("editProjectCardGridItem.change")}</span>
         </button>
         <button
           type="button"
@@ -62,7 +65,7 @@ export function EditProjectCardGridItem({
           className="flex-1 py-2.5 text-sm font-medium text-red-700 hover:bg-red-50 transition-colors flex items-center justify-center gap-1.5"
         >
           <Trash2 className="w-4 h-4" />
-          <span>Delete</span>
+          <span>{t("editProjectCardGridItem.delete")}</span>
         </button>
       </div>
     </div>
