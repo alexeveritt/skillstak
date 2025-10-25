@@ -156,7 +156,7 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
         await cardService.createCard(context.cloudflare.env, projectId, card.f, card.b);
       }
 
-      return redirect(`/p/${projectId}/cards`);
+      return redirect(`/p/${projectId}/edit?tab=cards`);
     } catch (error) {
       return { error: "Failed to import cards. Please try again." };
     }
