@@ -285,14 +285,15 @@ export default function EditProject() {
         {/* Cards Tab */}
         <TabsContent value="cards">
           {cards.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-md p-12 text-center">
-              <div className="text-5xl mb-3">📝</div>
-              <p className="text-gray-600 mb-4">No cards yet! Add your first card to get started.</p>
+            <div className="bg-white rounded-xl shadow-lg p-12 text-center border-2 border-gray-100">
+              <div className="text-6xl mb-4">📚</div>
+              <h2 className="text-xl font-bold text-gray-800 mb-2">No Cards Yet</h2>
+              <p className="text-gray-600 mb-4">Start building your card stack by adding your first flashcard. Each card can have a question and an answer to help you learn!</p>
               <button
                 onClick={() => setIsNewCardModalOpen(true)}
-                className="inline-block bg-gradient-to-r from-blue-100 to-indigo-200 text-blue-800 font-semibold py-2 px-6 rounded-lg border border-blue-300 hover:shadow-md hover:from-blue-200 hover:to-indigo-300 transition-all"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-3 px-8 rounded-lg hover:shadow-lg transition-all hover:scale-105"
               >
-                ➕ Add First Card
+                <span>Add First Card</span>
               </button>
             </div>
           ) : (
