@@ -20,6 +20,11 @@ export function LanguageSwitcher() {
       >
         <option value="en">{i18n.t("languageSwitcher.english")}</option>
         <option value="pt-PT">{i18n.t("languageSwitcher.portuguese")}</option>
+        <option value="fr">{i18n.t("languageSwitcher.french")}</option>
+        <option value="de">{i18n.t("languageSwitcher.german")}</option>
+        <option value="da">{i18n.t("languageSwitcher.danish")}</option>
+        <option value="es">{i18n.t("languageSwitcher.spanish")}</option>
+        <option value="sv">{i18n.t("languageSwitcher.swedish")}</option>
       </select>
     </div>
   );
