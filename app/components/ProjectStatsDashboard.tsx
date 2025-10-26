@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 export interface ProjectStatsDashboardProps {
   stats: {
     total_cards: number;
@@ -11,6 +13,8 @@ export interface ProjectStatsDashboardProps {
 }
 
 export function ProjectStatsDashboard({ stats, projectColor, projectForegroundColor }: ProjectStatsDashboardProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="mb-8 space-y-4">
       {/* Quick Stats Grid */}
@@ -20,24 +24,24 @@ export function ProjectStatsDashboard({ stats, projectColor, projectForegroundCo
           style={{ backgroundColor: projectColor, color: projectForegroundColor }}
         >
           <div className="text-3xl font-bold">{stats.total_cards}</div>
-          <div className="text-sm font-medium mt-1 opacity-80">📚 Total Cards</div>
+          <div className="text-sm font-medium mt-1 opacity-80">{t("projectStats.totalCards")}</div>
         </div>
         <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-5 shadow-md">
           <div className="text-3xl font-bold text-red-700">{stats.due_now}</div>
-          <div className="text-sm font-medium text-red-600 mt-1">🔥 Ready Now</div>
+          <div className="text-sm font-medium text-red-600 mt-1">{t("projectStats.readyNow")}</div>
         </div>
         <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-5 shadow-md">
           <div className="text-3xl font-bold text-green-700">{stats.mastered_cards}</div>
-          <div className="text-sm font-medium text-green-600 mt-1">⭐ Mastered</div>
+          <div className="text-sm font-medium text-green-600 mt-1">{t("projectStats.mastered")}</div>
         </div>
         <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl p-5 shadow-md">
           <div className="text-3xl font-bold text-yellow-700">{stats.learning_cards}</div>
-          <div className="text-sm font-medium text-yellow-600 mt-1">📖 Learning</div>
+          <div className="text-sm font-medium text-yellow-600 mt-1">{t("projectStats.learning")}</div>
         </div>
       </div>
       {/* Progress Bar */}
       <div className="bg-white rounded-xl p-5 shadow-md">
-        <div className="text-sm font-semibold text-gray-700 mb-3">Your Progress</div>
+        <div className="text-sm font-semibold text-gray-700 mb-3">{t("projectStats.yourProgress")}</div>
         <div className="flex items-center gap-2 h-8 bg-gray-200 rounded-full overflow-hidden">
           {stats.mastered_cards > 0 && (
             <div
@@ -73,15 +77,15 @@ export function ProjectStatsDashboard({ stats, projectColor, projectForegroundCo
         <div className="flex items-center gap-4 mt-3 text-xs">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span className="text-gray-600">Mastered</span>
+            <span className="text-gray-600">{t("projectStats.mastered")}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-yellow-400 rounded"></div>
-            <span className="text-gray-600">Learning</span>
+            <span className="text-gray-600">{t("projectStats.learning")}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-purple-400 rounded"></div>
-            <span className="text-gray-600">New</span>
+            <span className="text-gray-600">{t("projectStats.new")}</span>
           </div>
         </div>
       </div>
