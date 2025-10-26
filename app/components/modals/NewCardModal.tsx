@@ -49,7 +49,7 @@ export function NewCardModal({
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <ModalHeader
-          title={t("addCardModal.title")}
+          title={`✨ ${t("addCardModal.title")}`}
           onClose={onClose}
           projectColor={projectColor}
           projectForegroundColor={projectForegroundColor}
@@ -67,7 +67,7 @@ export function NewCardModal({
 
             <div>
               <label htmlFor="front" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                {t("addCardModal.questionLabel")}
+                {`${t("addCardModal.questionLabel")} 🤔`}
               </label>
               <textarea
                 id="front"
@@ -87,7 +87,7 @@ export function NewCardModal({
 
             <div>
               <label htmlFor="back" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                {t("addCardModal.answerLabel")}
+                {`${t("addCardModal.answerLabel")} 💡`}
               </label>
               <textarea
                 id="back"

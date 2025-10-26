@@ -203,9 +203,7 @@ export default function Home() {
                       />
                       <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
                       {actionData?.error && (
-                        <div className="text-red-600 text-sm font-medium mb-2">
-                          {t(actionData.error)}
-                        </div>
+                        <div className="text-red-600 text-sm font-medium mb-2">{t(actionData.error)}</div>
                       )}
                     </div>
                     <DialogFooter>
@@ -241,11 +239,15 @@ export default function Home() {
                             <>
                               {p.stats.due_now > 0 && (
                                 <>
-                                  <span className="font-semibold text-destructive">{p.stats.due_now} {t("home.due")}</span>
+                                  <span className="font-semibold text-destructive">
+                                    {p.stats.due_now} {t("home.due")}
+                                  </span>
                                   <span className="mx-2">·</span>
                                 </>
                               )}
-                              <span>{p.stats.total_cards} {t("home.cardsTotal")}</span>
+                              <span>
+                                {p.stats.total_cards} {t("home.cardsTotal")}
+                              </span>
                             </>
                           ) : (
                             <span className="text-muted-foreground">{t("home.noCardsYet")}</span>
@@ -264,7 +266,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                             {p.stats.mastered_cards}
                           </div>
-                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">{t("home.mastered")}</div>
+                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">{`⭐ ${t("home.mastered")}`}</div>
                         </div>
 
                         {/* Learning Cards */}
@@ -272,7 +274,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
                             {p.stats.learning_cards}
                           </div>
-                          <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 text-center">{t("home.learning")}</div>
+                          <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 text-center">{`📖 ${t("home.learning")}`}</div>
                         </div>
 
                         {/* New Cards */}
@@ -280,7 +282,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                             {p.stats.new_cards}
                           </div>
-                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">{t("home.new")}</div>
+                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">{`✨ ${t("home.new")}`}</div>
                         </div>
                       </div>
 
@@ -340,9 +342,7 @@ export default function Home() {
                   />
                   <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
                   {actionData?.error && (
-                    <div className="text-red-600 text-sm font-medium mb-2">
-                      {t(actionData.error)}
-                    </div>
+                    <div className="text-red-600 text-sm font-medium mb-2">{t(actionData.error)}</div>
                   )}
                 </div>
                 <DialogFooter>

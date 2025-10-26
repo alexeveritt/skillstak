@@ -22,9 +22,7 @@ export function CloseConfirmationModal({
           <DialogTitle>{t("closeConfirmationModal.title")}</DialogTitle>
         </DialogHeader>
         <div className="py-4 text-center">
-          <p className="text-sm text-gray-600 mb-4">
-            {t("closeConfirmationModal.description")}
-          </p>
+          <p className="text-sm text-gray-600 mb-4">{t("closeConfirmationModal.description")}</p>
           <div className="flex gap-2 justify-center">
             <button
               onClick={onKeepEditing}

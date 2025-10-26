@@ -24,19 +24,19 @@ export function ProjectStatsDashboard({ stats, projectColor, projectForegroundCo
           style={{ backgroundColor: projectColor, color: projectForegroundColor }}
         >
           <div className="text-3xl font-bold">{stats.total_cards}</div>
-          <div className="text-sm font-medium mt-1 opacity-80">{t("projectStats.totalCards")}</div>
+          <div className="text-sm font-medium mt-1 opacity-80">{`📚 ${t("projectStats.totalCards")}`}</div>
         </div>
         <div className="bg-gradient-to-br from-red-100 to-red-200 rounded-xl p-5 shadow-md">
           <div className="text-3xl font-bold text-red-700">{stats.due_now}</div>
-          <div className="text-sm font-medium text-red-600 mt-1">{t("projectStats.readyNow")}</div>
+          <div className="text-sm font-medium text-red-600 mt-1">{`🔥 ${t("projectStats.readyNow")}`}</div>
         </div>
         <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-xl p-5 shadow-md">
           <div className="text-3xl font-bold text-green-700">{stats.mastered_cards}</div>
-          <div className="text-sm font-medium text-green-600 mt-1">{t("projectStats.mastered")}</div>
+          <div className="text-sm font-medium text-green-600 mt-1">{`⭐ ${t("projectStats.mastered")}`}</div>
         </div>
         <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl p-5 shadow-md">
           <div className="text-3xl font-bold text-yellow-700">{stats.learning_cards}</div>
-          <div className="text-sm font-medium text-yellow-600 mt-1">{t("projectStats.learning")}</div>
+          <div className="text-sm font-medium text-yellow-600 mt-1">{`📖 ${t("projectStats.learning")}`}</div>
         </div>
       </div>
       {/* Progress Bar */}
@@ -77,11 +77,11 @@ export function ProjectStatsDashboard({ stats, projectColor, projectForegroundCo
         <div className="flex items-center gap-4 mt-3 text-xs">
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span className="text-gray-600">{t("projectStats.mastered")}</span>
+            <span className="text-gray-600">{`⭐ ${t("projectStats.mastered")}`}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-yellow-400 rounded"></div>
-            <span className="text-gray-600">{t("projectStats.learning")}</span>
+            <span className="text-gray-600">{`📖 ${t("projectStats.learning")}`}</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-purple-400 rounded"></div>

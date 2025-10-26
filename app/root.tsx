@@ -76,7 +76,11 @@ export function ErrorBoundary() {
         <body className="min-h-screen">
           <Header userId={null} />
           <main className="mx-auto max-w-3xl p-4">
-            <ErrorPage status={error.status} statusText={error.statusText} message={error.data?.message ? t("error.message", { message: error.data?.message }) : undefined} />
+            <ErrorPage
+              status={error.status}
+              statusText={error.statusText}
+              message={error.data?.message ? t("error.message", { message: error.data?.message }) : undefined}
+            />
           </main>
           <Scripts />
         </body>
@@ -97,7 +101,12 @@ export function ErrorBoundary() {
       <body className="min-h-screen">
         <Header userId={null} />
         <main className="mx-auto max-w-3xl p-4">
-          <ErrorPage status={500} message={error instanceof Error ? t("error.unexpected", { message: error.message }) : t("error.unexpectedDefault") } />
+          <ErrorPage
+            status={500}
+            message={
+              error instanceof Error ? t("error.unexpected", { message: error.message }) : t("error.unexpectedDefault")
+            }
+          />
         </main>
         <Scripts />
       </body>

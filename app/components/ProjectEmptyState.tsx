@@ -20,9 +20,7 @@ export function ProjectEmptyState({ projectId, projectName }: ProjectEmptyStateP
           {t("projectEmptyState.cardStack")}
         </h2>
         <p className="text-gray-600 text-lg mb-2">{t("projectEmptyState.noFlashcards")}</p>
-        <p className="text-gray-500 mb-6 max-w-md mx-auto">
-          {t("projectEmptyState.instructions")}
-        </p>
+        <p className="text-gray-500 mb-6 max-w-md mx-auto">{t("projectEmptyState.instructions")}</p>
         <Link
           to={`/p/${projectId}/edit?tab=cards`}
           className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg transition-all hover:scale-105"

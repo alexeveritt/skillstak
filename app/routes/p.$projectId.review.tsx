@@ -176,7 +176,11 @@ export default function Review() {
                 {t("review.cardOf", { current: currentCardIndex + 1, total: practiceCards.length })}
               </span>
               <span className="text-sm text-gray-600">
-                {t("review.score", { correct: score.correct, total: score.correct + score.incorrect, answers: answers.length })}
+                {t("review.score", {
+                  correct: score.correct,
+                  total: score.correct + score.incorrect,
+                  answers: answers.length,
+                })}
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -302,12 +306,12 @@ export default function Review() {
 
               <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-green-700">{stats.mastered_cards}</div>
-                <div className="text-sm font-medium text-green-600 mt-1">{t("projectStats.mastered")}</div>
+                <div className="text-sm font-medium text-green-600 mt-1">{`⭐ ${t("projectStats.mastered")}`}</div>
               </div>
 
               <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-yellow-700">{stats.learning_cards}</div>
-                <div className="text-sm font-medium text-yellow-600 mt-1">{t("projectStats.learning")}</div>
+                <div className="text-sm font-medium text-yellow-600 mt-1">{`📖 ${t("projectStats.learning")}`}</div>
               </div>
 
               <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 shadow-md">
@@ -323,11 +327,7 @@ export default function Review() {
             >
               <div className="text-lg font-semibold mb-2">{t("review.nextReview")}</div>
               <div className="text-3xl font-bold">{formatTimeUntil(stats.next_due_at, t)}</div>
-              {stats.next_due_at && (
-                <div className="text-sm mt-2 opacity-80">
-                  {t("review.keepUpGreatWork")}
-                </div>
-              )}
+              {stats.next_due_at && <div className="text-sm mt-2 opacity-80">{t("review.keepUpGreatWork")}</div>}
             </div>
           </div>
         )}
@@ -362,7 +362,9 @@ export default function Review() {
       )}
 
       <div className="mb-4">
-        <div className="text-center text-sm font-medium text-gray-500 mb-2">{isFlipped ? t("review.answer") : t("review.question")}</div>
+        <div className="text-center text-sm font-medium text-gray-500 mb-2">
+          {isFlipped ? t("review.answer") : t("review.question")}
+        </div>
         <div className="relative">
           <CardFlip
             front={card.front}

@@ -18,8 +18,7 @@ export function ProjectCard({ id, name, total, due }: Props) {
           {name}
         </Link>
         <div className="text-sm text-slate-600">
-          {t("projectCard.due", { count: due })} -{" "}
-          {t("projectCard.cards", { count: total })}
+          {t("projectCard.due", { count: due })} - {t("projectCard.cards", { count: total })}
         </div>
       </div>
       <Link to={`/p/${id}/review`} className="text-sm underline">

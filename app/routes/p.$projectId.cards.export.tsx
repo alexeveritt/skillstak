@@ -1,32 +1,32 @@
-import {useState} from "react";
-import type {LoaderFunctionArgs} from "react-router";
-import {useLoaderData, useMatches} from "react-router";
-import {requireUserId} from "../server/session";
+import { useState } from "react";
+import type { LoaderFunctionArgs } from "react-router";
+import { useLoaderData, useMatches } from "react-router";
+import { requireUserId } from "../server/session";
 import * as cardService from "../services/card.service";
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 
-export async function loader({params, context, request}: LoaderFunctionArgs) {
-  const userId = await requireUserId({request, cloudflare: context.cloudflare});
+export async function loader({ params, context, request }: LoaderFunctionArgs) {
+  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
   const projectId = params.projectId!;
 
   const cards = await cardService.listCards(context.cloudflare.env, projectId);
 
-  return {cards};
+  return { cards };
 }
 
 export default function ExportCards() {
-  const {t} = useTranslation();
-  const {cards: allCards} = useLoaderData<typeof loader>();
+  const { t } = useTranslation();
+  const { cards: allCards } = useLoaderData<typeof loader>();
   const matches = useMatches();
   const layoutData = matches.find((match) => match.id.includes("p.$projectId"))?.data as
     | {
-    project?: {
-      id: string;
-      name: string;
-      color?: string;
-      foreground_color?: string
-    }
-  }
+        project?: {
+          id: string;
+          name: string;
+          color?: string;
+          foreground_color?: string;
+        };
+      }
     | undefined;
   const project = layoutData?.project;
   const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set(allCards.map((card) => card.id)));
@@ -68,7 +68,7 @@ export default function ExportCards() {
     }
 
     const json = JSON.stringify(cardsToExport, null, 2);
-    const blob = new Blob([json], {type: "application/json"});
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -156,7 +156,7 @@ export default function ExportCards() {
               onClick={handleExport}
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-6 py-2.5 transition-colors"
             >
-              {t("exportCards.exportButton", {count: selectedCount})}
+              {t("exportCards.exportButton", { count: selectedCount })}
             </button>
             <a href={`/p/${project.id}/edit`} className="text-gray-600 hover:text-gray-800 underline transition-colors">
               {t("exportCards.cancel")}
@@ -169,7 +169,7 @@ export default function ExportCards() {
         <p className="text-sm text-gray-700">
           {t("exportCards.formatDesc")}
           <code className="bg-white px-2 py-1 rounded text-xs">
-            [{'{'}"f":"Front", "b":"Back"{'}'}]
+            [{"{"}"f":"Front", "b":"Back"{"}"}]
           </code>
         </p>
       </div>

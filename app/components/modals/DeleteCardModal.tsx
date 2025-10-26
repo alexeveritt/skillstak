@@ -29,9 +29,7 @@ export function DeleteCardModal({ open, onOpenChange, card, onCancel }: DeleteCa
         />
 
         <div className="px-6 pb-6 pt-4">
-          <DialogDescription className="mb-4">
-            {t("deleteCardModal.confirmText")}
-          </DialogDescription>
+          <DialogDescription className="mb-4">{t("deleteCardModal.confirmText")}</DialogDescription>
 
           {card && (
             <div className="space-y-4">

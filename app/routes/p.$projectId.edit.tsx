@@ -268,9 +268,7 @@ export default function EditProject() {
               {/* Delete Project Section */}
               <div className="border-t pt-6 mt-6">
                 <h3 className="text-lg font-bold text-red-700 mb-2">{t("advancedTab.deleteProjectTitle")}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t("advancedTab.deleteProjectWarning")}
-                </p>
+                <p className="text-sm text-gray-600 mb-4">{t("advancedTab.deleteProjectWarning")}</p>
                 <Form method="post">
                   <input type="hidden" name="intent" value="delete" />
                   <button

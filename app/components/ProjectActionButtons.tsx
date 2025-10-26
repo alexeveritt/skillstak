@@ -25,9 +25,7 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl font-bold">{t("projectActionButtons.startReviewSession")}</span>
               </div>
-              <div className="text-sm opacity-90">
-                {t("projectActionButtons.cardsReady", { count: stats.due_now })}
-              </div>
+              <div className="text-sm opacity-90">{t("projectActionButtons.cardsReady", { count: stats.due_now })}</div>
             </div>
             <div className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-blue-50 transition-colors">
               {t("projectActionButtons.start")}
@@ -42,9 +40,7 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1">
               <div className="text-lg font-bold mb-2">{t("projectActionButtons.practiceMode")}</div>
-              <div className="text-xs opacity-90">
-                {t("projectActionButtons.practiceDesc")}
-              </div>
+              <div className="text-xs opacity-90">{t("projectActionButtons.practiceDesc")}</div>
             </div>
             <div className="bg-white text-purple-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-purple-50 transition-colors">
               {t("projectActionButtons.start")}
@@ -85,9 +81,7 @@ export function ProjectActionButtons({ stats, formatNextReviewTime }: ProjectAct
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1">
             <div className="text-lg font-bold mb-2">{t("projectActionButtons.practiceMode")}</div>
-            <div className="text-sm opacity-90">
-              {t("projectActionButtons.practiceDesc")}
-            </div>
+            <div className="text-sm opacity-90">{t("projectActionButtons.practiceDesc")}</div>
           </div>
           <div className="bg-white text-purple-600 font-bold px-6 py-3 rounded-lg shadow-md flex-shrink-0 hover:bg-purple-50 transition-colors">
             {t("projectActionButtons.start")}

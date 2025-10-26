@@ -45,7 +45,7 @@ export function AddCardModal({ open, onOpenChange }: AddCardModalProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
         <ModalHeader
-          title={t("addCardModal.title")}
+          title={`✨ ${t("addCardModal.title")}`}
           onClose={() => handleOpenChange(false)}
           projectColor="#fef3c7"
           projectForegroundColor="#78350f"

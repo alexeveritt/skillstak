@@ -278,7 +278,7 @@ export default function ImportCards() {
           <p className="text-sm text-gray-600 mb-4">
             {t("importCards.uploadDescription")}
             <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-              [{'{'}"f":"Front", "b":"Back"{'}'}]
+              [{"{"}"f":"Front", "b":"Back"{"}"}]
             </code>
           </p>
 
@@ -329,9 +329,7 @@ export default function ImportCards() {
       ) : (
         <div className="bg-white border rounded-lg p-6">
           <h2 className="text-lg font-semibold mb-4">{t("importCards.previewTitle", { count: cards.length })}</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            {t("importCards.previewDescription")}
-          </p>
+          <p className="text-sm text-gray-600 mb-4">{t("importCards.previewDescription")}</p>
 
           <div className="space-y-3 mb-6 max-h-[600px] overflow-y-auto border rounded-lg p-4 bg-gray-50">
             {cards.map((card) => (

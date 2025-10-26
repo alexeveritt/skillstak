@@ -36,7 +36,9 @@ export function EditProjectSettingsForm({
           <div className="text-xs text-gray-500 mt-1.5">{t("editProjectSettingsForm.maxChars")}</div>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">{t("editProjectSettingsForm.themeColor")}</label>
+          <label className="block text-sm font-medium mb-2 text-gray-700">
+            {t("editProjectSettingsForm.themeColor")}
+          </label>
           <ColorPicker value={selectedColor} onChange={onColorChange} />
           <input type="hidden" name="color" value={selectedColor} />
           <input type="hidden" name="foregroundColor" value={selectedForegroundColor} />

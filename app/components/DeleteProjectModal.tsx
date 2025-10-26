@@ -39,9 +39,7 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
           projectForegroundColor="#991b1b"
         />
         <div className="px-6 pb-6">
-          <DialogDescription className="mb-4">
-            {t("deleteProjectModal.description", { projectName })}
-          </DialogDescription>
+          <DialogDescription className="mb-4">{t("deleteProjectModal.description", { projectName })}</DialogDescription>
           <Form method="post" onSubmit={handleSubmit}>
             <input type="hidden" name="intent" value="delete" />
             <div className="space-y-4">
