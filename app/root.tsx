@@ -16,6 +16,7 @@ import { Header } from "./components/Header";
 import i18n from "./lib/i18n";
 import { getSession } from "./server/session";
 import stylesHref from "./styles.css?url";
+import { useTranslation } from "react-i18next";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesHref }];
 
@@ -59,9 +60,9 @@ export default function Root() {
   );
 }
 
-export function ErrorBoundary() {
+function ErrorBoundaryContent() {
   const error = useRouteError();
-  const { t } = require("react-i18next");
+  const { t } = useTranslation();
 
   if (isRouteErrorResponse(error)) {
     return (
@@ -111,5 +112,13 @@ export function ErrorBoundary() {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+export function ErrorBoundary() {
+  return (
+    <I18nextProvider i18n={i18n}>
+      <ErrorBoundaryContent />
+    </I18nextProvider>
   );
 }
