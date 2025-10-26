@@ -17,11 +17,7 @@ import { EditMenu } from "~/components/EditMenu";
 import { ModalHeader } from "~/components/ModalHeader";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { projectSchema } from "../lib/z";
 import { getSession, requireUserId } from "../server/session";
@@ -249,7 +245,10 @@ export default function Home() {
                 key={p.id}
                 className="group hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
               >
-                <Link to={`/p/${p.id}`} className="block">
+                <Link
+                  to={p.stats && p.stats.total_cards > 0 ? `/p/${p.id}` : `/p/${p.id}/edit?tab=cards`}
+                  className="block"
+                >
                   <CardHeader className="relative pb-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
