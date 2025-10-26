@@ -14,17 +14,10 @@ import {
   useNavigation,
 } from "react-router";
 import { EditMenu } from "~/components/EditMenu";
+import { ModalHeader } from "~/components/ModalHeader";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { projectSchema } from "../lib/z";
 import { getSession, requireUserId } from "../server/session";
@@ -136,7 +129,7 @@ export default function Home() {
             {/* Heading */}
             <div className="space-y-3">
               <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
-                {t("home.welcome")}
+                {`${t("home.welcome")} 👋`}
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t("home.intro")}</p>
             </div>
@@ -186,33 +179,59 @@ export default function Home() {
                     {t("home.createFirstPack")}
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>{t("home.createNewPackTitle")}</DialogTitle>
-                    <DialogDescription>{t("home.createNewPackDesc")}</DialogDescription>
-                  </DialogHeader>
-                  <Form method="post" className="space-y-4">
-                    <div className="space-y-2">
-                      <Input
-                        ref={inputRef}
-                        name="name"
-                        placeholder={t("home.packNameExample")}
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        maxLength={50}
-                      />
-                      <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
-                      {actionData?.error && (
-                        <div className="text-red-600 text-sm font-medium mb-2">{t(actionData.error)}</div>
-                      )}
-                    </div>
-                    <DialogFooter>
-                      <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                        {t("home.cancel")}
-                      </Button>
-                      <Button type="submit">{t("home.create")}</Button>
-                    </DialogFooter>
-                  </Form>
+                <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+                  <ModalHeader
+                    title={`🎯 ${t("home.createNewPackTitle")}`}
+                    onClose={() => setIsDialogOpen(false)}
+                    projectColor="#9333ea"
+                    projectForegroundColor="#581c87"
+                  />
+                  <div className="px-6 pb-6">
+                    {actionData?.error && (
+                      <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                        <span className="font-semibold">{t("addCardModal.oops")}</span> {t(actionData.error)}
+                      </div>
+                    )}
+                    <Form method="post" className="space-y-4">
+                      <div className="space-y-2">
+                        <label htmlFor="pack-name" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                          {t("home.packNameLabel")}
+                        </label>
+                        <Input
+                          ref={inputRef}
+                          id="pack-name"
+                          name="name"
+                          placeholder={t("home.packNameExample")}
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          maxLength={50}
+                          className="border-2 border-gray-300 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all"
+                        />
+                        <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
+                      </div>
+                      <div className="flex gap-3 justify-end pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsDialogOpen(false)}
+                          className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
+                        >
+                          {t("home.cancel")}
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={!name.trim() || navigation.state === "submitting"}
+                          className="px-4 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                          style={{
+                            backgroundColor: name.trim() ? "#9333ea" : "#d1d5db",
+                            color: name.trim() ? "#ffffff" : "#6b7280",
+                          }}
+                        >
+                          <Plus className="w-4 h-4 flex-shrink-0" />
+                          <span>{navigation.state === "submitting" ? t("home.creating") : t("home.create")}</span>
+                        </button>
+                      </div>
+                    </Form>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -226,7 +245,10 @@ export default function Home() {
                 key={p.id}
                 className="group hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
               >
-                <Link to={`/p/${p.id}`} className="block">
+                <Link
+                  to={p.stats && p.stats.total_cards > 0 ? `/p/${p.id}` : `/p/${p.id}/edit?tab=cards`}
+                  className="block"
+                >
                   <CardHeader className="relative pb-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -325,33 +347,59 @@ export default function Home() {
                 {t("home.addAnotherPack")}
               </Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t("home.createNewPackTitle")}</DialogTitle>
-                <DialogDescription>{t("home.createNewPackDesc")}</DialogDescription>
-              </DialogHeader>
-              <Form method="post" className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    ref={inputRef}
-                    name="name"
-                    placeholder={t("home.packNameExample")}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    maxLength={50}
-                  />
-                  <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
-                  {actionData?.error && (
-                    <div className="text-red-600 text-sm font-medium mb-2">{t(actionData.error)}</div>
-                  )}
-                </div>
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    {t("home.cancel")}
-                  </Button>
-                  <Button type="submit">{t("home.create")}</Button>
-                </DialogFooter>
-              </Form>
+            <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+              <ModalHeader
+                title={t("home.createNewPackTitle")}
+                onClose={() => setIsDialogOpen(false)}
+                projectColor="#9333ea"
+                projectForegroundColor="#581c87"
+              />
+              <div className="px-6 pb-6 mt-4">
+                {actionData?.error && (
+                  <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                    <span className="font-semibold">{t("addCardModal.oops")}</span> {t(actionData.error)}
+                  </div>
+                )}
+                <Form method="post" className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="pack-name-2" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                      {t("home.packNameLabel")}
+                    </label>
+                    <Input
+                      ref={inputRef}
+                      id="pack-name-2"
+                      name="name"
+                      placeholder={t("home.packNameExample")}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      maxLength={50}
+                      className="border-2 border-gray-300 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all"
+                    />
+                    <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
+                  </div>
+                  <div className="flex gap-3 justify-end pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsDialogOpen(false)}
+                      className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
+                    >
+                      {t("home.cancel")}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={!name.trim() || navigation.state === "submitting"}
+                      className="px-4 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        backgroundColor: name.trim() ? "#9333ea" : "#d1d5db",
+                        color: name.trim() ? "#ffffff" : "#6b7280",
+                      }}
+                    >
+                      <Plus className="w-4 h-4 flex-shrink-0" />
+                      <span>{navigation.state === "submitting" ? t("home.creating") : t("home.create")}</span>
+                    </button>
+                  </div>
+                </Form>
+              </div>
             </DialogContent>
           </Dialog>
         </>

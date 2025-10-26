@@ -1,31 +1,62 @@
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "~/components/ui/dropdown-menu";
+import { Tooltip } from "~/components/ui/tooltip";
+
+// Language configuration - easy to extend with new languages
+const LANGUAGES = [
+  { code: "en", flag: "🇬🇧", nameKey: "languageSwitcher.english" },
+  { code: "pt-PT", flag: "🇵🇹", nameKey: "languageSwitcher.portuguese" },
+  { code: "fr", flag: "🇫🇷", nameKey: "languageSwitcher.french" },
+  { code: "de", flag: "🇩🇪", nameKey: "languageSwitcher.german" },
+  { code: "da", flag: "🇩🇰", nameKey: "languageSwitcher.danish" },
+  { code: "es", flag: "🇪🇸", nameKey: "languageSwitcher.spanish" },
+  { code: "sv", flag: "🇸🇪", nameKey: "languageSwitcher.swedish" },
+] as const;
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    i18n.changeLanguage(e.target.value);
+  const currentLanguage = LANGUAGES.find((lang) => lang.code === i18n.language) || LANGUAGES[0];
+
+  const handleLanguageChange = (languageCode: string) => {
+    i18n.changeLanguage(languageCode);
+    setIsOpen(false);
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <label htmlFor="language-select" className="text-sm font-medium text-gray-700">
-        {i18n.t("languageSwitcher.label")}
-      </label>
-      <select
-        id="language-select"
-        value={i18n.language}
-        onChange={handleChange}
-        className="border rounded px-2 py-1 text-sm"
-      >
-        <option value="en">{i18n.t("languageSwitcher.english")}</option>
-        <option value="pt-PT">{i18n.t("languageSwitcher.portuguese")}</option>
-        <option value="fr">{i18n.t("languageSwitcher.french")}</option>
-        <option value="de">{i18n.t("languageSwitcher.german")}</option>
-        <option value="da">{i18n.t("languageSwitcher.danish")}</option>
-        <option value="es">{i18n.t("languageSwitcher.spanish")}</option>
-        <option value="sv">{i18n.t("languageSwitcher.swedish")}</option>
-      </select>
-    </div>
+    <DropdownMenu>
+      <Tooltip content={t(currentLanguage.nameKey)} side="bottom">
+        <DropdownMenuTrigger
+          onClick={() => setIsOpen(!isOpen)}
+          className="text-2xl hover:opacity-80 transition-opacity focus:ring-2 focus:ring-purple-500 rounded p-1"
+          aria-label={`Current language: ${t(currentLanguage.nameKey)}`}
+        >
+          {currentLanguage.flag}
+        </DropdownMenuTrigger>
+      </Tooltip>
+      {isOpen && (
+        <DropdownMenuContent align="end" onMouseLeave={() => setIsOpen(false)}>
+          {LANGUAGES.map((language) => (
+            <DropdownMenuItem
+              key={language.code}
+              onClick={() => handleLanguageChange(language.code)}
+              className="flex items-center gap-3 cursor-pointer"
+            >
+              <span className="text-xl">{language.flag}</span>
+              <span className="flex-1">{t(language.nameKey)}</span>
+              {currentLanguage.code === language.code && <Check className="w-4 h-4 text-purple-600" />}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      )}
+    </DropdownMenu>
   );
 }

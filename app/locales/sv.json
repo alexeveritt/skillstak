@@ -28,6 +28,8 @@
   "home.nameError": "Ange ett namn",
   "home.cancel": "Avbryt",
   "home.create": "Skapa kortlek",
+  "home.creating": "Skapar...",
+  "home.packNameLabel": "Kortlekens namn",
   "home.addAnotherPack": "Lägg till ytterligare kortlek",
   "home.packNameExample": "t.ex. Spanska ord, React Hooks, Biologi 101",
   "home.due": "förfaller",

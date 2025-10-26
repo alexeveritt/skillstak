@@ -78,7 +78,7 @@ export function EditCardModal({
 
             <div>
               <label htmlFor="edit-front" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                {t("editCardModal.questionLabel")}
+                {`${t("editCardModal.questionLabel")} 🤔`}
               </label>
               <textarea
                 id="edit-front"
