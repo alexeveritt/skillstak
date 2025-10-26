@@ -29,6 +29,8 @@ void i18n
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
+    pluralSeparator: "_",
+    contextSeparator: "_",
   });
 
 export default i18n;
