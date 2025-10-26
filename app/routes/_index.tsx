@@ -1,11 +1,20 @@
 // app/routes/_index.tsx
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
-import { getSession, requireUserId } from "../server/session";
-import { projectSchema } from "../lib/z";
+
+import { BookOpen, Brain, ChevronRight, Plus, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  type ActionFunctionArgs,
+  Form,
+  Link,
+  type LoaderFunctionArgs,
+  redirect,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "react-router";
+import { EditMenu } from "~/components/EditMenu";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   Dialog,
@@ -16,10 +25,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { BookOpen, ChevronRight, Plus, Brain, TrendingUp, Zap } from "lucide-react";
+import { Input } from "~/components/ui/input";
+import { projectSchema } from "../lib/z";
+import { getSession, requireUserId } from "../server/session";
 import * as projectService from "../services/project.service";
 import * as reviewService from "../services/review.service";
-import { EditMenu } from "~/components/EditMenu";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   // Check if user is logged in, if not redirect to login
@@ -50,7 +60,8 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const form = await request.formData();
   const name = String(form.get("name") || "");
   const parsed = projectSchema.safeParse({ name });
-  if (!parsed.success) return { error: "Enter a name" };
+  // Use translation key for error
+  if (!parsed.success) return { error: "home.nameError" };
 
   await projectService.createProject(context.cloudflare.env, userId, name);
   return null;
@@ -60,6 +71,7 @@ export default function Home() {
   const { projects } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,14 +98,11 @@ export default function Home() {
       {hasProjects && (
         <div className="text-center space-y-3 py-6">
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
-            Your Learning Journey
+            {t("home.yourLearningJourney")}
           </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Track your progress, master new skills, and build knowledge that lasts with spaced repetition
-          </p>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t("home.trackProgress")}</p>
         </div>
       )}
-
       {!hasProjects ? (
         <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-purple-200 dark:border-purple-800 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950/30 dark:via-purple-950/30 dark:to-pink-950/30 shadow-lg">
           {/* Decorative background elements */}
@@ -106,7 +115,11 @@ export default function Home() {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full blur-xl opacity-50" />
                 <div className="relative bg-white dark:bg-gray-900 rounded-full p-6 shadow-xl">
-                  <BookOpen className="h-16 w-16 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600" strokeWidth={2} stroke="url(#gradient)" />
+                  <BookOpen
+                    className="h-16 w-16 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"
+                    strokeWidth={2}
+                    stroke="url(#gradient)"
+                  />
                   <svg width="0" height="0">
                     <defs>
                       <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -123,13 +136,9 @@ export default function Home() {
             {/* Heading */}
             <div className="space-y-3">
               <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-400 dark:via-purple-400 dark:to-pink-400">
-                Welcome to SkillStak! 👋
+                {t("home.welcome")}
               </h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Hey there! SkillStak helps you learn and remember things better using a proven technique called spaced repetition.
-                Think of it like having a personal study buddy that knows exactly when you should review your flashcards to keep
-                information fresh in your brain. Create your first card pack to get started!
-              </p>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t("home.intro")}</p>
             </div>
 
             {/* Feature highlights */}
@@ -138,24 +147,30 @@ export default function Home() {
                 <div className="flex justify-center mb-2">
                   <Brain className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="font-semibold text-sm mb-1 text-blue-700 dark:text-blue-300">Smart Learning</h3>
-                <p className="text-xs text-muted-foreground">Algorithm-driven reviews at optimal intervals</p>
+                <h3 className="font-semibold text-sm mb-1 text-blue-700 dark:text-blue-300">
+                  {t("home.smartLearning")}
+                </h3>
+                <p className="text-xs text-muted-foreground">{t("home.smartLearningDesc")}</p>
               </div>
 
               <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur rounded-xl p-4 border border-purple-200 dark:border-purple-800 shadow-sm">
                 <div className="flex justify-center mb-2">
                   <TrendingUp className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="font-semibold text-sm mb-1 text-purple-700 dark:text-purple-300">Track Progress</h3>
-                <p className="text-xs text-muted-foreground">Watch your knowledge grow with detailed stats</p>
+                <h3 className="font-semibold text-sm mb-1 text-purple-700 dark:text-purple-300">
+                  {t("home.trackProgressTitle")}
+                </h3>
+                <p className="text-xs text-muted-foreground">{t("home.trackProgressDesc")}</p>
               </div>
 
               <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur rounded-xl p-4 border border-pink-200 dark:border-pink-800 shadow-sm">
                 <div className="flex justify-center mb-2">
                   <Zap className="w-8 h-8 text-pink-600 dark:text-pink-400" />
                 </div>
-                <h3 className="font-semibold text-sm mb-1 text-pink-700 dark:text-pink-300">Stay Consistent</h3>
-                <p className="text-xs text-muted-foreground">Build lasting knowledge through daily practice</p>
+                <h3 className="font-semibold text-sm mb-1 text-pink-700 dark:text-pink-300">
+                  {t("home.stayConsistent")}
+                </h3>
+                <p className="text-xs text-muted-foreground">{t("home.stayConsistentDesc")}</p>
               </div>
             </div>
 
@@ -163,36 +178,39 @@ export default function Home() {
             <div className="pt-4">
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95">
+                  <Button
+                    size="lg"
+                    className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95"
+                  >
                     <Plus className="mr-2 h-5 w-5" />
-                    Create Your First Card Pack
+                    {t("home.createFirstPack")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Create New Card Pack</DialogTitle>
-                    <DialogDescription>
-                      Start a new learning card pack to organize your flashcards by topic or subject.
-                    </DialogDescription>
+                    <DialogTitle>{t("home.createNewPackTitle")}</DialogTitle>
+                    <DialogDescription>{t("home.createNewPackDesc")}</DialogDescription>
                   </DialogHeader>
                   <Form method="post" className="space-y-4">
                     <div className="space-y-2">
                       <Input
                         ref={inputRef}
                         name="name"
-                        placeholder="e.g., Spanish Vocabulary, React Hooks, Biology 101"
+                        placeholder={t("home.packNameExample")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         maxLength={50}
                       />
-                      <div className="text-xs text-gray-500 mt-1">Max 50 characters</div>
-                      {actionData?.error && <p className="text-destructive text-sm">{actionData.error}</p>}
+                      <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
+                      {actionData?.error && (
+                        <div className="text-red-600 text-sm font-medium mb-2">{t(actionData.error)}</div>
+                      )}
                     </div>
                     <DialogFooter>
                       <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                        Cancel
+                        {t("home.cancel")}
                       </Button>
-                      <Button type="submit">Create Card Pack</Button>
+                      <Button type="submit">{t("home.create")}</Button>
                     </DialogFooter>
                   </Form>
                 </DialogContent>
@@ -221,14 +239,18 @@ export default function Home() {
                             <>
                               {p.stats.due_now > 0 && (
                                 <>
-                                  <span className="font-semibold text-destructive">{p.stats.due_now} due</span>
+                                  <span className="font-semibold text-destructive">
+                                    {p.stats.due_now} {t("home.due")}
+                                  </span>
                                   <span className="mx-2">·</span>
                                 </>
                               )}
-                              <span>{p.stats.total_cards} cards total</span>
+                              <span>
+                                {p.stats.total_cards} {t("home.cardsTotal")}
+                              </span>
                             </>
                           ) : (
-                            <span className="text-muted-foreground">No cards yet</span>
+                            <span className="text-muted-foreground">{t("home.noCardsYet")}</span>
                           )}
                         </CardDescription>
                       </div>
@@ -244,7 +266,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                             {p.stats.mastered_cards}
                           </div>
-                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">⭐ Mastered</div>
+                          <div className="text-xs text-green-600 dark:text-green-400 mt-1 text-center">{`⭐ ${t("home.mastered")}`}</div>
                         </div>
 
                         {/* Learning Cards */}
@@ -252,9 +274,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
                             {p.stats.learning_cards}
                           </div>
-                          <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 text-center">
-                            📖 Learning
-                          </div>
+                          <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 text-center">{`📖 ${t("home.learning")}`}</div>
                         </div>
 
                         {/* New Cards */}
@@ -262,7 +282,7 @@ export default function Home() {
                           <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
                             {p.stats.new_cards}
                           </div>
-                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">✨ New</div>
+                          <div className="text-xs text-purple-600 dark:text-purple-400 mt-1 text-center">{`✨ ${t("home.new")}`}</div>
                         </div>
                       </div>
 
@@ -302,34 +322,34 @@ export default function Home() {
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full" size="lg">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Another Card Pack
+                {t("home.addAnotherPack")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New Card Pack</DialogTitle>
-                <DialogDescription>
-                  Start a new learning card pack to organize your flashcards by topic or subject.
-                </DialogDescription>
+                <DialogTitle>{t("home.createNewPackTitle")}</DialogTitle>
+                <DialogDescription>{t("home.createNewPackDesc")}</DialogDescription>
               </DialogHeader>
               <Form method="post" className="space-y-4">
                 <div className="space-y-2">
                   <Input
                     ref={inputRef}
                     name="name"
-                    placeholder="e.g., Spanish Vocabulary, React Hooks, Biology 101"
+                    placeholder={t("home.packNameExample")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     maxLength={50}
                   />
-                  <div className="text-xs text-gray-500 mt-1">Max 50 characters</div>
-                  {actionData?.error && <p className="text-destructive text-sm">{actionData.error}</p>}
+                  <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
+                  {actionData?.error && (
+                    <div className="text-red-600 text-sm font-medium mb-2">{t(actionData.error)}</div>
+                  )}
                 </div>
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
+                    {t("home.cancel")}
                   </Button>
-                  <Button type="submit">Create Card Pack</Button>
+                  <Button type="submit">{t("home.create")}</Button>
                 </DialogFooter>
               </Form>
             </DialogContent>

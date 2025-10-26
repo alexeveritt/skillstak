@@ -1,5 +1,5 @@
 // app/routes.ts
-import { index, route, layout } from "@react-router/dev/routes";
+import { index, layout, route } from "@react-router/dev/routes";
 
 export default [
   index("routes/_index.tsx"),
@@ -14,7 +14,6 @@ export default [
     index("routes/p.$projectId._index.tsx"),
     route("edit", "routes/p.$projectId.edit.tsx"),
     route("review", "routes/p.$projectId.review.tsx"),
-    route("cards", "routes/p.$projectId.cards._index.tsx"),
     route("cards/import", "routes/p.$projectId.cards.import.tsx"),
     route("cards/export", "routes/p.$projectId.cards.export.tsx"),
   ]),

@@ -1,8 +1,9 @@
 // app/services/project.service.ts
-import type { Env } from "../server/types";
-import * as projectRepo from "../repositories/project.repository";
-import * as cardRepo from "../repositories/card.repository";
+
 import { newId } from "../lib/id";
+import * as cardRepo from "../repositories/card.repository";
+import * as projectRepo from "../repositories/project.repository";
+import type { Env } from "../server/types";
 
 export type ProjectWithStats = {
   id: string;

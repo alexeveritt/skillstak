@@ -1,6 +1,6 @@
-import type { Env } from "./types";
-import * as authService from "../services/auth.service";
 import * as userRepo from "../repositories/user.repository";
+import * as authService from "../services/auth.service";
+import type { Env } from "./types";
 
 export async function findUserByEmail(env: Env, email: string) {
   return await userRepo.findUserByEmail(env, email);

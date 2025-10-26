@@ -1,6 +1,7 @@
 // app/routes/reset.$token.tsx
-import { Form, redirect, useLoaderData, useActionData } from "react-router";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Form, redirect, useActionData, useLoaderData } from "react-router";
 import { passwordSchema } from "../lib/z";
 import { consumeResetToken } from "../server/email";
 import * as authService from "../services/auth.service";

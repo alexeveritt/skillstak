@@ -1,7 +1,8 @@
 // app/services/auth.service.ts
-import type { Env } from "../server/types";
-import * as userRepo from "../repositories/user.repository";
+
 import { ulid } from "ulidx";
+import * as userRepo from "../repositories/user.repository";
+import type { Env } from "../server/types";
 
 // Use Web Crypto API which is available in Cloudflare Workers
 async function hashPassword(password: string): Promise<string> {

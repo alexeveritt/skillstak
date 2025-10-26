@@ -1,17 +1,11 @@
 import { useState } from "react";
 import { Form } from "react-router";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+import { ModalHeader } from "./ModalHeader";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTrigger } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { useTranslation } from "react-i18next";
 
 interface DeleteProjectModalProps {
   projectName: string;
@@ -20,6 +14,7 @@ interface DeleteProjectModalProps {
 export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
   const [open, setOpen] = useState(false);
   const [confirmName, setConfirmName] = useState("");
+  const { t } = useTranslation();
 
   const isValid = confirmName.trim().toLowerCase() === projectName.trim().toLowerCase();
 
@@ -33,46 +28,44 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button type="button" className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-          Delete Card Pack
+          {t("deleteProjectModal.deleteButton")}
         </button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="text-red-600">Delete Card Pack</DialogTitle>
-          <DialogDescription>
-            {`This action cannot be undone. This will permanently delete the card pack ${projectName} and all its cards.`}
-          </DialogDescription>
-        </DialogHeader>
-        <Form method="post" onSubmit={handleSubmit}>
-          <input type="hidden" name="intent" value="delete" />
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="confirmName">{`Please type ${projectName} to confirm`}</Label>
-              <Input
-                id="confirmName"
-                type="text"
-                value={confirmName}
-                onChange={(e) => setConfirmName(e.target.value)}
-                placeholder="Enter card pack name"
-                className="mt-2"
-                autoComplete="off"
-              />
+      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+        <ModalHeader
+          title={t("deleteProjectModal.title")}
+          onClose={() => setOpen(false)}
+          projectColor="#fee2e2"
+          projectForegroundColor="#991b1b"
+        />
+        <div className="px-6 pb-6">
+          <DialogDescription className="mb-4">{t("deleteProjectModal.description", { projectName })}</DialogDescription>
+          <Form method="post" onSubmit={handleSubmit}>
+            <input type="hidden" name="intent" value="delete" />
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="confirmName">{t("deleteProjectModal.confirmLabel", { projectName })}</Label>
+                <Input
+                  id="confirmName"
+                  type="text"
+                  value={confirmName}
+                  onChange={(e) => setConfirmName(e.target.value)}
+                  placeholder={t("deleteProjectModal.inputPlaceholder")}
+                  className="mt-2"
+                  autoComplete="off"
+                />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                  {t("deleteProjectModal.cancel")}
+                </Button>
+                <Button type="submit" variant="destructive" disabled={!isValid}>
+                  {t("deleteProjectModal.confirm")}
+                </Button>
+              </DialogFooter>
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="destructive"
-                disabled={!isValid}
-                className="bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Delete Card Pack
-              </Button>
-            </DialogFooter>
-          </div>
-        </Form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );

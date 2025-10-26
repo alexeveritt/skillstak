@@ -1,10 +1,12 @@
 // app/routes/p.$projectId.review.tsx
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
-import { Form, useLoaderData, useActionData, Link, useMatches } from "react-router";
-import { useState, useEffect } from "react";
-import { requireUserId } from "../server/session";
+
+import { useEffect, useState } from "react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { Form, Link, useActionData, useLoaderData, useMatches } from "react-router";
 import { CardFlip } from "../components/CardFlip";
+import { requireUserId } from "../server/session";
 import * as reviewService from "../services/review.service";
+import { useTranslation } from "react-i18next";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
@@ -44,8 +46,8 @@ export async function action({ request, context }: ActionFunctionArgs) {
   return { ok: true };
 }
 
-function formatTimeUntil(dueAt: string | null): string {
-  if (!dueAt) return "No cards scheduled";
+function formatTimeUntil(dueAt: string | null, t: (key: string, options?: any) => string): string {
+  if (!dueAt) return t("review.noCardsScheduled");
 
   const now = new Date();
   const due = new Date(dueAt);
@@ -54,13 +56,14 @@ function formatTimeUntil(dueAt: string | null): string {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? "s" : ""}`;
-  if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? "s" : ""}`;
-  if (diffMins > 0) return `${diffMins} minute${diffMins > 1 ? "s" : ""}`;
-  return "Soon!";
+  if (diffDays > 0) return t("review.day", { count: diffDays });
+  if (diffHours > 0) return t("review.hour", { count: diffHours });
+  if (diffMins > 0) return t("review.minute", { count: diffMins });
+  return t("review.soon");
 }
 
 export default function Review() {
+  const { t } = useTranslation();
   const { card, practiceCards, stats, mode } = useLoaderData<typeof loader>();
   const matches = useMatches();
   // Find the layout route data
@@ -124,7 +127,7 @@ export default function Review() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4" style={{ color: projectForegroundColor }}>
-            Practice Complete!
+            {t("review.practiceComplete")}
           </h1>
 
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
@@ -133,12 +136,12 @@ export default function Review() {
               {percentage}%
             </div>
             <div className="text-xl text-gray-700 mb-6">
-              {score.correct} correct, {score.incorrect} need review
+              {score.correct} {t("review.correct")}, {score.incorrect} {t("review.needReview")}
             </div>
             <div className="text-gray-600">
-              {percentage >= 80 && "Excellent work! You're mastering these cards!"}
-              {percentage >= 60 && percentage < 80 && "Good job! Keep practicing to improve."}
-              {percentage < 60 && "Keep going! Practice makes perfect."}
+              {percentage >= 80 && t("review.excellentWork")}
+              {percentage >= 60 && percentage < 80 && t("review.goodJob")}
+              {percentage < 60 && t("review.keepGoing")}
             </div>
           </div>
 
@@ -152,7 +155,7 @@ export default function Review() {
             }}
             className="inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 mb-4"
           >
-            Practice Again
+            {t("review.practiceAgain")}
           </Link>
         </div>
       </div>
@@ -170,10 +173,14 @@ export default function Review() {
           <div className="bg-white rounded-xl shadow p-4 mb-2">
             <div className="flex items-center justify-between mb-2">
               <span className="text-lg font-bold">
-                Card {currentCardIndex + 1} of {practiceCards.length}
+                {t("review.cardOf", { current: currentCardIndex + 1, total: practiceCards.length })}
               </span>
               <span className="text-sm text-gray-600">
-                Score: {score.correct} / {score.correct + score.incorrect} (Total answers: {answers.length})
+                {t("review.score", {
+                  correct: score.correct,
+                  total: score.correct + score.incorrect,
+                  answers: answers.length,
+                })}
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -198,7 +205,7 @@ export default function Review() {
             />
             <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
               <span className="text-blue-600 underline text-sm font-medium opacity-80">
-                {isFlipped ? "Click to view question" : "Click to view answer"}
+                {isFlipped ? t("review.clickToViewQuestion") : t("review.clickToViewAnswer")}
               </span>
             </div>
           </div>
@@ -228,8 +235,8 @@ export default function Review() {
             }}
             className="flex-1 bg-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            <div className="text-sm mb-1">I need to review this</div>
-            <div className="text-lg">Review Again</div>
+            <div className="text-sm mb-1">{t("review.needToReviewThis")}</div>
+            <div className="text-lg">{t("review.reviewAgain")}</div>
           </button>
 
           <button
@@ -251,8 +258,8 @@ export default function Review() {
             }}
             className="flex-1 bg-green-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            <div className="text-sm mb-1">I know this well</div>
-            <div className="text-lg">I Got This!</div>
+            <div className="text-sm mb-1">{t("review.knowThisWell")}</div>
+            <div className="text-lg">{t("review.gotThis")}</div>
           </button>
         </Form>
       </div>
@@ -264,14 +271,14 @@ export default function Review() {
     return (
       <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-3xl font-bold mb-4" style={{ color: projectForegroundColor }}>
-          No Cards Available
+          {t("review.noCardsAvailable")}
         </h1>
-        <p className="text-lg text-gray-700 mb-6">Add some cards to start practicing!</p>
+        <p className="text-lg text-gray-700 mb-6">{t("review.addCardsToStartPracticing")}</p>
         <Link
           to={`/p/${project?.id}/edit?tab=cards`}
           className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
         >
-          Add Your First Card
+          {t("projectEmptyState.addFirstCard")}
         </Link>
       </div>
     );
@@ -283,9 +290,9 @@ export default function Review() {
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold mb-2" style={{ color: projectForegroundColor }}>
-            All Done!
+            {t("review.allDone")}
           </h1>
-          <p className="text-lg text-gray-700">Great job! You've reviewed all your cards for now.</p>
+          <p className="text-lg text-gray-700">{t("review.greatJobReviewed")}</p>
         </div>
 
         {stats && stats.total_cards > 0 && (
@@ -294,22 +301,22 @@ export default function Review() {
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-blue-700">{stats.total_cards}</div>
-                <div className="text-sm font-medium text-blue-600 mt-1">Total Cards</div>
+                <div className="text-sm font-medium text-blue-600 mt-1">{t("review.totalCards")}</div>
               </div>
 
               <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-green-700">{stats.mastered_cards}</div>
-                <div className="text-sm font-medium text-green-600 mt-1">Mastered</div>
+                <div className="text-sm font-medium text-green-600 mt-1">{`⭐ ${t("projectStats.mastered")}`}</div>
               </div>
 
               <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-yellow-700">{stats.learning_cards}</div>
-                <div className="text-sm font-medium text-yellow-600 mt-1">Learning</div>
+                <div className="text-sm font-medium text-yellow-600 mt-1">{`📖 ${t("projectStats.learning")}`}</div>
               </div>
 
               <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl p-6 shadow-md">
                 <div className="text-4xl font-bold text-purple-700">{stats.new_cards}</div>
-                <div className="text-sm font-medium text-purple-600 mt-1">New</div>
+                <div className="text-sm font-medium text-purple-600 mt-1">{t("projectStats.new")}</div>
               </div>
             </div>
 
@@ -318,25 +325,21 @@ export default function Review() {
               className="rounded-2xl p-6 shadow-lg"
               style={{ backgroundColor: projectColor, color: projectForegroundColor }}
             >
-              <div className="text-lg font-semibold mb-2">Next Review</div>
-              <div className="text-3xl font-bold">{formatTimeUntil(stats.next_due_at)}</div>
-              {stats.next_due_at && (
-                <div className="text-sm mt-2 opacity-80">
-                  Keep up the great work! Come back later to review more cards.
-                </div>
-              )}
+              <div className="text-lg font-semibold mb-2">{t("review.nextReview")}</div>
+              <div className="text-3xl font-bold">{formatTimeUntil(stats.next_due_at, t)}</div>
+              {stats.next_due_at && <div className="text-sm mt-2 opacity-80">{t("review.keepUpGreatWork")}</div>}
             </div>
           </div>
         )}
 
         {(!stats || stats.total_cards === 0) && (
           <div className="text-center py-12">
-            <p className="text-xl text-gray-600 mb-6">No cards yet! Let's create some.</p>
+            <p className="text-xl text-gray-600 mb-6">{t("review.noCardsYet")}</p>
             <Link
               to={`/p/${project?.id}/edit?tab=cards`}
               className="inline-block bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
             >
-              Add Your First Card
+              {t("projectEmptyState.addFirstCard")}
             </Link>
           </div>
         )}
@@ -353,13 +356,15 @@ export default function Review() {
       {stats && (
         <div className="mb-4 text-center">
           <div className="text-sm font-medium text-gray-600">
-            {stats.due_now > 1 ? `${stats.due_now - 1} more cards to review` : "Last card!"}
+            {stats.due_now > 1 ? t("review.moreCardsToReview", { count: stats.due_now - 1 }) : t("review.lastCard")}
           </div>
         </div>
       )}
 
       <div className="mb-4">
-        <div className="text-center text-sm font-medium text-gray-500 mb-2">{isFlipped ? "Answer" : "Question"}</div>
+        <div className="text-center text-sm font-medium text-gray-500 mb-2">
+          {isFlipped ? t("review.answer") : t("review.question")}
+        </div>
         <div className="relative">
           <CardFlip
             front={card.front}
@@ -371,7 +376,7 @@ export default function Review() {
           />
           <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
             <span className="text-blue-600 underline text-sm font-medium opacity-80">
-              {isFlipped ? "Click to view question" : "Click to view answer"}
+              {isFlipped ? t("review.clickToViewQuestion") : t("review.clickToViewAnswer")}
             </span>
           </div>
         </div>
@@ -388,8 +393,8 @@ export default function Review() {
           disabled={!isFlipped}
           className="flex-1 bg-red-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          <div className="text-sm mb-1">I need to review this</div>
-          <div className="text-lg">Review Again</div>
+          <div className="text-sm mb-1">{t("review.needToReviewThis")}</div>
+          <div className="text-lg">{t("review.reviewAgain")}</div>
         </button>
 
         <button
@@ -398,8 +403,8 @@ export default function Review() {
           disabled={!isFlipped}
           className="flex-1 bg-green-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
-          <div className="text-sm mb-1">I know this well</div>
-          <div className="text-lg">I Got This!</div>
+          <div className="text-sm mb-1">{t("review.knowThisWell")}</div>
+          <div className="text-lg">{t("review.gotThis")}</div>
         </button>
       </Form>
     </div>

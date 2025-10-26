@@ -1,6 +1,7 @@
 // app/repositories/project.repository.ts
-import type { Env } from "../server/types";
+
 import { q, run } from "../server/db";
+import type { Env } from "../server/types";
 
 export type Project = {
   id: string;
