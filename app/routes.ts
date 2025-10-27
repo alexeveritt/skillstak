@@ -14,8 +14,9 @@ export default [
     index("routes/p.$projectId._index.tsx"),
     route("edit", "routes/p.$projectId.edit.tsx"),
     route("review", "routes/p.$projectId.review.tsx"),
-    route("cards/import", "routes/p.$projectId.cards.import.tsx"),
-    route("cards/export", "routes/p.$projectId.cards.export.tsx"),
+    // Deprecated: Import/export cards routes (keeping code for potential future use)
+    // route("cards/import", "routes/p.$projectId.cards.import.tsx"),
+    // route("cards/export", "routes/p.$projectId.cards.export.tsx"),
   ]),
 
   // Catch-all for .well-known and other 404s

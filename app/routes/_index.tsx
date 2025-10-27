@@ -1,6 +1,6 @@
 // app/routes/_index.tsx
 
-import { BookOpen, Brain, ChevronRight, Plus, TrendingUp, Zap } from "lucide-react";
+import { BookOpen, Brain, ChevronRight, FileUp, Plus, TrendingUp, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,9 +10,12 @@ import {
   type LoaderFunctionArgs,
   redirect,
   useActionData,
+  useFetcher,
   useLoaderData,
   useNavigation,
+  useNavigate,
 } from "react-router";
+import { toast } from "sonner";
 import { EditMenu } from "~/components/EditMenu";
 import { ModalHeader } from "~/components/ModalHeader";
 import { Button } from "~/components/ui/button";
@@ -22,7 +25,9 @@ import { Input } from "~/components/ui/input";
 import { projectSchema } from "../lib/z";
 import { getSession, requireUserId } from "../server/session";
 import * as projectService from "../services/project.service";
+import * as cardService from "../services/card.service";
 import * as reviewService from "../services/review.service";
+import { ImportProjectModal } from "~/components/ImportProjectModal";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   // Check if user is logged in, if not redirect to login
@@ -51,9 +56,51 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 export async function action({ request, context }: ActionFunctionArgs) {
   const userId = await requireUserId({ request, cloudflare: context.cloudflare });
   const form = await request.formData();
+  const intent = form.get("intent") as string;
+
+  // Handle project import
+  if (intent === "importProject") {
+    const projectData = form.get("projectData") as string;
+
+    if (!projectData) {
+      return { error: "home.importError", intent: "importProject" };
+    }
+
+    try {
+      const data = JSON.parse(projectData);
+      const { name: originalName, cards } = data;
+
+      // Get all existing projects to check for duplicate names
+      const existingProjects = await projectService.listProjects(context.cloudflare.env, userId);
+      const existingNames = new Set(existingProjects.map((p) => p.name.toLowerCase()));
+
+      // Generate unique name if needed
+      let finalName = originalName;
+      if (existingNames.has(originalName.toLowerCase())) {
+        let counter = 1;
+        while (existingNames.has(`${originalName} (${counter})`.toLowerCase())) {
+          counter++;
+        }
+        finalName = `${originalName} (${counter})`;
+      }
+
+      // Create the project
+      const projectId = await projectService.createProject(context.cloudflare.env, userId, finalName);
+
+      // Import all cards
+      for (const card of cards) {
+        await cardService.createCard(context.cloudflare.env, projectId, card.f, card.b);
+      }
+
+      return { success: true, projectId, intent: "importProject" };
+    } catch (error) {
+      return { error: "home.importError", intent: "importProject" };
+    }
+  }
+
+  // Handle regular project creation
   const name = String(form.get("name") || "");
   const parsed = projectSchema.safeParse({ name });
-  // Use translation key for error
   if (!parsed.success) return { error: "home.nameError" };
 
   await projectService.createProject(context.cloudflare.env, userId, name);
@@ -68,6 +115,8 @@ export default function Home() {
   const [name, setName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const importFetcher = useFetcher<typeof action>();
 
   // Reset input and close dialog when form is successfully submitted
   useEffect(() => {
@@ -77,12 +126,37 @@ export default function Home() {
     }
   }, [navigation.state, actionData]);
 
+  // Handle successful import
+  useEffect(() => {
+    if (importFetcher.state === "idle" && importFetcher.data?.success && importFetcher.data?.intent === "importProject") {
+      const projectId = importFetcher.data.projectId;
+      toast.success(t("importProject.successMessage"));
+      // Navigate to the new project
+      if (projectId) {
+        navigate(`/p/${projectId}/edit?tab=cards`);
+      }
+    }
+  }, [importFetcher.state, importFetcher.data, navigate, t]);
+
   // Focus input when dialog opens
   useEffect(() => {
     if (isDialogOpen) {
       setTimeout(() => inputRef.current?.focus(), 0);
     }
   }, [isDialogOpen]);
+
+  const handleImportProject = (projectData: { name: string; cards: { f: string; b: string }[] }) => {
+    // Use fetcher to submit the import data
+    importFetcher.submit(
+      {
+        intent: "importProject",
+        projectData: JSON.stringify(projectData),
+      },
+      {
+        method: "post",
+      }
+    );
+  };
 
   const hasProjects = projects.length > 0;
 
@@ -340,68 +414,72 @@ export default function Home() {
             ))}
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full" size="lg">
-                <Plus className="mr-2 h-4 w-4" />
-                {t("home.addAnotherPack")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
-              <ModalHeader
-                title={t("home.createNewPackTitle")}
-                onClose={() => setIsDialogOpen(false)}
-                projectColor="#9333ea"
-                projectForegroundColor="#581c87"
-              />
-              <div className="px-6 pb-6 mt-4">
-                {actionData?.error && (
-                  <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-                    <span className="font-semibold">{t("addCardModal.oops")}</span> {t(actionData.error)}
-                  </div>
-                )}
-                <Form method="post" className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="pack-name-2" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                      {t("home.packNameLabel")}
-                    </label>
-                    <Input
-                      ref={inputRef}
-                      id="pack-name-2"
-                      name="name"
-                      placeholder={t("home.packNameExample")}
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      maxLength={50}
-                      className="border-2 border-gray-300 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all"
-                    />
-                    <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
-                  </div>
-                  <div className="flex gap-3 justify-end pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsDialogOpen(false)}
-                      className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
-                    >
-                      {t("home.cancel")}
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={!name.trim() || navigation.state === "submitting"}
-                      className="px-4 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        backgroundColor: name.trim() ? "#9333ea" : "#d1d5db",
-                        color: name.trim() ? "#ffffff" : "#6b7280",
-                      }}
-                    >
-                      <Plus className="w-4 h-4 flex-shrink-0" />
-                      <span>{navigation.state === "submitting" ? t("home.creating") : t("home.create")}</span>
-                    </button>
-                  </div>
-                </Form>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full" size="lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t("home.addAnotherPack")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+                <ModalHeader
+                  title={t("home.createNewPackTitle")}
+                  onClose={() => setIsDialogOpen(false)}
+                  projectColor="#9333ea"
+                  projectForegroundColor="#581c87"
+                />
+                <div className="px-6 pb-6 mt-4">
+                  {actionData?.error && (
+                    <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                      <span className="font-semibold">{t("addCardModal.oops")}</span> {t(actionData.error)}
+                    </div>
+                  )}
+                  <Form method="post" className="space-y-4">
+                    <div className="space-y-2">
+                      <label htmlFor="pack-name-2" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                        {t("home.packNameLabel")}
+                      </label>
+                      <Input
+                        ref={inputRef}
+                        id="pack-name-2"
+                        name="name"
+                        placeholder={t("home.packNameExample")}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        maxLength={50}
+                        className="border-2 border-gray-300 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all"
+                      />
+                      <div className="text-xs text-gray-500 mt-1">{t("home.maxChars")}</div>
+                    </div>
+                    <div className="flex gap-3 justify-end pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsDialogOpen(false)}
+                        className="px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 rounded-lg transition-colors border-2 border-gray-300"
+                      >
+                        {t("home.cancel")}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={!name.trim() || navigation.state === "submitting"}
+                        className="px-4 py-2.5 text-sm font-bold rounded-lg transition-all shadow-sm hover:shadow flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{
+                          backgroundColor: name.trim() ? "#9333ea" : "#d1d5db",
+                          color: name.trim() ? "#ffffff" : "#6b7280",
+                        }}
+                      >
+                        <Plus className="w-4 h-4 flex-shrink-0" />
+                        <span>{navigation.state === "submitting" ? t("home.creating") : t("home.create")}</span>
+                      </button>
+                    </div>
+                  </Form>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <ImportProjectModal onImport={handleImportProject} />
+          </div>
         </>
       )}
     </div>
