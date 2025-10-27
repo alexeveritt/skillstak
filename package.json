@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "react-router dev",
     "dev:cf": "CLOUDFLARE_MODE=true react-router dev",
-    "dev:wrangler": "npm run build:cf && wrangler pages dev ./build/client --compatibility-date=2024-11-11 --live-reload",
-    "build": "react-router build",
-    "build:cf": "CLOUDFLARE_MODE=true react-router build",
+    "dev:wrangler": "npm run build && wrangler pages dev ./build/client --compatibility-date=2024-11-11 --live-reload",
+    "build": "CLOUDFLARE_MODE=true react-router build",
+    "build:node": "react-router build",
     "start": "react-router start",
     "cf:pages": "wrangler pages dev --compatibility-date=2024-11-11 ./build/client",
     "d1:apply-prod": "wrangler d1 execute SKILLSTAK_DB --file=./db/schema.sql --remote",
