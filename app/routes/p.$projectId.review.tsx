@@ -7,23 +7,25 @@ import { CardFlip } from "../components/CardFlip";
 import { requireUserId } from "../server/session";
 import * as reviewService from "../services/review.service";
 import { useTranslation } from "react-i18next";
+import { getEnvFromContext } from "~/server/db";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const projectId = params.projectId!;
   const url = new URL(request.url);
   const mode = url.searchParams.get("mode") || "review"; // "review" or "practice"
+  const env = getEnvFromContext(context);
 
-  const stats = await reviewService.getProjectStats(context.cloudflare.env, projectId, userId);
+  const stats = await reviewService.getProjectStats(env, projectId, userId);
 
   let card = null;
   let practiceCards = null;
 
   if (mode === "practice") {
     // Get a session of random cards for practice
-    practiceCards = await reviewService.getRandomCardsForPracticeSession(context.cloudflare.env, projectId, userId, 10);
+    practiceCards = await reviewService.getRandomCardsForPracticeSession(env, projectId, userId, 10);
   } else {
-    card = await reviewService.getNextDueCard(context.cloudflare.env, projectId, userId);
+    card = await reviewService.getNextDueCard(env, projectId, userId);
   }
 
   return { card, practiceCards, stats, mode };
@@ -35,7 +37,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const result = String(fd.get("result")); // again|good
   const mode = String(fd.get("mode") || "review");
   const isPracticeMode = mode === "practice";
-  const env = context.cloudflare.env;
+  const env = getEnvFromContext(context);
 
   if (result === "again") {
     await reviewService.reviewCardAgain(env, cardId, isPracticeMode);

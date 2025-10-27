@@ -5,17 +5,19 @@ import { Form, useActionData } from "react-router";
 import { emailSchema } from "../lib/z";
 import { findUserByEmail } from "../server/auth";
 import { createResetToken, sendResetEmail } from "../server/email";
+import { getEnvFromContext } from "~/server/db";
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const form = await request.formData();
   const email = String(form.get("email") || "");
   if (!emailSchema.safeParse(email).success) return { ok: false, message: "Enter a valid email" };
-  const user = await findUserByEmail(context.cloudflare.env, email);
+  const env = getEnvFromContext(context);
+  const user = await findUserByEmail(env, email);
   if (user) {
-    const token = await createResetToken(context.cloudflare.env, user.id);
-    const base = context.cloudflare.env.APP_BASE_URL || new URL(request.url).origin;
+    const token = await createResetToken(env, user.id);
+    const base = env.APP_BASE_URL || new URL(request.url).origin;
     const link = `${base}/reset/${token}`;
-    await sendResetEmail(context.cloudflare.env, email, link);
+    await sendResetEmail(env, email, link);
   }
   return { ok: true, message: "If that email exists, a link was sent." };
 }

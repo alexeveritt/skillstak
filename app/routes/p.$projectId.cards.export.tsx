@@ -4,12 +4,14 @@ import { useLoaderData, useMatches } from "react-router";
 import { requireUserId } from "../server/session";
 import * as cardService from "../services/card.service";
 import { useTranslation } from "react-i18next";
+import { getEnvFromContext } from "~/server/db";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const projectId = params.projectId!;
+  const env = getEnvFromContext(context);
 
-  const cards = await cardService.listCards(context.cloudflare.env, projectId);
+  const cards = await cardService.listCards(env, projectId);
 
   return { cards };
 }

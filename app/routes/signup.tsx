@@ -9,6 +9,7 @@ import { Label } from "~/components/ui/label";
 import { emailSchema, passwordSchema } from "../lib/z";
 import { createUserWithPassword, findUserByEmail } from "../server/auth";
 import { createSession } from "../server/session";
+import { getEnvFromContext } from "~/server/db";
 
 export async function action({ request, context }: ActionFunctionArgs) {
   const form = await request.formData();
@@ -17,10 +18,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const emailOk = emailSchema.safeParse(email).success;
   const passOk = passwordSchema.safeParse(password).success;
   if (!emailOk || !passOk) return { error: "Invalid email or password" };
-  const existing = await findUserByEmail(context.cloudflare?.env, email);
+  const env = getEnvFromContext(context);
+  const existing = await findUserByEmail(env, email);
   if (existing) return { error: "Email in use" };
-  const user = await createUserWithPassword(context.cloudflare?.env, email, password);
-  const setCookie = await createSession({ request, cloudflare: context.cloudflare }, user.id);
+  const user = await createUserWithPassword(env, email, password);
+  const setCookie = await createSession(context, user.id);
   return redirect("/", { headers: { "Set-Cookie": setCookie } });
 }
 

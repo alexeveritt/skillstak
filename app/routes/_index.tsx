@@ -28,21 +28,28 @@ import * as projectService from "../services/project.service";
 import * as cardService from "../services/card.service";
 import * as reviewService from "../services/review.service";
 import { ImportProjectModal } from "~/components/ImportProjectModal";
+import { getEnvFromContext } from "~/server/db";
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
+  console.log(`[Home Loader] Checking session...`);
   // Check if user is logged in, if not redirect to login
-  const session = await getSession({ request, cloudflare: context.cloudflare });
+  const session = await getSession(context, request);
+  console.log(`[Home Loader] Session result: ${JSON.stringify(session)}`);
+
   if (!session) {
+    console.log(`[Home Loader] No session found, redirecting to /login`);
     return redirect("/login");
   }
 
   const userId = session.userId;
-  const projects = await projectService.listProjects(context.cloudflare.env, userId);
+  console.log(`[Home Loader] User authenticated: userId=${userId}`);
+  const env = getEnvFromContext(context);
+  const projects = await projectService.listProjects(env, userId);
 
   // Fetch detailed stats for each project
   const projectsWithStats = await Promise.all(
     projects.map(async (project) => {
-      const stats = await reviewService.getProjectStats(context.cloudflare.env, project.id, userId);
+      const stats = await reviewService.getProjectStats(env, project.id, userId);
       return {
         ...project,
         stats,
@@ -54,9 +61,10 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const form = await request.formData();
   const intent = form.get("intent") as string;
+  const env = getEnvFromContext(context);
 
   // Handle project import
   if (intent === "importProject") {
@@ -71,7 +79,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       const { name: originalName, cards } = data;
 
       // Get all existing projects to check for duplicate names
-      const existingProjects = await projectService.listProjects(context.cloudflare.env, userId);
+      const existingProjects = await projectService.listProjects(env, userId);
       const existingNames = new Set(existingProjects.map((p) => p.name.toLowerCase()));
 
       // Generate unique name if needed
@@ -85,11 +93,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
       }
 
       // Create the project
-      const projectId = await projectService.createProject(context.cloudflare.env, userId, finalName);
+      const projectId = await projectService.createProject(env, userId, finalName);
 
       // Import all cards
       for (const card of cards) {
-        await cardService.createCard(context.cloudflare.env, projectId, card.f, card.b);
+        await cardService.createCard(env, projectId, card.f, card.b);
       }
 
       return { success: true, projectId, intent: "importProject" };
@@ -103,7 +111,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const parsed = projectSchema.safeParse({ name });
   if (!parsed.success) return { error: "home.nameError" };
 
-  await projectService.createProject(context.cloudflare.env, userId, name);
+  await projectService.createProject(env, userId, name);
   return null;
 }
 
@@ -264,7 +272,7 @@ export default function Home() {
                     projectColor="#9333ea"
                     projectForegroundColor="#581c87"
                   />
-                  <div className="px-6 pb-6">
+                  <div className="px-6 pb-6 mt-4">
                     {actionData?.error && (
                       <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
                         <span className="font-semibold">{t("addCardModal.oops")}</span> {t(actionData.error)}
