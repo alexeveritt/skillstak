@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Form } from "react-router";
 import { ModalHeader } from "./ModalHeader";
 import { Button } from "./ui/button";
@@ -15,6 +15,18 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
   const [open, setOpen] = useState(false);
   const [confirmName, setConfirmName] = useState("");
   const { t } = useTranslation();
+
+  const quotedProjectName = `"${projectName}"`;
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+      // Optionally select the input contents
+      inputRef.current.select();
+    }
+  }, [open]);
 
   const isValid = confirmName.trim().toLowerCase() === projectName.trim().toLowerCase();
 
@@ -38,19 +50,26 @@ export function DeleteProjectModal({ projectName }: DeleteProjectModalProps) {
           projectColor="#fee2e2"
           projectForegroundColor="#991b1b"
         />
-        <div className="px-6 pb-6">
-          <DialogDescription className="mb-4">{t("deleteProjectModal.description", { projectName })}</DialogDescription>
+        <div className="px-6 pb-6 mt-4">
+          <DialogDescription className="mb-4">
+            {t("deleteProjectModal.description", { projectName: quotedProjectName })}
+          </DialogDescription>
           <Form method="post" onSubmit={handleSubmit}>
             <input type="hidden" name="intent" value="delete" />
             <div className="space-y-4">
               <div>
-                <Label htmlFor="confirmName">{t("deleteProjectModal.confirmLabel", { projectName })}</Label>
+                <Label htmlFor="confirmName">
+                  {t("deleteProjectModal.confirmLabel", { projectName: quotedProjectName })}
+                </Label>
+
                 <Input
                   id="confirmName"
                   type="text"
+                  ref={inputRef}
                   value={confirmName}
                   onChange={(e) => setConfirmName(e.target.value)}
-                  placeholder={t("deleteProjectModal.inputPlaceholder")}
+                  placeholder={projectName}
+                  aria-describedby="delete-project-name delete-project-name-sr"
                   className="mt-2"
                   autoComplete="off"
                 />
