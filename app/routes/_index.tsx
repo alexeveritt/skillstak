@@ -128,7 +128,11 @@ export default function Home() {
 
   // Handle successful import
   useEffect(() => {
-    if (importFetcher.state === "idle" && importFetcher.data?.success && importFetcher.data?.intent === "importProject") {
+    if (
+      importFetcher.state === "idle" &&
+      importFetcher.data?.success &&
+      importFetcher.data?.intent === "importProject"
+    ) {
       const projectId = importFetcher.data.projectId;
       toast.success(t("importProject.successMessage"));
       // Navigate to the new project

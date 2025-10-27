@@ -16,7 +16,13 @@ import { EditProjectCardGridItem } from "../components/EditProjectCardGridItem";
 import { EditProjectCardList } from "../components/EditProjectCardList";
 import { EditProjectSettingsForm } from "../components/EditProjectSettingsForm";
 import { EditProjectTabs } from "../components/EditProjectTabs";
-import { CloseConfirmationModal, DeleteCardModal, DeleteProjectModal, NewCardModal, ViewCardModal } from "../components/modals";
+import {
+  CloseConfirmationModal,
+  DeleteCardModal,
+  DeleteProjectModal,
+  NewCardModal,
+  ViewCardModal,
+} from "../components/modals";
 import { TabsContent } from "../components/ui/tabs";
 import { cardSchema, projectSchema } from "../lib/z";
 import { requireUserId } from "../server/session";

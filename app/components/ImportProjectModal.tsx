@@ -173,9 +173,7 @@ export function ImportProjectModal({ onImport }: ImportProjectModalProps) {
           <p className="text-sm text-gray-600 mb-4">{t("importProject.description")}</p>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
-              {error}
-            </div>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">{error}</div>
           )}
 
           <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded mb-4 text-sm">
