@@ -14,7 +14,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
   return json({
     cookieHeader,
-    sessionKeys: keys.keys.map(k => k.name),
+    sessionKeys: keys.keys.map((k) => k.name),
     cloudflareEnvExists: !!context.cloudflare?.env,
   });
 }
@@ -22,4 +22,3 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 export default function DebugSession() {
   return <div>Debug session data (check network tab for JSON response)</div>;
 }
-

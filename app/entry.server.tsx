@@ -1,7 +1,6 @@
 // app/entry.server.tsx
 
 import { isbot } from "isbot";
-import { PassThrough } from "node:stream";
 import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
 
@@ -25,16 +24,13 @@ export default async function handleRequest(
         .then(async (ReactDOMServer) => {
           const { renderToReadableStream } = ReactDOMServer;
 
-          const body = await renderToReadableStream(
-            <ServerRouter context={entryContext} url={request.url} />,
-            {
-              signal: request.signal,
-              onError(error: unknown) {
-                console.error(error);
-                responseStatusCode = 500;
-              },
-            }
-          );
+          const body = await renderToReadableStream(<ServerRouter context={entryContext} url={request.url} />, {
+            signal: request.signal,
+            onError(error: unknown) {
+              console.error(error);
+              responseStatusCode = 500;
+            },
+          });
 
           if (isbot(userAgent)) {
             await body.allReady;
@@ -51,56 +47,58 @@ export default async function handleRequest(
         .catch(reject);
     } else {
       // Use renderToPipeableStream for Node.js
-      import("react-dom/server")
-        .then((ReactDOMServer) => {
+      Promise.all([
+        import("react-dom/server"),
+        // Use a computed string to prevent Vite from statically analyzing this import
+        import(/* @vite-ignore */ "node" + ":stream"),
+      ])
+        .then(([ReactDOMServer, nodeStream]) => {
           const { renderToPipeableStream } = ReactDOMServer;
+          const { PassThrough } = nodeStream as any;
 
-          const { pipe, abort } = renderToPipeableStream(
-            <ServerRouter context={entryContext} url={request.url} />,
-            {
-              onShellReady() {
-                shellRendered = true;
-                const body = new PassThrough();
-                const stream = new ReadableStream({
-                  start(controller) {
-                    body.on("data", (chunk: Buffer) => {
-                      controller.enqueue(chunk);
-                    });
-                    body.on("end", () => {
-                      controller.close();
-                    });
-                    body.on("error", (error) => {
-                      controller.error(error);
-                    });
-                  },
-                  cancel() {
-                    abort();
-                  },
-                });
+          const { pipe, abort } = renderToPipeableStream(<ServerRouter context={entryContext} url={request.url} />, {
+            onShellReady() {
+              shellRendered = true;
+              const body = new PassThrough();
+              const stream = new ReadableStream({
+                start(controller) {
+                  body.on("data", (chunk: Buffer) => {
+                    controller.enqueue(chunk);
+                  });
+                  body.on("end", () => {
+                    controller.close();
+                  });
+                  body.on("error", (error) => {
+                    controller.error(error);
+                  });
+                },
+                cancel() {
+                  abort();
+                },
+              });
 
-                responseHeaders.set("Content-Type", "text/html");
-                resolve(
-                  new Response(stream, {
-                    headers: responseHeaders,
-                    status: responseStatusCode,
-                  })
-                );
+              responseHeaders.set("Content-Type", "text/html");
+              resolve(
+                new Response(stream, {
+                  headers: responseHeaders,
+                  status: responseStatusCode,
+                })
+              );
 
-                pipe(body);
-              },
-              onShellError(error: unknown) {
-                reject(error);
-              },
-              onError(error: unknown) {
-                console.error(error);
-                responseStatusCode = 500;
+              pipe(body);
+            },
+            onShellError(error: unknown) {
+              reject(error);
+            },
+            onError(error: unknown) {
+              console.error(error);
+              responseStatusCode = 500;
 
-                if (shellRendered) {
-                  console.error("Error after shell rendered:", error);
-                }
-              },
-            }
-          );
+              if (shellRendered) {
+                console.error("Error after shell rendered:", error);
+              }
+            },
+          });
 
           setTimeout(abort, 10000);
         })

@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * Playwright configuration supporting both Node.js dev mode and Cloudflare/Wrangler mode
@@ -9,19 +9,19 @@ import { defineConfig, devices } from '@playwright/test';
  * - npm run test:e2e - Default, tests against Node.js dev server
  */
 
-const testEnv = process.env.TEST_ENV || 'node';
-const isCloudflareMode = testEnv === 'cloudflare';
+const testEnv = process.env.TEST_ENV || "node";
+const isCloudflareMode = testEnv === "cloudflare";
 
 // Different ports and commands for different environments
 const config = {
   node: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    command: "npm run dev",
+    url: "http://localhost:5173",
     port: 5173,
   },
   cloudflare: {
-    command: 'npm run dev:wrangler',
-    url: 'http://localhost:8788',
+    command: "npm run dev:wrangler",
+    url: "http://localhost:8788",
     port: 8788,
   },
 };
@@ -29,7 +29,7 @@ const config = {
 const selectedConfig = config[testEnv as keyof typeof config] || config.node;
 
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: "./tests/e2e",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -39,21 +39,21 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || selectedConfig.url,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
 
     // Uncomment to test on Firefox and WebKit
@@ -79,12 +79,14 @@ export default defineConfig({
   ],
 
   /* Start dev server before running tests */
-  webServer: process.env.START_SERVER ? {
-    command: selectedConfig.command,
-    url: selectedConfig.url,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  } : undefined,
+  webServer: process.env.START_SERVER
+    ? {
+        command: selectedConfig.command,
+        url: selectedConfig.url,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120 * 1000,
+        stdout: "pipe",
+        stderr: "pipe",
+      }
+    : undefined,
 });

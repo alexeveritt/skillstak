@@ -11,4 +11,3 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 export default function ClearSession() {
   return null;
 }
-

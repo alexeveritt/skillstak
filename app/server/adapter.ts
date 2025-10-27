@@ -22,7 +22,9 @@ class LocalKV {
 
   async get(key: string, options?: { type?: "text" | "json" | "arrayBuffer" | "stream" }) {
     const value = this.store.get(key);
-    console.log(`[LocalKV:${this.instanceId}] GET key="${key}", found=${!!value}, value=${value}, storeSize=${this.store.size}`);
+    console.log(
+      `[LocalKV:${this.instanceId}] GET key="${key}", found=${!!value}, value=${value}, storeSize=${this.store.size}`
+    );
     if (!value) return null;
 
     if (options?.type === "json") {
@@ -39,7 +41,9 @@ class LocalKV {
   async put(key: string, value: string, options?: { expirationTtl?: number }) {
     console.log(`[LocalKV:${this.instanceId}] PUT key="${key}", value=${value}, ttl=${options?.expirationTtl}`);
     this.store.set(key, value);
-    console.log(`[LocalKV:${this.instanceId}] PUT complete, storeSize=${this.store.size}, allKeys=${Array.from(this.store.keys()).join(', ')}`);
+    console.log(
+      `[LocalKV:${this.instanceId}] PUT complete, storeSize=${this.store.size}, allKeys=${Array.from(this.store.keys()).join(", ")}`
+    );
 
     // Simple expiration handling
     // Note: In dev mode, we don't actually need to expire sessions since the server restarts frequently
@@ -64,12 +68,10 @@ class LocalKV {
 
   async list(options?: { prefix?: string }) {
     const keys = Array.from(this.store.keys());
-    const filtered = options?.prefix
-      ? keys.filter(k => k.startsWith(options.prefix!))
-      : keys;
+    const filtered = options?.prefix ? keys.filter((k) => k.startsWith(options.prefix!)) : keys;
 
     return {
-      keys: filtered.map(name => ({ name })),
+      keys: filtered.map((name) => ({ name })),
       list_complete: true,
     };
   }
@@ -101,42 +103,42 @@ class LocalD1 {
       }
       this.initialized = true;
     } catch (error) {
-      console.error('Error checking database initialization:', error);
+      console.error("Error checking database initialization:", error);
       this.initializeSchema();
       this.initialized = true;
     }
   }
 
   private initializeSchema(): void {
-    console.log('📦 Initializing local database schema...');
-    const schemaPath = path.join(process.cwd(), 'db', 'schema.sql');
+    console.log("📦 Initializing local database schema...");
+    const schemaPath = path.join(process.cwd(), "db", "schema.sql");
 
     if (!fs.existsSync(schemaPath)) {
-      console.error('❌ Schema file not found at:', schemaPath);
+      console.error("❌ Schema file not found at:", schemaPath);
       return;
     }
 
     try {
-      const schema = fs.readFileSync(schemaPath, 'utf8');
+      const schema = fs.readFileSync(schemaPath, "utf8");
       const statements = schema
-        .split(';')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
+        .split(";")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
 
       for (const statement of statements) {
         try {
           this.db.exec(statement);
         } catch (error: any) {
           // Ignore "table already exists" errors
-          if (!error.message?.includes('already exists')) {
-            console.error('Error executing statement:', error.message);
+          if (!error.message?.includes("already exists")) {
+            console.error("Error executing statement:", error.message);
           }
         }
       }
 
-      console.log('✅ Database schema initialized successfully!');
+      console.log("✅ Database schema initialized successfully!");
     } catch (error) {
-      console.error('❌ Failed to initialize schema:', error);
+      console.error("❌ Failed to initialize schema:", error);
     }
   }
 
@@ -172,8 +174,8 @@ class LocalD1 {
                 success: true,
                 meta: {
                   changes: result.changes,
-                  last_row_id: result.lastInsertRowid
-                }
+                  last_row_id: result.lastInsertRowid,
+                },
               };
             } catch (error) {
               console.error("Database query error:", error);
@@ -207,8 +209,8 @@ class LocalD1 {
             success: true,
             meta: {
               changes: result.changes,
-              last_row_id: result.lastInsertRowid
-            }
+              last_row_id: result.lastInsertRowid,
+            },
           };
         } catch (error) {
           console.error("Database query error:", error);
@@ -243,27 +245,35 @@ declare global {
  * Get the environment bindings - either from Cloudflare or local mocks
  */
 export function getEnv(context: AppLoadContext): Env {
-  console.log('[getEnv] context.cloudflare?.env exists:', !!context.cloudflare?.env);
+  console.log("[getEnv] context.cloudflare?.env exists:", !!context.cloudflare?.env);
 
   // If running on Cloudflare (production or wrangler dev), use real bindings
   if (context.cloudflare?.env) {
-    console.log('[getEnv] Using Cloudflare bindings');
+    console.log("[getEnv] Using Cloudflare bindings");
     return context.cloudflare.env;
   }
 
-  console.log('[getEnv] Using local mocks');
+  console.log("[getEnv] Using local mocks");
 
   // Otherwise, use local mocks for Node.js dev mode
   // Use globalThis to persist across HMR reloads
   if (!globalThis.__localKV) {
-    console.log('[getEnv] Creating new LocalKV instance');
+    console.log("[getEnv] Creating new LocalKV instance");
     globalThis.__localKV = new LocalKV();
   } else {
-    console.log('[getEnv] Reusing existing LocalKV instance');
+    console.log("[getEnv] Reusing existing LocalKV instance");
   }
 
   if (!globalThis.__localD1) {
-    const dbPath = path.join(process.cwd(), ".wrangler", "state", "v3", "d1", "miniflare-D1DatabaseObject", "local.sqlite");
+    const dbPath = path.join(
+      process.cwd(),
+      ".wrangler",
+      "state",
+      "v3",
+      "d1",
+      "miniflare-D1DatabaseObject",
+      "local.sqlite"
+    );
     globalThis.__localD1 = new LocalD1(dbPath);
   }
 
