@@ -5,6 +5,7 @@ export function getEnv(env: Env) {
   // Provide typed, trimmed env access with safe fallbacks
   return {
     ADSENSE_CLIENT: (env.ADSENSE_CLIENT || "").trim(),
+    GOOGLE_SITE_VERIFICATION: (env.GOOGLE_SITE_VERIFICATION || "").trim(),
     APP_BASE_URL: (env.APP_BASE_URL || "").trim(),
     SMTP_HOST: (env.SMTP_HOST || "").trim(),
     SMTP_PORT: (env.SMTP_PORT || "").trim(),
