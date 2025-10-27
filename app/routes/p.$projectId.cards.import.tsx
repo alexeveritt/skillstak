@@ -4,6 +4,7 @@ import { Form, redirect, useActionData, useLoaderData, useMatches } from "react-
 import { requireUserId } from "../server/session";
 import * as cardService from "../services/card.service";
 import { useTranslation } from "react-i18next";
+import { getEnvFromContext } from "~/server/db";
 
 type ImportCard = {
   f: string;
@@ -49,15 +50,16 @@ async function preValidateJsonContent(file: File): Promise<{ valid: boolean; err
 }
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  await requireUserId({ request, cloudflare: context.cloudflare });
+  await requireUserId(context, request);
   return {};
 }
 
 export async function action({ params, context, request }: ActionFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const projectId = params.projectId!;
   const formData = await request.formData();
   const intent = formData.get("intent");
+  const env = getEnvFromContext(context);
 
   if (intent === "parse") {
     const file = formData.get("file") as File;

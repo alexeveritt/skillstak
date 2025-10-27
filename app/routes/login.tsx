@@ -10,15 +10,32 @@ import { emailSchema } from "../lib/z";
 import { verifyPassword } from "../server/auth";
 import { createSession } from "../server/session";
 import { useTranslation } from "react-i18next";
+import { getEnvFromContext } from "~/server/db";
 
 export async function action({ request, context }: ActionFunctionArgs) {
+  console.log(`[Login ACTION] ===== LOGIN ACTION CALLED =====`);
   const form = await request.formData();
   const email = String(form.get("email") || "").toLowerCase();
   const password = String(form.get("password") || "");
-  if (!emailSchema.safeParse(email).success) return { error: "Invalid email" };
-  const userId = await verifyPassword(context.cloudflare.env, email, password);
-  if (!userId) return { error: "Wrong email or password" };
-  const setCookie = await createSession({ request, cloudflare: context.cloudflare }, userId);
+  console.log(`[Login] Attempting login for email: ${email}`);
+
+  if (!emailSchema.safeParse(email).success) {
+    console.log(`[Login] Invalid email format`);
+    return { error: "Invalid email" };
+  }
+
+  const env = getEnvFromContext(context);
+  const userId = await verifyPassword(env, email, password);
+  console.log(`[Login] verifyPassword result: userId=${userId}`);
+
+  if (!userId) {
+    console.log(`[Login] Authentication failed`);
+    return { error: "Wrong email or password" };
+  }
+
+  const setCookie = await createSession(context, userId);
+  console.log(`[Login] Session created, redirecting to / with Set-Cookie: ${setCookie}`);
+
   return redirect("/", {
     headers: {
       "Set-Cookie": setCookie,

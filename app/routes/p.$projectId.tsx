@@ -4,12 +4,14 @@ import { Link, Outlet, useLoaderData, useLocation } from "react-router";
 import { EditMenu } from "~/components/EditMenu";
 import { requireUserId } from "../server/session";
 import * as projectService from "../services/project.service";
+import { getEnvFromContext } from "~/server/db";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const projectId = params.projectId!;
+  const env = getEnvFromContext(context);
 
-  const project = await projectService.getProject(context.cloudflare.env, projectId, userId);
+  const project = await projectService.getProject(env, projectId, userId);
 
   if (!project) {
     throw new Response("Project not found", { status: 404 });

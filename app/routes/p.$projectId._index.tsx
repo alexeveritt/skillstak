@@ -7,12 +7,14 @@ import { ProjectHeader } from "../components/ProjectHeader";
 import { ProjectStatsDashboard } from "../components/ProjectStatsDashboard";
 import { requireUserId } from "../server/session";
 import * as reviewService from "../services/review.service";
+import { getEnvFromContext } from "~/server/db";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const projectId = params.projectId!;
+  const env = getEnvFromContext(context);
 
-  const stats = await reviewService.getProjectStats(context.cloudflare.env, projectId, userId);
+  const stats = await reviewService.getProjectStats(env, projectId, userId);
 
   return { stats };
 }

@@ -17,14 +17,16 @@ import i18n from "./lib/i18n";
 import { getSession } from "./server/session";
 import stylesHref from "./styles.css?url";
 import { useTranslation } from "react-i18next";
+import { getEnvFromContext } from "~/server/db";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesHref }];
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const session = await getSession({ request, cloudflare: context.cloudflare });
+  const session = await getSession(context, request);
+  const env = getEnvFromContext(context);
   return {
     userId: session?.userId ?? null,
-    adsense: context.cloudflare?.env?.ADSENSE_CLIENT || "",
+    adsense: env.ADSENSE_CLIENT || "",
   };
 }
 

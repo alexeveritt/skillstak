@@ -5,9 +5,11 @@ import { Form, redirect, useActionData, useLoaderData } from "react-router";
 import { passwordSchema } from "../lib/z";
 import { consumeResetToken } from "../server/email";
 import * as authService from "../services/auth.service";
+import { getEnvFromContext } from "~/server/db";
 
 export async function loader({ params, context }: LoaderFunctionArgs) {
-  const userId = await consumeResetToken(context.cloudflare?.env, params.token!);
+  const env = getEnvFromContext(context);
+  const userId = await consumeResetToken(env, params.token!);
   return { userId };
 }
 
@@ -16,8 +18,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const userId = String(form.get("userId"));
   const pass = String(form.get("password"));
   if (!userId || !passwordSchema.safeParse(pass).success) return { error: "Invalid input" };
+  const env = getEnvFromContext(context);
 
-  await authService.resetPassword(context.cloudflare.env, userId, pass);
+  await authService.resetPassword(env, userId, pass);
 
   return redirect("/login");
 }

@@ -29,32 +29,35 @@ import { requireUserId } from "../server/session";
 import * as cardService from "../services/card.service";
 import * as projectService from "../services/project.service";
 import { useTranslation } from "react-i18next";
+import { getEnvFromContext } from "~/server/db";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const projectId = params.projectId!;
+  const env = getEnvFromContext(context);
 
   // Get all cards for the cards panel
-  const cards = await cardService.listCards(context.cloudflare.env, projectId);
+  const cards = await cardService.listCards(env, projectId);
 
   return { cards };
 }
 
 export async function action({ params, context, request }: ActionFunctionArgs) {
-  const userId = await requireUserId({ request, cloudflare: context.cloudflare });
+  const userId = await requireUserId(context, request);
   const projectId = params.projectId!;
   const formData = await request.formData();
   const intent = formData.get("intent");
+  const env = getEnvFromContext(context);
 
   if (intent === "delete") {
-    await projectService.deleteProject(context.cloudflare.env, projectId, userId);
+    await projectService.deleteProject(env, projectId, userId);
     return redirect("/");
   }
 
   if (intent === "deleteCard") {
     const cardId = formData.get("cardId") as string;
     if (cardId) {
-      await cardService.deleteCard(context.cloudflare.env, cardId, projectId);
+      await cardService.deleteCard(env, cardId, projectId);
     }
     return redirect(`/p/${projectId}/edit?tab=cards&deleted=true`);
   }
@@ -70,7 +73,7 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
       return { error: errorMsg, intent };
     }
 
-    await cardService.createCard(context.cloudflare.env, projectId, data.front, data.back);
+    await cardService.createCard(env, projectId, data.front, data.back);
 
     if (intent === "createCardAndNew") {
       // Return data but don't trigger a redirect - modal should stay open
@@ -86,7 +89,7 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
     const front = String(formData.get("front") || "");
     const back = String(formData.get("back") || "");
     if (cardId) {
-      await cardService.updateCard(context.cloudflare.env, cardId, projectId, front, back);
+      await cardService.updateCard(env, cardId, projectId, front, back);
     }
     return redirect(`/p/${projectId}/edit?tab=cards`);
   }
@@ -101,7 +104,7 @@ export async function action({ params, context, request }: ActionFunctionArgs) {
     return { error: errorMsg };
   }
 
-  await projectService.updateProject(context.cloudflare.env, projectId, userId, name.trim(), color, foregroundColor);
+  await projectService.updateProject(env, projectId, userId, name.trim(), color, foregroundColor);
   return redirect(`/p/${projectId}`);
 }
 
