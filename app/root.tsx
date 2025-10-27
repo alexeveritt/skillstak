@@ -33,6 +33,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
   return {
     userId: session?.userId ?? null,
     adsense: env.ADSENSE_CLIENT || "",
+    googleSiteVerification: env.GOOGLE_SITE_VERIFICATION || "",
     sentryDsn: env.SENTRY_DSN || "",
     sentryEnvironment: env.SENTRY_ENVIRONMENT || "",
   };
@@ -42,13 +43,16 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 const SentryRouterProvider = withSentryReactRouterV7Routing(RouterProvider);
 
 export default function Root() {
-  const { userId, adsense, sentryDsn, sentryEnvironment } = useLoaderData<typeof loader>();
+  const { userId, adsense, googleSiteVerification, sentryDsn, sentryEnvironment } = useLoaderData<typeof loader>();
   return (
     <I18nextProvider i18n={i18n}>
       <html lang={i18n.language || "en"} className="h-full">
         <head>
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          {googleSiteVerification ? (
+            <meta name="google-site-verification" content={googleSiteVerification} />
+          ) : null}
           <Meta />
           <Links />
           {adsense ? (

@@ -31,7 +31,8 @@ id = "ad8779437ea6478ba8584ab3a14aa404"
 
 [env.production]
 [env.production.vars]
-ADSENSE_CLIENT = ""
+ADSENSE_CLIENT = "ca-pub-1658747403579017"
+GOOGLE_SITE_VERIFICATION = ""
 APP_BASE_URL = "https://www.skillstak.com"
 SMTP_HOST = ""
 SMTP_PORT = ""
