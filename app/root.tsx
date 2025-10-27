@@ -5,6 +5,7 @@ import {
   Links,
   Meta,
   Outlet,
+  RouterProvider,
   Scripts,
   ScrollRestoration,
   useLoaderData,
@@ -18,20 +19,30 @@ import { getSession } from "./server/session";
 import stylesHref from "./styles.css?url";
 import { useTranslation } from "react-i18next";
 import { getEnvFromContext } from "~/server/db";
+import { withSentryReactRouterV7Routing } from "@sentry/react";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesHref }];
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   const session = await getSession(context, request);
   const env = getEnvFromContext(context);
+
+  console.log("[Root Loader] SENTRY_DSN:", env.SENTRY_DSN);
+  console.log("[Root Loader] SENTRY_ENVIRONMENT:", env.SENTRY_ENVIRONMENT);
+
   return {
     userId: session?.userId ?? null,
     adsense: env.ADSENSE_CLIENT || "",
+    sentryDsn: env.SENTRY_DSN || "",
+    sentryEnvironment: env.SENTRY_ENVIRONMENT || "",
   };
 }
 
+// Wrap the RouterProvider with Sentry
+const SentryRouterProvider = withSentryReactRouterV7Routing(RouterProvider);
+
 export default function Root() {
-  const { userId, adsense } = useLoaderData<typeof loader>();
+  const { userId, adsense, sentryDsn, sentryEnvironment } = useLoaderData<typeof loader>();
   return (
     <I18nextProvider i18n={i18n}>
       <html lang={i18n.language || "en"} className="h-full">
@@ -47,6 +58,11 @@ export default function Root() {
               crossOrigin="anonymous"
             ></script>
           ) : null}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify({ SENTRY_DSN: sentryDsn, SENTRY_ENVIRONMENT: sentryEnvironment })}`,
+            }}
+          />
         </head>
         <body className="min-h-screen">
           <Header userId={userId} />
@@ -123,4 +139,8 @@ export function ErrorBoundary() {
       <ErrorBoundaryContent />
     </I18nextProvider>
   );
+}
+
+function App() {
+  return <SentryRouterProvider />;
 }

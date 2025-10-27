@@ -16,6 +16,8 @@ SMTP_FROM = "no-reply@yourdomain.com"
 GOOGLE_CLIENT_ID = ""
 GOOGLE_CLIENT_SECRET = ""
 GOOGLE_REDIRECT_URI = ""
+SENTRY_DSN = "https://57a07b7bc14de4c8d0248e556f39f9b5@o4508075818352640.ingest.de.sentry.io/4510262573989968"
+CLOUDFLARE_MODE = "true"
 
 # Default (preview) environment
 [[d1_databases]]
@@ -39,6 +41,8 @@ SMTP_FROM = "no-reply@yourdomain.com"
 GOOGLE_CLIENT_ID = ""
 GOOGLE_CLIENT_SECRET = ""
 GOOGLE_REDIRECT_URI = ""
+SENTRY_DSN = "https://57a07b7bc14de4c8d0248e556f39f9b5@o4508075818352640.ingest.de.sentry.io/4510262573989968"
+SENTRY_ENVIRONMENT = "production"
 # ...production-specific vars...
 
 [[env.production.d1_databases]]
