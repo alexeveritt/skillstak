@@ -8,6 +8,7 @@ export default [
   route("logout", "routes/logout.tsx"),
   route("reset", "routes/reset.request.tsx"),
   route("reset/:token", "routes/reset.$token.tsx"),
+  route("test-sentry", "routes/test-sentry.tsx"),
 
   // Project routes with shared layout
   route("p/:projectId", "routes/p.$projectId.tsx", [

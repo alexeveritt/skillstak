@@ -14,6 +14,8 @@ export function getEnv(env: Env) {
     GOOGLE_CLIENT_ID: (env.GOOGLE_CLIENT_ID || "").trim(),
     GOOGLE_CLIENT_SECRET: (env.GOOGLE_CLIENT_SECRET || "").trim(),
     GOOGLE_REDIRECT_URI: (env.GOOGLE_REDIRECT_URI || "").trim(),
+    SENTRY_DSN: (env.SENTRY_DSN || "").trim(),
+    SENTRY_ENVIRONMENT: (env.SENTRY_ENVIRONMENT || "").trim(),
   };
 }
 

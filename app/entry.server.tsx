@@ -3,6 +3,7 @@
 import { isbot } from "isbot";
 import type { AppLoadContext, EntryContext } from "react-router";
 import { ServerRouter } from "react-router";
+import { initSentry, captureException } from "./sentry.server";
 
 export default async function handleRequest(
   request: Request,
@@ -11,6 +12,12 @@ export default async function handleRequest(
   entryContext: EntryContext,
   loadContext: AppLoadContext
 ) {
+  // Initialize Sentry on server
+  const env = loadContext?.env as any;
+  if (env?.SENTRY_DSN) {
+    initSentry(env.SENTRY_DSN, env.SENTRY_ENVIRONMENT || "production");
+  }
+
   return new Promise((resolve, reject) => {
     const userAgent = request.headers.get("user-agent");
     let shellRendered = false;
@@ -28,6 +35,7 @@ export default async function handleRequest(
             signal: request.signal,
             onError(error: unknown) {
               console.error(error);
+              captureException(error);
               responseStatusCode = 500;
             },
           });
@@ -44,7 +52,10 @@ export default async function handleRequest(
             })
           );
         })
-        .catch(reject);
+        .catch((error) => {
+          captureException(error);
+          reject(error);
+        });
     } else {
       // Use renderToPipeableStream for Node.js
       Promise.all([
@@ -68,7 +79,7 @@ export default async function handleRequest(
                   body.on("end", () => {
                     controller.close();
                   });
-                  body.on("error", (error) => {
+                  body.on("error", (error: Error) => {
                     controller.error(error);
                   });
                 },
@@ -88,10 +99,12 @@ export default async function handleRequest(
               pipe(body);
             },
             onShellError(error: unknown) {
+              captureException(error);
               reject(error);
             },
             onError(error: unknown) {
               console.error(error);
+              captureException(error);
               responseStatusCode = 500;
 
               if (shellRendered) {
@@ -102,7 +115,10 @@ export default async function handleRequest(
 
           setTimeout(abort, 10000);
         })
-        .catch(reject);
+        .catch((error) => {
+          captureException(error);
+          reject(error);
+        });
     }
   });
 }
