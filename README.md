@@ -89,7 +89,7 @@ Both apps know about each other through environment variables:
 
 ### Marketing Environment
 - `APP_URL`: URL of the app (localhost:3001 or app.skillstak.com)
-- `MARKETING_URL`: URL of marketing site (localhost:3000 or www.skillstak.com)
+- `MARKETING_URL`: URL of marketing site (localhost:3000 or www.skillstak.com) 
 
 These are configured in each app's `wrangler.toml` file.
 
