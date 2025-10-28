@@ -21,10 +21,6 @@
     "d1:reset-node": "npm run d1:delete-local && npm run d1:init:node",
     "migrate:local": "node scripts/migrate-local.js",
     "migrate:prod": "node scripts/migrate-prod.js",
-    "lint": "biome lint .",
-    "format": "biome format --write .",
-    "check": "biome check --write .",
-    "ci": "biome ci .",
     "kill-port": "node ./scripts/kill-port.cjs 8788",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -63,7 +59,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.2.6",
     "@cloudflare/workers-types": "^4.20251011.0",
     "@playwright/test": "^1.56.1",
     "@types/better-sqlite3": "^7.6.13",

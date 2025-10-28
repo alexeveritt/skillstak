@@ -2,7 +2,7 @@
 // Got fed up with having to kill open node ports manually, so created
 // this script to do it for me.
 
-const {exec} = require("child_process");
+const { exec } = require("child_process");
 
 // Retrieve the port number from the command line arguments
 const port = process.argv[2];

@@ -6,7 +6,7 @@ export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  entryContext: EntryContext,
+  entryContext: EntryContext
 ) {
   return new Promise((resolve, reject) => {
     const userAgent = request.headers.get("user-agent");
@@ -21,16 +21,13 @@ export default async function handleRequest(
         .then(async (ReactDOMServer) => {
           const { renderToReadableStream } = ReactDOMServer;
 
-          const body = await renderToReadableStream(
-            <ServerRouter context={entryContext} url={request.url} />,
-            {
-              signal: request.signal,
-              onError(error: unknown) {
-                console.error(error);
-                responseStatusCode = 500;
-              },
-            }
-          );
+          const body = await renderToReadableStream(<ServerRouter context={entryContext} url={request.url} />, {
+            signal: request.signal,
+            onError(error: unknown) {
+              console.error(error);
+              responseStatusCode = 500;
+            },
+          });
 
           if (isbot(userAgent)) {
             await body.allReady;
@@ -58,52 +55,49 @@ export default async function handleRequest(
           const { renderToPipeableStream } = ReactDOMServer;
           const { PassThrough } = nodeStream as any;
 
-          const { pipe, abort } = renderToPipeableStream(
-            <ServerRouter context={entryContext} url={request.url} />,
-            {
-              onShellReady() {
-                shellRendered = true;
-                const body = new PassThrough();
-                const stream = new ReadableStream({
-                  start(controller) {
-                    body.on("data", (chunk: Buffer) => {
-                      controller.enqueue(chunk);
-                    });
-                    body.on("end", () => {
-                      controller.close();
-                    });
-                    body.on("error", (error: Error) => {
-                      controller.error(error);
-                    });
-                  },
-                  cancel() {
-                    abort();
-                  },
-                });
+          const { pipe, abort } = renderToPipeableStream(<ServerRouter context={entryContext} url={request.url} />, {
+            onShellReady() {
+              shellRendered = true;
+              const body = new PassThrough();
+              const stream = new ReadableStream({
+                start(controller) {
+                  body.on("data", (chunk: Buffer) => {
+                    controller.enqueue(chunk);
+                  });
+                  body.on("end", () => {
+                    controller.close();
+                  });
+                  body.on("error", (error: Error) => {
+                    controller.error(error);
+                  });
+                },
+                cancel() {
+                  abort();
+                },
+              });
 
-                responseHeaders.set("Content-Type", "text/html");
-                resolve(
-                  new Response(stream, {
-                    headers: responseHeaders,
-                    status: responseStatusCode,
-                  })
-                );
+              responseHeaders.set("Content-Type", "text/html");
+              resolve(
+                new Response(stream, {
+                  headers: responseHeaders,
+                  status: responseStatusCode,
+                })
+              );
 
-                pipe(body);
-              },
-              onShellError(error: unknown) {
-                console.error(error);
-                reject(error);
-              },
-              onError(error: unknown) {
-                console.error(error);
-                responseStatusCode = 500;
-                if (shellRendered) {
-                  console.error("Error during stream rendering");
-                }
-              },
-            }
-          );
+              pipe(body);
+            },
+            onShellError(error: unknown) {
+              console.error(error);
+              reject(error);
+            },
+            onError(error: unknown) {
+              console.error(error);
+              responseStatusCode = 500;
+              if (shellRendered) {
+                console.error("Error during stream rendering");
+              }
+            },
+          });
 
           setTimeout(abort, 10000);
         })
