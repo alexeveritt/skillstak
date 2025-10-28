@@ -1,0 +1,31 @@
+{
+  "name": "@skillstak/marketing",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "react-router dev --port 3000",
+    "build": "react-router build",
+    "start": "react-router-serve ./build/server/index.js",
+    "lint": "echo 'No linting configured yet'",
+    "format": "echo 'No formatting configured yet'",
+    "check": "echo 'No checking configured yet'"
+  },
+  "dependencies": {
+    "@react-router/cloudflare": "^7.0.0",
+    "@react-router/dev": "^7.0.0",
+    "@react-router/serve": "^7.0.0",
+    "isbot": "^5.1.31",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "^7.9.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251011.0",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.8",
+    "wrangler": "^4.43.0"
+  }
+}
+

@@ -1,0 +1,13 @@
+name = "skillstak-marketing"
+compatibility_date = "2024-11-11"
+pages_build_output_dir = "build/client"
+
+[vars]
+APP_URL = "http://localhost:3001"
+MARKETING_URL = "http://localhost:3000"
+
+[env.production]
+[env.production.vars]
+APP_URL = "https://app.skillstak.com"
+MARKETING_URL = "https://www.skillstak.com"
+
