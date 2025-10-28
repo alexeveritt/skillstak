@@ -1,0 +1,58 @@
+name = "skillstak-app"
+compatibility_date = "2024-11-11"
+pages_build_output_dir = "build/client"
+
+[vars]
+# set ADSENSE_CLIENT="ca-pub-xxxxxxxx" to enable ad footer
+ADSENSE_CLIENT = ""
+APP_BASE_URL = "http://localhost:3001"
+MARKETING_URL = "http://localhost:3000"
+# Optional Email SMTP creds if you want direct SMTP from Worker (or use an external free tier)
+SMTP_HOST = ""
+SMTP_PORT = ""
+SMTP_USER = ""
+SMTP_PASS = ""
+SMTP_FROM = "no-reply@yourdomain.com"
+# Google OAuth placeholders
+GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_SECRET = ""
+GOOGLE_REDIRECT_URI = ""
+SENTRY_DSN = "https://57a07b7bc14de4c8d0248e556f39f9b5@o4508075818352640.ingest.de.sentry.io/4510262573989968"
+CLOUDFLARE_MODE = "true"
+
+# Default (preview) environment
+[[d1_databases]]
+binding = "SKILLSTAK_DB"
+database_name = "skillstak-db-preview"
+database_id = "ac9d30d1-95dd-4a94-8cb8-19240ac22033"
+
+[[kv_namespaces]]
+binding = "SKILLSTAK_SESSIONS"
+id = "ad8779437ea6478ba8584ab3a14aa404"
+
+[env.production]
+[env.production.vars]
+ADSENSE_CLIENT = "ca-pub-1658747403579017"
+GOOGLE_SITE_VERIFICATION = ""
+APP_BASE_URL = "https://app.skillstak.com"
+MARKETING_URL = "https://www.skillstak.com"
+CLOUDFLARE_MODE = "true"
+SMTP_HOST = ""
+SMTP_PORT = ""
+SMTP_USER = ""
+SMTP_PASS = ""
+SMTP_FROM = "no-reply@yourdomain.com"
+GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_SECRET = ""
+GOOGLE_REDIRECT_URI = ""
+SENTRY_DSN = "https://57a07b7bc14de4c8d0248e556f39f9b5@o4508075818352640.ingest.de.sentry.io/4510262573989968"
+SENTRY_ENVIRONMENT = "production"
+
+[[env.production.d1_databases]]
+binding = "SKILLSTAK_DB"
+database_name = "skillstak-db"
+database_id = "9ccf7355-08a9-4d13-8932-ca82b05e05a7"
+
+[[env.production.kv_namespaces]]
+binding = "SKILLSTAK_SESSIONS"
+id = "bec55b6e54f64a9286be85abfd22007e"

@@ -7,5 +7,4 @@ build
 .dev.vars
 *.log
 .cache
-.turbo
-.react-router
+

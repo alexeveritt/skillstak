@@ -1,0 +1,12 @@
+# Build outputs
+**/node_modules
+**/build
+**/dist
+**/.turbo
+**/.wrangler
+**/playwright-report
+**/test-results
+
+# Generated type files
+**/.react-router
+
