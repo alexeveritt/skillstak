@@ -5,11 +5,11 @@
   "scripts": {
     "dev": "react-router dev --port 3001",
     "dev:cf": "CLOUDFLARE_MODE=true react-router dev",
-    "dev:wrangler": "npm run build && wrangler pages dev ./build/client --compatibility-date=2024-11-11 --live-reload",
+    "dev:wrangler": "npm run build && wrangler pages dev ./build/client --compatibility-date=2024-11-11 --port=8788 --live-reload",
     "build": "CLOUDFLARE_MODE=true react-router build",
     "build:node": "react-router build",
     "start": "react-router start",
-    "cf:pages": "wrangler pages dev --compatibility-date=2024-11-11 ./build/client",
+    "cf:pages": "wrangler pages dev --compatibility-date=2024-11-11 --port=8788 ./build/client",
     "d1:apply-prod": "wrangler d1 execute SKILLSTAK_DB --file=./db/schema.sql --remote",
     "d1:create-prod": "wrangler d1 create skillstak-db",
     "d1:export-prod": "node scripts/export-prod-db.js",

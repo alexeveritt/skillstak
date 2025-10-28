@@ -13,11 +13,11 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "noEmit": true,
+    "types": ["@cloudflare/workers-types"],
     "paths": {
       "~/*": ["./app/*"]
     }
   },
-  "include": ["app/**/*"],
+  "include": ["app/**/*", "vite.config.ts", "react-router.config.ts"],
   "exclude": ["node_modules"]
 }
-
