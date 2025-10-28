@@ -1,4 +1,4 @@
-# SkillsTak Monorepo
+# SkillStak Monorepo
 
 This is a Turborepo monorepo containing the SkillsTak application and marketing website.
 
